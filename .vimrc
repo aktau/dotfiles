@@ -33,7 +33,7 @@ Bundle 'ervandew/supertab'
 Bundle 'tomtom/tcomment_vim'
 Bundle 'Lokaltog/vim-powerline'
 Bundle 'airblade/vim-gitgutter'
-Bundle 'vim-scripts/YankRing.vim'
+" Bundle 'vim-scripts/YankRing.vim'
 
 " themes
 Bundle 'altercation/vim-colors-solarized'
@@ -85,6 +85,7 @@ set list
 set listchars=tab:\|\ ,trail:…
 
 " searching
+nnoremap <CR> :noh<CR><CR>
 nnoremap / /\v
 vnoremap / /\v
 set incsearch                     " Find as you type search
@@ -283,7 +284,8 @@ if has('autocmd')
     au FileType ruby map <leader>r :!ruby %<CR>
     au FileType lua map <leader>r :!lua %<CR>
     au FileType html,xhtml map <leader>r :!firefox %<CR>
-    au FileType go map <leader>r :!go run %<CR>
+    au FileType go map <leader>r :update<bar>:!go run %<CR>
+    au FileType go map <leader>b :update<bar>:!go build -o go-app<CR>:!./go-app<CR>
 
     " MS Word document reading
     au BufReadPre *.doc set ro
