@@ -33,7 +33,11 @@ Bundle 'ervandew/supertab'
 Bundle 'tomtom/tcomment_vim'
 Bundle 'Lokaltog/vim-powerline'
 Bundle 'airblade/vim-gitgutter'
+Bundle 'mattn/webapi-vim'
+Bundle 'mattn/gist-vim'
+Bundle 'terryma/vim-multiple-cursors'
 " Bundle 'vim-scripts/YankRing.vim'
+" Bundle 'dahu/vim-fanfingtastic'
 
 " themes
 Bundle 'altercation/vim-colors-solarized'
@@ -65,7 +69,7 @@ set showcmd                       " display incomplete commands.
 set showmode                      " display the mode you're in.
 set showmatch                     " show matching brackets/parenthesis
 set mat=5                         " duration to show matching tabs
-set autoread                      "
+set autoread                      " reload files automagically
 
 " text preferences
 set nowrap                        " don't wrap lines
@@ -195,6 +199,9 @@ nnoremap <leader>ev <C-w><C-v><C-l>:e $MYVIMRC<cr>
 " clear search results
 nnoremap <leader><space> :noh<cr>
 
+" select last matched item
+nnoremap <leader>/ //e<Enter>v??<Enter>
+
 " make and open quickfix window
 map <silent> <F7> :make %<CR>:copen<CR>
 
@@ -223,6 +230,9 @@ highlight clear SignColumn
 " yankring.vim
 nnoremap <silent> <F3> :YRShow<cr>
 inoremap <silent> <F3> <ESC>:YRShow<cr>
+
+" gist-vim
+let g:gist_detect_filetype = 1
 
 """"""""""""""""""""
 " filetype detection
@@ -285,7 +295,7 @@ if has('autocmd')
     au FileType lua map <leader>r :!lua %<CR>
     au FileType html,xhtml map <leader>r :!firefox %<CR>
     au FileType go map <leader>r :update<bar>:!go run %<CR>
-    au FileType go map <leader>b :update<bar>:!go build -o go-app<CR>:!./go-app<CR>
+    au FileType go map <leader>b :update<bar>:!go build -o go-app && ./go-app<CR>
 
     " MS Word document reading
     au BufReadPre *.doc set ro
@@ -298,3 +308,22 @@ if has('autocmd')
     " Reload vimrc when we edit it
     au! BufWritePost .vimrc source %
 endif
+
+""""""""""""""""""""""""
+" hacks
+""""""""""""""""""""""""
+
+" tries to get buffer reloading to work correctly in terminals
+augroup checktime
+    au!
+    if !has("gui_running")
+        " silent! necessary otherwise throws errors when using command
+        " line window.
+        autocmd BufEnter        * silent! checktime
+        autocmd CursorHold      * silent! checktime
+        autocmd CursorHoldI     * silent! checktime
+        " these two _may_ slow things down. Remove if they do.
+        " autocmd CursorMoved     * silent! checktime
+        " autocmd CursorMovedI    * silent! checktime
+    endif
+augroup END
