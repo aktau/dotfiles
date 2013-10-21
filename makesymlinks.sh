@@ -4,14 +4,15 @@
 
 dir=~/dotfiles                                      # dotfiles directory
 olddir=~/dotfiles_old                               # old dotfiles backup directory
+olddir_current=$olddir/"$(date +%d-%d-%Y)"
 files=".vimrc .vim"   # list of files/folders to symlink in homedir
 # .bashrc .zshrc .oh-my-zsh .Xresources
 
 ##########
 
 # create dotfiles_old in homedir
-echo -n "Creating $olddir for backup of any existing dotfiles in ~ ..."
-mkdir -p $olddir
+echo -n "Creating $olddir_current for backup of any existing dotfiles in ~ ..."
+mkdir -p $olddir_current
 echo "done"
 
 # change to the dotfiles directory
@@ -22,14 +23,15 @@ echo "done"
 # move any existing dotfiles in homedir to dotfiles_old directory, then create
 # symlinks from the homedir to any files in the ~/dotfiles directory specified in
 # $files
+echo "Moving any existing dotfiles from ~ to $olddir"
 for file in $files; do
-    echo "Moving any existing dotfiles from ~ to $olddir"
     if [[ -L ~/$file ]] ; then
         echo "~/$file is a symlink, removing"
-        rm ~/$file
+        rm -f ~/$file
     elif [[ -e ~/$file ]]; then
-        echo "~/$file exists, backing up to $olddir"
-        mv ~/$file $olddir
+        echo "~/$file exists, backing up to $olddir_current"
+        rm -rf $olddir_current/$file || true
+        mv ~/$file $olddir_current
     else
         echo "~/$file not present"
     fi
