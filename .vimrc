@@ -27,15 +27,16 @@ Bundle 'tpope/vim-fugitive'
 Bundle 'tpope/vim-surround'
 Bundle 'tpope/vim-eunuch'
 Bundle 'tpope/vim-unimpaired'
+Bundle 'tpope/vim-commentary'
+Bundle 'Lokaltog/vim-powerline'
+Bundle 'airblade/vim-gitgutter'
+Bundle 'terryma/vim-multiple-cursors'
 Bundle 'kien/ctrlp.vim'
 Bundle 'rking/ag.vim'
 Bundle 'ervandew/supertab'
-Bundle 'tomtom/tcomment_vim'
-Bundle 'Lokaltog/vim-powerline'
-Bundle 'airblade/vim-gitgutter'
+" Bundle 'tomtom/tcomment_vim'
 Bundle 'mattn/webapi-vim'
 Bundle 'mattn/gist-vim'
-Bundle 'terryma/vim-multiple-cursors'
 Bundle 'scrooloose/syntastic'
 " Bundle 'vim-scripts/YankRing.vim'
 " Bundle 'dahu/vim-fanfingtastic'
@@ -223,7 +224,11 @@ inoremap ;; <Esc>
 " enable the dot command in visual mode
 vnoremap . :norm.<CR>
 
-" sane movement with wrap turned on
+" oh dear... disable the arrow keys
+map <Left> :echo "no!"<cr>
+map <Right> :echo "no!"<cr>
+map <Up> :echo "no!"<cr>
+map <Down> :echo "no!"<cr>
 
 """"""""""""""""""""""
 " plugin customization
