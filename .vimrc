@@ -36,6 +36,7 @@ Bundle 'airblade/vim-gitgutter'
 Bundle 'mattn/webapi-vim'
 Bundle 'mattn/gist-vim'
 Bundle 'terryma/vim-multiple-cursors'
+Bundle 'scrooloose/syntastic'
 " Bundle 'vim-scripts/YankRing.vim'
 " Bundle 'dahu/vim-fanfingtastic'
 
@@ -46,6 +47,7 @@ Bundle 'tomasr/molokai'
 Bundle 'zaiste/Atom'
 Bundle 'jnurmine/Zenburn'
 Bundle 'jpo/vim-railscasts-theme'
+Bundle 'michalbachowski/vim-wombat256mod'
 
 " language support
 Bundle 'rodjek/vim-puppet'
@@ -169,8 +171,11 @@ nnoremap <c-\> <c-w>g<c-]>
 " fix trailing spaces
 nnoremap <leader>w :%s/\s\+$//<cr>:let @/=''<CR>
 
+" map sort function to a key
+vnoremap <leader>s :sort<CR>
+
 " search with ag
-nnoremap <leader>a :Ag
+nnoremap <leader>a :Ag<space>
 
 " save on ctrl-s in every mode, does not work under tmux
 noremap <C-S> :update<CR>
@@ -179,6 +184,8 @@ inoremap <C-S> <C-O>:update<CR>
 
 " re-hardwrap paragraphs
 nnoremap <leader>q gqip
+vmap Q gq
+nmap Q gqap
 
 " close the quickfix window
 map <leader>qc :cclose<cr>
@@ -213,6 +220,9 @@ map <silent> <F7> :make %<CR>:copen<CR>
 " inoremap jj <ESC>
 inoremap ;; <Esc>
 
+" enable the dot command in visual mode
+vnoremap . :norm.<CR>
+
 " sane movement with wrap turned on
 
 """"""""""""""""""""""
@@ -233,6 +243,13 @@ inoremap <silent> <F3> <ESC>:YRShow<cr>
 
 " gist-vim
 let g:gist_detect_filetype = 1
+
+" syntastic
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+" let g:syntastic_auto_loc_list=1
+" let g:syntastic_loc_list_height=5
 
 """"""""""""""""""""
 " filetype detection
