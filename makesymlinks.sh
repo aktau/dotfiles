@@ -40,6 +40,13 @@ for file in $files; do
     ln -s $dir/$file ~/$file
 done
 
+function install_vim {
+    if [ ! -d "~/.vim/bundle/vundle" ] ; then
+        mkdir -p ~/.vim/bundle && cd ~/.vim/bundle && git clone https://github.com/gmarik/vundle
+        vim +BundleInstall +qall
+    fi
+}
+
 function install_zsh {
 # Test to see if zshell is installed.  If it is:
 if [ -f /bin/zsh -o -f /usr/bin/zsh ]; then
@@ -67,3 +74,4 @@ fi
 }
 
 #install_zsh
+install_vim
