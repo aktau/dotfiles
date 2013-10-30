@@ -55,7 +55,11 @@ Bundle 'michalbachowski/vim-wombat256mod'
 Bundle 'rodjek/vim-puppet'
 
 " golang
-set rtp+=$GOROOT/misc/vim
+if has('mac')
+    set rtp+=$GOROOT/misc/vim
+else
+    set rtp+=/usr/share/vim/addons
+endif
 set rtp+=$GOPATH/src/github.com/nsf/gocode/vim
 autocmd FileType go let g:SuperTabDefaultCompletionType = "context"
 autocmd FileType go setlocal makeprg=go\ build
