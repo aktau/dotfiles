@@ -40,11 +40,34 @@ for file in $files; do
     ln -s $dir/$file ~/$file
 done
 
-function install_vim {
+function setup_vim {
     if [ ! -d "~/.vim/bundle/vundle" ] ; then
         mkdir -p ~/.vim/bundle && cd ~/.vim/bundle && git clone https://github.com/gmarik/vundle
         vim +BundleInstall +qall
     fi
+}
+
+function setup_git {
+    git config --global user.name "Nicolas Hillegeer"
+    git config --global user.email nicolas@hillegeer.com
+
+    # tells git-branch and git-checkout to setup new branches so that git-pull(1) will appropriately merge from that remote branch.  Recommended.  Without this, you will have to add --track to your branch command or manually merge remote tracking branches with "fetch" and then "merge".
+    # git config branch.autosetupmerge true
+
+    # convert newlines to the system's standard when checking out files, and to LF newlines when committing in.    │etc/hsflowd.conf
+    # git config core.autocrlf true
+
+    # old systems don't got the CA
+    # git config --global http.sslVerify false
+}
+
+function setup_ssh {
+    ## ~/.ssh
+    # Just dir/permissions.  Don't wanna autolink config...
+    mkdir -p ~/.ssh
+    chmod 700 ~/.ssh
+    chmod -f 600 ~/.ssh/authorized_keys
+    chown -R $USER ~/.ssh
 }
 
 function install_zsh {
@@ -74,4 +97,6 @@ fi
 }
 
 #install_zsh
-install_vim
+setup_git
+setup_ssh
+setup_vim
