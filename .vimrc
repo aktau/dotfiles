@@ -32,6 +32,7 @@ Bundle 'Lokaltog/vim-powerline'
 Bundle 'Lokaltog/vim-easymotion'
 Bundle 'airblade/vim-gitgutter'
 Bundle 'terryma/vim-multiple-cursors'
+" Bundle 'junegunn/vim-easy-align'
 Bundle 'kien/ctrlp.vim'
 Bundle 'rking/ag.vim'
 Bundle 'ervandew/supertab'
@@ -53,6 +54,7 @@ Bundle 'michalbachowski/vim-wombat256mod'
 
 " language support
 Bundle 'rodjek/vim-puppet'
+Bundle 'exu/pgsql.vim'
 
 " golang
 if has('mac')
@@ -260,6 +262,10 @@ set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 " let g:syntastic_auto_loc_list=1
 " let g:syntastic_loc_list_height=5
+
+" vim-easy-align
+" vnoremap <silent> <Enter> :EasyAlign<Enter>
+" nnoremap <silent> <Leader>\ :EasyAlign<Enter>
 
 """"""""""""""""""""
 " filetype detection
