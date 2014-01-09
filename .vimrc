@@ -335,9 +335,6 @@ if has('autocmd')
     au BufReadPre *.doc set hlsearch!
     au BufReadPost *.doc %!antiword "%"
 
-    " Git
-    au BufRead,BufNewFile COMMIT_EDITMSG set ft=git
-
     " Reload vimrc when we edit it
     au! BufWritePost .vimrc source %
 endif
