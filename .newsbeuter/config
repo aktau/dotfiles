@@ -1,0 +1,6 @@
+browser     open
+# show-read-feeds no
+# show-read-articles no
+ignore-mode "display"
+ignore-article "https://www.kernel.org/feeds/kdist.xml" "title !~ \"stable\""
+ignore-article "https://www.kernel.org/feeds/kdist.xml" "title =~ \"mainline\""

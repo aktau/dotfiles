@@ -5,7 +5,7 @@
 dir=~/dotfiles                                      # dotfiles directory
 olddir=~/dotfiles_old                               # old dotfiles backup directory
 olddir_current=$olddir/"$(date +%d-%d-%Y)"
-files=".vimrc .vim .psqlrc"   # list of files/folders to symlink in homedir
+files=".vimrc .vim .psqlrc .newsbeuter"   # list of files/folders to symlink in homedir
 # .bashrc .zshrc .oh-my-zsh .Xresources
 
 ##########
