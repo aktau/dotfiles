@@ -1,3 +1,4 @@
 .vim/bundle/*
 .newsbeuter/*.db
+.newsbeuter/*.lock
 .newsbeuter/history.*

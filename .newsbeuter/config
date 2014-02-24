@@ -1,4 +1,5 @@
-browser     open
+browser open
+reload-threads 4
 show-read-feeds no
 show-read-articles no
 ignore-mode "display"
