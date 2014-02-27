@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -u
+
 ########## Variables
 
 dir=~/dotfiles                                      # dotfiles directory
@@ -20,13 +22,20 @@ echo -n "Changing to the $dir directory ..."
 cd $dir
 echo "done"
 
-# move any existing dotfiles in homedir to dotfiles_old directory, then create
-# symlinks from the homedir to any files in the ~/dotfiles directory specified in
-# $files
-echo "Moving any existing dotfiles from ~ to $olddir"
-for file in $files; do
+function setup_vim {
+    if [[ ! -d "$dir/.vim/bundle/vundle" ]] ; then
+        mkdir -p ~/.vim/bundle && cd ~/.vim/bundle && git clone https://github.com/gmarik/vundle
+    fi
+
+    vim +BundleInstall +qall
+}
+
+function setup_link {
+    orig="$1"
+    file="$2"
+
     if [[ -L ~/$file ]] ; then
-        echo "~/$file is a symlink, removing"
+        # echo "~/$file is a symlink, removing"
         rm -f ~/$file
     elif [[ -e ~/$file ]]; then
         echo "~/$file exists, backing up to $olddir_current"
@@ -36,15 +45,27 @@ for file in $files; do
         echo "~/$file not present"
     fi
 
-    echo "Creating symlink to $file in home directory."
-    ln -s $dir/$file ~/$file
-done
+    ln -sv $dir/$orig ~/$file
+}
 
-function setup_vim {
-    if [ ! -d "~/.vim/bundle/vundle" ] ; then
-        mkdir -p ~/.vim/bundle && cd ~/.vim/bundle && git clone https://github.com/gmarik/vundle
-        vim +BundleInstall +qall
-    fi
+function setup_neovim {
+    echo "Setting up neovim aliases..."
+
+    # neovim uses the same config as vanilla
+    setup_link ".vimrc" ".neovimrc"
+    setup_link ".vim" ".neovim"
+}
+
+function setup_dotfiles {
+    files="$1"
+
+    # move any existing dotfiles in homedir to dotfiles_old directory, then create
+    # symlinks from the homedir to any files in the ~/dotfiles directory specified in
+    # $files
+    echo "Moving any existing dotfiles from ~ to $olddir_current"
+    for file in $files; do
+        setup_link "$file" "$file"
+    done
 }
 
 function setup_git {
@@ -66,7 +87,7 @@ function setup_ssh {
     # Just dir/permissions.  Don't wanna autolink config...
     mkdir -p ~/.ssh
     chmod 700 ~/.ssh
-    chmod -f 600 ~/.ssh/authorized_keys
+    [ -f ~/.ssh/authorized_keys ] && chmod -f 600 ~/.ssh/authorized_keys
     chown -R $USER ~/.ssh
 }
 
@@ -97,6 +118,8 @@ fi
 }
 
 #install_zsh
+setup_dotfiles "$files"
 setup_git
 setup_ssh
 setup_vim
+setup_neovim
