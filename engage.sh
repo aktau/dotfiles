@@ -2,6 +2,16 @@
 
 set -u
 
+########## Colors
+
+CCCOLOR="\033[34m"
+LINKCOLOR="\033[34;1m"
+ERRCOLOR="\033[31;1m"
+SRCCOLOR="\033[33m"
+BINCOLOR="\033[37;1m"
+MAKECOLOR="\033[32;1m"
+ENDCOLOR="\033[0m"
+
 ########## Variables
 
 dir=~/dotfiles                                      # dotfiles directory
@@ -13,12 +23,12 @@ files=".vimrc .vim .psqlrc .newsbeuter"   # list of files/folders to symlink in 
 ##########
 
 # create dotfiles_old in homedir
-echo -n "Creating $olddir_current for backup of any existing dotfiles in ~ ..."
+printf '%b %b %b' ${MAKECOLOR}"Creating"${ENDCOLOR} ${BINCOLOR}${olddir_current}${ENDCOLOR} "for backup of any existing dotfiles in ~ ..."
 mkdir -p $olddir_current
 echo "done"
 
 # change to the dotfiles directory
-echo -n "Changing to the $dir directory ..."
+printf '%b %b %b%b' ${MAKECOLOR}"Changing"${ENDCOLOR} "working directory to" ${BINCOLOR}${dir}${ENDCOLOR} "..."
 cd $dir
 echo "done"
 
@@ -35,21 +45,22 @@ function setup_link {
     file="$2"
 
     if [[ -L ~/$file ]] ; then
-        # echo "~/$file is a symlink, removing"
         rm -f ~/$file
     elif [[ -e ~/$file ]]; then
-        echo "~/$file exists, backing up to $olddir_current"
+        printf '%b\n' ${ERRCOLOR}"~/$file exists, backing up to $olddir_current"${ENDCOLOR}
         rm -rf $olddir_current/$file || true
         mv ~/$file $olddir_current
     else
         echo "~/$file not present"
     fi
 
+    printf '%b' ${SRCCOLOR}
     ln -sv $dir/$orig ~/$file
+    printf '%b' ${ENDCOLOR}
 }
 
 function setup_neovim {
-    echo "Setting up neovim aliases..."
+    printf "%b %b\n" ${MAKECOLOR}"Creating"${ENDCOLOR} "neovim aliases..."
 
     # neovim uses the same config as vanilla
     setup_link ".vimrc" ".neovimrc"
@@ -62,7 +73,11 @@ function setup_dotfiles {
     # move any existing dotfiles in homedir to dotfiles_old directory, then create
     # symlinks from the homedir to any files in the ~/dotfiles directory specified in
     # $files
-    echo "Moving any existing dotfiles from ~ to $olddir_current"
+    printf '%b %b %b %b %b\n' ${MAKECOLOR}"Moving"${ENDCOLOR} \
+        "any existing dotfiles from" \
+        ${BINCOLOR}"~"${ENDCOLOR} \
+        "to" \
+        ${BINCOLOR}${olddir_current}${ENDCOLOR}
     for file in $files; do
         setup_link "$file" "$file"
     done
