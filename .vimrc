@@ -42,6 +42,8 @@ Bundle 'mattn/gist-vim'
 Bundle 'scrooloose/syntastic'
 " Bundle 'vim-scripts/YankRing.vim'
 " Bundle 'dahu/vim-fanfingtastic'
+Bundle 'xolox/vim-misc'
+Bundle 'xolox/vim-easytags'
 
 " themes
 Bundle 'altercation/vim-colors-solarized'
@@ -242,7 +244,7 @@ map <Down> :echo "no!"<cr>
 """"""""""""""""""""""
 
 " ctrlp.vim
-set wildignore+=*/.git/*,*/.hg/*,*/.svn/*   " for Linux/MacOSX
+set wildignore+=*/.git/objects/*,*/.git/refs/*,*/.hg/*,*/.svn/*   " for Linux/MacOSX
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip
 
 " vim-gitguttter
@@ -266,6 +268,13 @@ set statusline+=%*
 " vim-easy-align
 " vnoremap <silent> <Enter> :EasyAlign<Enter>
 " nnoremap <silent> <Leader>\ :EasyAlign<Enter>
+
+" vim-easytags
+" don't enable this for now... editing a file in $HOME wrecks the HDD
+" let g:easytags_autorecurse = 1
+" set tags=./tags;/,tags;/
+let g:easytags_dynamic_files = 2
+let g:easytags_file = "~/.easytags"
 
 """"""""""""""""""""
 " filetype detection
