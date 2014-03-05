@@ -31,7 +31,7 @@ Bundle 'tpope/vim-commentary'
 Bundle 'Lokaltog/vim-powerline'
 Bundle 'Lokaltog/vim-easymotion'
 Bundle 'airblade/vim-gitgutter'
-Bundle 'terryma/vim-multiple-cursors'
+" Bundle 'terryma/vim-multiple-cursors'
 " Bundle 'junegunn/vim-easy-align'
 Bundle 'kien/ctrlp.vim'
 Bundle 'rking/ag.vim'
@@ -57,6 +57,7 @@ Bundle 'michalbachowski/vim-wombat256mod'
 " language support
 Bundle 'rodjek/vim-puppet'
 Bundle 'exu/pgsql.vim'
+Bundle 'leafo/moonscript-vim'
 
 " golang
 if has('mac')
