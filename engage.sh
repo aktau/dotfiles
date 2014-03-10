@@ -63,8 +63,8 @@ function setup_neovim {
     printf "%b %b\n" ${MAKECOLOR}"Creating"${ENDCOLOR} "neovim aliases..."
 
     # neovim uses the same config as vanilla
-    setup_link ".vimrc" ".neovimrc"
-    setup_link ".vim" ".neovim"
+    setup_link ".vimrc" ".nvimrc"
+    setup_link ".vim" ".nvim"
 }
 
 function setup_dotfiles {
