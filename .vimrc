@@ -44,6 +44,7 @@ Bundle 'scrooloose/syntastic'
 " Bundle 'dahu/vim-fanfingtastic'
 Bundle 'xolox/vim-misc'
 Bundle 'xolox/vim-easytags'
+Bundle 'ciaranm/detectindent'
 
 " themes
 Bundle 'altercation/vim-colors-solarized'
