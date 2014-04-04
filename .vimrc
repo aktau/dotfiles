@@ -59,6 +59,7 @@ Bundle 'michalbachowski/vim-wombat256mod'
 Bundle 'rodjek/vim-puppet'
 Bundle 'exu/pgsql.vim'
 Bundle 'leafo/moonscript-vim'
+Bundle 'dgryski/vim-godef'
 
 " golang
 if has('mac')
@@ -277,6 +278,9 @@ set statusline+=%*
 " set tags=./tags;/,tags;/
 let g:easytags_dynamic_files = 2
 let g:easytags_file = "~/.easytags"
+
+" vim-godef
+let g:godef_split = 0
 
 """"""""""""""""""""
 " filetype detection
