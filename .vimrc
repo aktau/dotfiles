@@ -322,6 +322,7 @@ if has('autocmd')
     " Others..
     au BufRead,BufNewFile *.sql set ft=pgsql
     au BufRead,BufNewFile *.svg set ft=svg
+    au BufRead,BufNewFile *.dasc set ft=c
 
     au BufRead,BufNewFile *.vimp set ft=vimperator
 
