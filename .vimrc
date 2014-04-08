@@ -45,6 +45,7 @@ Bundle 'scrooloose/syntastic'
 Bundle 'xolox/vim-misc'
 Bundle 'xolox/vim-easytags'
 Bundle 'ciaranm/detectindent'
+Bundle 'danro/rename.vim'
 
 " themes
 Bundle 'altercation/vim-colors-solarized'
