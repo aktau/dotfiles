@@ -17,7 +17,7 @@ ENDCOLOR="\033[0m"
 dir=~/dotfiles                                      # dotfiles directory
 olddir=~/dotfiles_old                               # old dotfiles backup directory
 olddir_current=$olddir/"$(date +%d-%m-%Y)"
-files=".vimrc .vim .psqlrc .newsbeuter"   # list of files/folders to symlink in homedir
+files=".vimrc .vim .psqlrc .newsbeuter .zshrc-extra"   # list of files/folders to symlink in homedir
 # .bashrc .zshrc .oh-my-zsh .Xresources
 
 ##########
@@ -133,7 +133,17 @@ else
 fi
 }
 
+function config_zsh {
+    printf "%b %b\n" ${MAKECOLOR}"Configuring"${ENDCOLOR} "zsh"
+
+    local zshrc="$HOME/.zshrc"
+    local line="source ~/.zshrc-extra"
+
+    grep -q "$line" "$zshrc" || printf "\n%b\n%b" "# include some extra helpers" "$line" >> "$zshrc"
+}
+
 #install_zsh
+config_zsh
 setup_dotfiles "$files"
 setup_git
 setup_ssh
