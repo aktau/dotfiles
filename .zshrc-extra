@@ -20,3 +20,37 @@ ssh-reagent () {
 
    echo "Cannot find ssh agent - maybe you should reconnect and forward it?"
 }
+
+domain-from-url () {
+    local url="$1"
+    python -c "from urlparse import urlparse
+if '$url'.find('://') == -1:
+  url = urlparse('//$url','http')
+else:
+  url = urlparse('$url')
+print url.netloc"
+}
+
+fetch-website () {
+    local dom
+    local url
+
+    if [[ "$#" -eq 2 ]]; then
+        url="$2"
+        dom="$1"
+    else
+        url="$1"
+        dom=$(domain-from-url $url)
+    fi
+
+    wget \
+         --recursive \
+         --no-clobber \
+         --page-requisites \
+         --html-extension \
+         --convert-links \
+         --restrict-file-names=windows \
+         --domains "$dom" \
+         --no-parent \
+         "$url"
+}
