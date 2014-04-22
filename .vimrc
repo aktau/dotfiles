@@ -46,6 +46,7 @@ Bundle 'xolox/vim-misc'
 Bundle 'xolox/vim-easytags'
 Bundle 'ciaranm/detectindent'
 Bundle 'danro/rename.vim'
+Bundle 'xuhdev/SingleCompile'
 
 " themes
 Bundle 'altercation/vim-colors-solarized'
@@ -283,6 +284,9 @@ let g:easytags_file = "~/.easytags"
 " vim-godef
 let g:godef_split = 0
 
+" SingleCompile
+nnoremap <leader>r :SCCompileRun<cr>
+
 """"""""""""""""""""
 " filetype detection
 """"""""""""""""""""
@@ -344,6 +348,7 @@ if has('autocmd')
     au FileType ruby map <leader>r :!ruby %<CR>
     au FileType lua map <leader>r :!lua %<CR>
     au FileType html,xhtml map <leader>r :!firefox %<CR>
+    au FileType go unmap <leader>r
     au FileType go map <leader>r :update<bar>:!go run %<CR>
     au FileType go map <leader>b :update<bar>:!go build -o go-app && ./go-app<CR>
 
