@@ -35,6 +35,8 @@ echo "done"
 function setup_vim {
     if [[ ! -d "$dir/.vim/bundle/vundle" ]] ; then
         mkdir -p ~/.vim/bundle && cd ~/.vim/bundle && git clone https://github.com/gmarik/vundle
+    else
+        cd "$dir/.vim/bundle/vundle" && git pull --ff-only
     fi
 
     vim +BundleInstall +qall
