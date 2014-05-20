@@ -7,6 +7,11 @@ unsetopt correct_all
 # $HISTFILE, handy for secret commands
 setopt HIST_IGNORE_SPACE
 
+
+# seems to be necessary to make vim mode work right
+# bindkey '^[[A' history-substring-search-up
+# bindkey '^[[B' history-substring-search-down
+
 # execute this to try to import any running ssh-agent sessions
 ssh-reagent () {
     for agent in /tmp/ssh-*/agent.*; do
