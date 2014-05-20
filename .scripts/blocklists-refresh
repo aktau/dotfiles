@@ -1,0 +1,56 @@
+#!/bin/sh
+
+APP="/Users/$USER/Applications/Transmission.app "
+
+pgrep Transmission
+if [ $? -eq 0 ];
+then
+    echo "Killing Transmission"
+    killall Transmission
+    REOPEN=0
+else
+    REOPEN=1
+fi
+
+echo "Updating Blocklists"
+
+# follow this format for adding new blocklists. remember to use quotation marks around the url as shown
+urls[0]="http://list.iblocklist.com/?list=ijfqtofzixtwayqovmxn&fileformat=p2p&archiveformat=gz"
+urls[1]="http://list.iblocklist.com/?list=bt_level1&fileformat=p2p&archiveformat=gz"
+urls[2]="http://tbg.iblocklist.com/Lists/ipfilter.dat.gz"
+urls[3]="http://list.iblocklist.com/?list=bt_templist&fileformat=p2p&archiveformat=gz"
+urls[4]="http://list.iblocklist.com/?list=bt_bogon&fileformat=p2p&archiveformat=gz"
+
+# whenever you add a new blocklist, add the name so the gz file gets named properly
+blocklistnames[0]="tbgprimarythreats"
+blocklistnames[1]="bluetacklevel1"
+blocklistnames[2]="tbgipfilter"
+blocklistnames[3]="badpeers"
+blocklistnames[4]="bogons"
+
+# change this if you use an alternate folder for the blocklists, otherwise no need to touch this
+cd /Users/$USER/Library/Application\ Support/Transmission/blocklists/
+
+# please dont touch anything below this line
+for ((i=0; i<${#urls[@]}; i++))
+do
+    if curl -L ${urls[$i]} > ${blocklistnames[$i]}.gz;
+    then
+        if gunzip -f ${blocklistnames[$i]}.gz && rm -f ${blocklistnames[$i]}.gz;
+        then
+            echo "blocklist " ${blocklistnames[$i]} " updated"
+        else
+            rm -f ${blocklistnames[$i]}.gz
+            echo "blocklist " ${blocklistnames[$i]} " not updated"
+        fi
+    fi
+done
+
+echo "Done Updating"
+echo "Reopening if necessary"
+if [ $REOPEN -eq 0 ];
+then
+    echo "Opening Transmission"
+    open "$APP"
+fi
+exit 0
