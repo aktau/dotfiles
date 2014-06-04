@@ -284,6 +284,9 @@ let g:easytags_file = "~/.easytags"
 " vim-godef
 let g:godef_split = 0
 
+" detectindent
+autocmd BufReadPost * :DetectIndent
+
 " SingleCompile
 nnoremap <leader>r :SCCompileRun<cr>
 
