@@ -270,6 +270,8 @@ set statusline+=%*
 " let g:syntastic_auto_loc_list=1
 " let g:syntastic_loc_list_height=5
 
+let g:syntastic_go_checkers=['go', 'govet', 'golint']
+
 " vim-easy-align
 " vnoremap <silent> <Enter> :EasyAlign<Enter>
 " nnoremap <silent> <Leader>\ :EasyAlign<Enter>
