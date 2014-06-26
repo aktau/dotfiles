@@ -89,6 +89,7 @@ function setup_git {
     git config --global user.name "Nicolas Hillegeer"
     git config --global user.email nicolas@hillegeer.com
     git config --global color.ui true
+    git config --global user.signingkey 09E6512A
 
     # git aliases
     git config --global alias.ci commit
