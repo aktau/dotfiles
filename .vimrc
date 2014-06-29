@@ -73,6 +73,9 @@ set rtp+=$GOPATH/src/github.com/nsf/gocode/vim
 autocmd FileType go let g:SuperTabDefaultCompletionType = "context"
 autocmd FileType go setlocal makeprg=go\ build
 autocmd FileType go setlocal noexpandtab shiftwidth=4 tabstop=4 softtabstop=4 nolist
+
+" prefer goimports, less typing! go get code.google.com/p/go.tools/cmd/goimports
+let g:gofmt_command = 'goimports'
 autocmd BufWritePre *.go Fmt
 
 set encoding=utf-8
