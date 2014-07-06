@@ -86,9 +86,8 @@ pr () {
     fi
     (
     set -e
-    local user_repo=$(< .git/user-repo)
     git checkout -b $branch
-    curl "https://github.com/$(< .git/user-repo)/pull/$pr_num.patch" 2> /dev/null | git am --3way
+    curl "https://github.com/$user_repo/pull/$pr_num.patch" 2> /dev/null | git am --3way
     )
 }
 
@@ -138,7 +137,7 @@ mpr () {
     # check if this is a prefixed PR ([RFC], [WIP], ...)
     local pr_meta="$(curl https://api.github.com/repos/$user_repo/issues/$pr_num 2> /dev/null)"
     local pr_title=
-    if egrep -q '^\[\w+\]' <<< $pr_meta; then
+    if egrep -q '"\[\w+\]' <<< $pr_meta; then
         local pr_title="$($sed -n -e 's/.*"title":\s\+"\([^"]\+\)".*/\1/g' -e 's/^\[\(\w\+\)]\s*\(.\+\)/\2/p' <<< $pr_meta)"
     else
         local pr_title="$($sed -n -e 's/.*"title":\s\+"\([^"]\+\)".*/\1/p' <<< $pr_meta)"
