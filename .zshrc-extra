@@ -143,10 +143,10 @@ mpr () {
         local pr_title="$($sed -n -e 's/.*"title":\s\+"\([^"]\+\)".*/\1/p' <<< $pr_meta)"
     fi
 
-    git merge --no-ff -m "Merge pull request #$pr_num '$pr_title'" $branch
+    git merge --no-ff -m "Merge #$pr_num '$pr_title'" $branch
     git branch -D $branch
     git log --graph --decorate --pretty=oneline --abbrev-commit --all --max-count=20
-    echo "Continue with the merge?[y/N]"
+    echo "Continue with the merge? [y/N]"
     local confirm
     read confirm
     if [[ $confirm != "y" ]]; then
