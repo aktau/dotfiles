@@ -315,7 +315,10 @@ if has('autocmd')
 
     " C file specific options
     au FileType c,cpp set cindent
-    au FileType c,cpp set formatoptions+=ro
+    au FileType c,cpp set formatoptions+=roj
+
+    " Go file specific options
+    au FileType go setlocal formatoptions+=j
 
     " Ruby file specific options
     au Filetype ruby set textwidth=80 ts=2
