@@ -143,7 +143,21 @@ mpr () {
         local pr_title="$($sed -n -e 's/.*"title":\s\+"\([^"]\+\)".*/\1/p' <<< $pr_meta)"
     fi
 
-    git merge --no-ff -m "Merge #$pr_num '$pr_title'" $branch
+    local merge_title="Merge #$pr_num '$pr_title'"
+    local merge_title_new=
+    local max_chars=72
+
+    # check if the merge commit title doesn't surpass 80 characters
+    local merge_title_chars=$(wc -c <<< "$merge_title" | tr -d ' ')
+    while [[ $merge_title_chars -gt $max_chars ]]; do
+      echo "$merge_title has $merge_title_chars characters, the maximum is $max_chars, please type a shorter title:"
+      echo -n "Merge #$pr_num '<fill this in>': "
+      read merge_title_new
+      local merge_title="Merge #$pr_num '$merge_title_new'"
+      local merge_title_chars=$(wc -c <<< "$merge_title" | tr -d ' ')
+    done
+
+    git merge --no-ff -m "$merge_title" $branch
     git branch -D $branch
     git log --graph --decorate --pretty=oneline --abbrev-commit --all --max-count=20
     echo "Continue with the merge? [y/N]"
