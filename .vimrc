@@ -289,7 +289,8 @@ let g:easytags_file = "~/.easytags"
 let g:godef_split = 0
 
 " detectindent
-autocmd BufReadPost * :DetectIndent
+let detectindent_blacklist = ['go']
+autocmd BufReadPost * if index(detectindent_blacklist, &ft) < 0 | :DetectIndent
 let g:detectindent_preferred_expandtab = 1
 let g:detectindent_preferred_indent = 4
 
