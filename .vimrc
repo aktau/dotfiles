@@ -290,7 +290,7 @@ let g:godef_split = 0
 
 " detectindent
 let detectindent_blacklist = ['go']
-autocmd BufReadPost * if index(detectindent_blacklist, &ft) < 0 | :DetectIndent
+autocmd BufReadPost * if index(detectindent_blacklist, &ft) < 0 | :DetectIndent | endif
 let g:detectindent_preferred_expandtab = 1
 let g:detectindent_preferred_indent = 4
 
