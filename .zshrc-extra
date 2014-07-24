@@ -11,6 +11,9 @@ setopt HIST_IGNORE_SPACE
 # bindkey '^[[A' history-substring-search-up
 # bindkey '^[[B' history-substring-search-down
 
+# make LuaJIT nicer to use from the CLI
+alias luajit="rlwrap luajit"
+
 # quickly find folders or files in a subdirectory
 fname () {
   find . -iname "*$@*"
