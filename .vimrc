@@ -60,6 +60,7 @@ Bundle 'michalbachowski/vim-wombat256mod'
 " language support
 Bundle 'rodjek/vim-puppet'
 Bundle 'exu/pgsql.vim'
+Bundle 'ivalkeen/vim-simpledb'
 Bundle 'leafo/moonscript-vim'
 Bundle 'dgryski/vim-godef'
 
