@@ -18,6 +18,7 @@ dir=~/dotfiles                                      # dotfiles directory
 olddir=~/dotfiles_old                               # old dotfiles backup directory
 olddir_current=$olddir/"$(date +%d-%m-%Y)"
 files=".vimrc .vim .psqlrc .newsbeuter .zshrc-extra"   # list of files/folders to symlink in homedir
+linuxonly=".tmux.conf"
 # .bashrc .zshrc .oh-my-zsh .Xresources
 
 ##########
@@ -154,6 +155,9 @@ function config_zsh {
 #install_zsh
 config_zsh
 setup_dotfiles "$files"
+if [[ `uname` == 'Linux' ]] ; then
+    setup_dotfiles "$linuxonly"
+fi
 setup_git
 setup_ssh
 setup_vim
