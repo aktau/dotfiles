@@ -2,3 +2,4 @@
 .newsbeuter/*.db
 .newsbeuter/*.lock
 .newsbeuter/history.*
+.netrwhist
