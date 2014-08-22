@@ -17,7 +17,7 @@ ENDCOLOR="\033[0m"
 dir=~/dotfiles                                      # dotfiles directory
 olddir=~/dotfiles_old                               # old dotfiles backup directory
 olddir_current=$olddir/"$(date +%d-%m-%Y)"
-files=".vimrc .vim .psqlrc .newsbeuter .zshrc-extra"   # list of files/folders to symlink in homedir
+files=".vimrc .vim .psqlrc .newsbeuter .zshrc-extra .ctags"
 linuxonly=".tmux.conf"
 # .bashrc .zshrc .oh-my-zsh .Xresources
 
