@@ -273,6 +273,14 @@ set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 " let g:syntastic_auto_loc_list=1
 " let g:syntastic_loc_list_height=5
+let g:syntastic_c_include_dirs = [
+            \ '../build/include',
+            \ 'build/include',
+            \ '../build/src/nvim/auto',
+            \ 'build/src/nvim/auto',
+            \ ]
+let g:syntastic_c_compiler_options = '-std=gnu99 -DINCLUDE_GENERATED_DECLARATIONS'
+
 let g:syntastic_go_checkers=['go', 'govet']
 
 " vim-easy-align
