@@ -326,6 +326,7 @@ if has('autocmd')
     " C file specific options
     au FileType c,cpp set cindent
     au FileType c,cpp set formatoptions+=roj
+    au FileType c,cpp setlocal comments^=:///
 
     " Go file specific options
     au FileType go setlocal formatoptions+=j
