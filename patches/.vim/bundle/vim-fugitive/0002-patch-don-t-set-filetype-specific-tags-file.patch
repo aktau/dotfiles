@@ -1,0 +1,26 @@
+From e661bd2d75d2c3576aaec2474c2e6a300d609c1c Mon Sep 17 00:00:00 2001
+From: Nicolas Hillegeer <nicolas@hillegeer.com>
+Date: Sun, 14 Sep 2014 12:50:48 +0200
+Subject: [PATCH] patch: don't set filetype specific tags file
+
+---
+ plugin/fugitive.vim | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/plugin/fugitive.vim b/plugin/fugitive.vim
+index 849ead3..49e177d 100644
+--- a/plugin/fugitive.vim
++++ b/plugin/fugitive.vim
+@@ -187,9 +187,6 @@ function! fugitive#detect(path) abort
+     endif
+     if stridx(buffer.getvar('&tags'), escape(b:git_dir.'/tags', ', ')) == -1
+       call buffer.setvar('&tags', escape(b:git_dir.'/tags', ', ').','.buffer.getvar('&tags'))
+-      if &filetype !=# ''
+-        call buffer.setvar('&tags', escape(b:git_dir.'/'.&filetype.'.tags', ', ').','.buffer.getvar('&tags'))
+-      endif
+     endif
+     silent doautocmd User Fugitive
+   endif
+-- 
+2.1.0
+

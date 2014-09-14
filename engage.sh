@@ -158,3 +158,6 @@ setup_git
 setup_ssh
 setup_vim
 setup_neovim
+
+# add patches against upstream, if necessary
+exec "$dir/patchup.sh"

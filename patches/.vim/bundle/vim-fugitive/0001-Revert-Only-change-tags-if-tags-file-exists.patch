@@ -1,0 +1,32 @@
+From 020f8d4b344bc18d357a8e91066996da1086ea54 Mon Sep 17 00:00:00 2001
+From: Nicolas Hillegeer <nicolas@hillegeer.com>
+Date: Sun, 14 Sep 2014 12:26:54 +0200
+Subject: [PATCH] Revert "Only change 'tags' if tags file exists"
+
+This reverts commit 11f89ba7494a03e6b0a9296b8393240d40dcc811.
+---
+ plugin/fugitive.vim | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/plugin/fugitive.vim b/plugin/fugitive.vim
+index 8fabd1c..849ead3 100644
+--- a/plugin/fugitive.vim
++++ b/plugin/fugitive.vim
+@@ -185,11 +185,9 @@ function! fugitive#detect(path) abort
+     if expand('%:p') =~# '//'
+       call buffer.setvar('&path', s:sub(buffer.getvar('&path'), '^\.%(,|$)', ''))
+     endif
+-    if stridx(buffer.getvar('&tags'), escape(b:git_dir, ', ')) == -1
+-      if filereadable(b:git_dir.'/tags')
+-        call buffer.setvar('&tags', escape(b:git_dir.'/tags', ', ').','.buffer.getvar('&tags'))
+-      endif
+-      if &filetype !=# '' && filereadable(b:git_dir.'/'.&filetype.'.tags')
++    if stridx(buffer.getvar('&tags'), escape(b:git_dir.'/tags', ', ')) == -1
++      call buffer.setvar('&tags', escape(b:git_dir.'/tags', ', ').','.buffer.getvar('&tags'))
++      if &filetype !=# ''
+         call buffer.setvar('&tags', escape(b:git_dir.'/'.&filetype.'.tags', ', ').','.buffer.getvar('&tags'))
+       endif
+     endif
+-- 
+2.1.0
+
