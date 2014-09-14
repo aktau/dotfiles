@@ -47,6 +47,8 @@ Bundle 'aktau/vim-easytags'
 Bundle 'ciaranm/detectindent'
 Bundle 'danro/rename.vim'
 Bundle 'xuhdev/SingleCompile'
+Bundle 'editorconfig/editorconfig-vim'
+Bundle 'godlygeek/tabular'
 
 " themes
 Bundle 'altercation/vim-colors-solarized'
