@@ -19,6 +19,11 @@ fname () {
   find . -iname "*$@*"
 }
 
+# quickly find folders or files in a subdirectory
+fname0 () {
+  find . -iname "*$@*" -print0
+}
+
 # execute this to try to import any running ssh-agent sessions
 ssh-reagent () {
     for agent in /tmp/ssh-*/agent.*; do
