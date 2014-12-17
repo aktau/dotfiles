@@ -70,7 +70,6 @@ Plugin 'michalbachowski/vim-wombat256mod'
 Plugin 'rodjek/vim-puppet'
 Plugin 'exu/pgsql.vim'
 Plugin 'ivalkeen/vim-simpledb'
-Plugin 'leafo/moonscript-vim'
 Plugin 'fatih/vim-go'
 
 " golang
