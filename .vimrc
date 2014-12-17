@@ -71,22 +71,15 @@ Plugin 'rodjek/vim-puppet'
 Plugin 'exu/pgsql.vim'
 Plugin 'ivalkeen/vim-simpledb'
 Plugin 'leafo/moonscript-vim'
-Plugin 'dgryski/vim-godef'
+Plugin 'fatih/vim-go'
 
 " golang
-if has('mac')
-    set rtp+=$GOROOT/misc/vim
-else
-    set rtp+=/usr/share/vim/addons
-endif
-set rtp+=$GOPATH/src/github.com/nsf/gocode/vim
-autocmd FileType go let g:SuperTabDefaultCompletionType = "context"
 autocmd FileType go setlocal makeprg=go\ build
 autocmd FileType go setlocal noexpandtab shiftwidth=4 tabstop=4 softtabstop=4 nolist
+autocmd FileType go let g:SuperTabDefaultCompletionType = "context"
 
 " prefer goimports, less typing! go get code.google.com/p/go.tools/cmd/goimports
 let g:gofmt_command = 'goimports'
-autocmd BufWritePre *.go Fmt
 
 set encoding=utf-8
 set termencoding=utf-8
