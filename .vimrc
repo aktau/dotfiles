@@ -28,6 +28,7 @@ Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-eunuch'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'tpope/vim-commentary'
+Plugin 'tpope/vim-repeat'
 Plugin 'Lokaltog/vim-powerline'
 Plugin 'Lokaltog/vim-easymotion'
 Plugin 'airblade/vim-gitgutter'
@@ -41,7 +42,7 @@ Plugin 'mattn/webapi-vim'
 Plugin 'mattn/gist-vim'
 Plugin 'scrooloose/syntastic'
 " Plugin 'vim-scripts/YankRing.vim'
-" Plugin 'dahu/vim-fanfingtastic'
+Plugin 'justinmk/vim-sneak'
 Plugin 'xolox/vim-misc'
 Plugin 'aktau/vim-easytags'
 Plugin 'ciaranm/detectindent'
@@ -260,6 +261,9 @@ inoremap <silent> <F3> <ESC>:YRShow<cr>
 
 " gist-vim
 let g:gist_detect_filetype = 1
+
+" vim-sneak
+let g:sneak#streak = 1
 
 " syntastic
 set statusline+=%#warningmsg#
