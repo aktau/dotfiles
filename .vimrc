@@ -17,13 +17,6 @@ if has('mac')
     set clipboard+=unnamed
 endif
 
-if has('nvim')
-    " Neovim has a different implementation of clipboards, no longer
-    " requiring platform specific code in the code, but through shelling out
-    " (xclip/xsel on linux and pb{copy,paste} on OSX)
-    set unnamedclip
-endif
-
 call vundle#rc()
 
 " let vundle manage vundle
