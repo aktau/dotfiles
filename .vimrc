@@ -2,10 +2,6 @@
 filetype off
 filetype plugin indent off
 
-" adjust runtime path (to test our new installation)
-set rtp+=~/.vim/bundle/vundle/
-" let &rtp = substitute(&rtp, $HOME."/\.vim", $HOME."/newvim/\.vim", "g")
-
 set nocompatible               " be iMproved
 set modelines=0
 
@@ -15,9 +11,12 @@ if has('mac')
     " might need something like
     " https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard
     set clipboard+=unnamed
+else
+    set clipboard=unnamedplus
 endif
 
-call vundle#rc()
+set rtp+=~/.vim/bundle/vundle/
+call vundle#begin()
 
 " let vundle manage vundle
 Plugin 'gmarik/vundle'
@@ -55,10 +54,7 @@ Plugin 'godlygeek/tabular'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'chriskempson/tomorrow-theme', {'rtp': 'vim/'}
 Plugin 'tomasr/molokai'
-Plugin 'zaiste/Atom'
 Plugin 'jnurmine/Zenburn'
-Plugin 'jpo/vim-railscasts-theme'
-Plugin 'michalbachowski/vim-wombat256mod'
 
 " language support
 Plugin 'rodjek/vim-puppet'
@@ -66,20 +62,18 @@ Plugin 'exu/pgsql.vim'
 Plugin 'ivalkeen/vim-simpledb'
 Plugin 'fatih/vim-go'
 
-" golang
-autocmd FileType go setlocal makeprg=go\ build
-autocmd FileType go setlocal noexpandtab shiftwidth=4 tabstop=4 softtabstop=4 nolist
-autocmd FileType go let g:SuperTabDefaultCompletionType = "context"
+" Enable any local modifications
+if filereadable($HOME . '/.local_config/local.vim')
+  source ~/.local_config/local.vim
+endif
 
-" prefer goimports, less typing! go get code.google.com/p/go.tools/cmd/goimports
-let g:gofmt_command = 'goimports'
+call vundle#end()
+filetype plugin indent on         " load file type plugins + indentation
+syntax enable
 
 set encoding=utf-8
 set termencoding=utf-8
 scriptencoding utf-8
-
-syntax enable
-filetype plugin indent on         " load file type plugins + indentation
 
 set showcmd                       " display incomplete commands.
 set showmode                      " display the mode you're in.
@@ -292,9 +286,6 @@ let g:syntastic_go_checkers=['go', 'govet']
 let g:easytags_dynamic_files = 2
 let g:easytags_file = "~/.easytags"
 
-" vim-godef
-let g:godef_split = 0
-
 " detectindent
 let detectindent_blacklist = ['go']
 autocmd BufReadPost * if index(detectindent_blacklist, &ft) < 0 | :DetectIndent | endif
@@ -303,6 +294,12 @@ let g:detectindent_preferred_indent = 4
 
 " SingleCompile
 nnoremap <leader>r :SCCompileRun<cr>
+
+" vim-go
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
+let g:go_fmt_command = "goimports"
 
 """"""""""""""""""""
 " filetype detection
@@ -369,9 +366,23 @@ if has('autocmd')
     au FileType ruby map <leader>r :!ruby %<CR>
     au FileType lua map <leader>r :!lua %<CR>
     au FileType html,xhtml map <leader>r :!firefox %<CR>
+
+    au FileType go setlocal makeprg=go\ build
+    au FileType go setlocal noexpandtab shiftwidth=4 tabstop=4 softtabstop=4 nolist
+    au FileType go let g:SuperTabDefaultCompletionType = "context"
+
     au FileType go unmap <leader>r
-    au FileType go map <leader>r :update<bar>:!go run %<CR>
-    au FileType go map <leader>b :update<bar>:!go build -o go-app && ./go-app<CR>
+    au FileType go nmap <leader>r <Plug>(go-run)
+    " au FileType go map <leader>b :update<bar>:!go build -o go-app && ./go-app<CR>
+    au FileType go nmap <leader>b <Plug>(go-build)
+    au FileType go nmap <leader>t <Plug>(go-test)
+    au FileType go nmap <leader>c <Plug>(go-coverage)
+    au FileType go nmap <leader>i <Plug>(go-info)
+    au FileType go nmap <leader>d <Plug>(go-doc-browser)
+    au FileType go nmap <leader>m <Plug>(go-rename)
+
+    " useful, but dangerous in a work environment
+    " au FileType go noremap <leader>p :GoPlay<CR>
 
     " MS Word document reading
     au BufReadPre *.doc set ro
@@ -400,3 +411,6 @@ augroup checktime
         " autocmd CursorMovedI    * silent! checktime
     endif
 augroup END
+
+ab asap as soon as possible
+ab ptal please take another look
