@@ -17,7 +17,7 @@ ENDCOLOR="\033[0m"
 dir=~/dotfiles                                      # dotfiles directory
 olddir=~/dotfiles_old                               # old dotfiles backup directory
 olddir_current=$olddir/"$(date +%d-%m-%Y)"
-files=".vimrc .vim .psqlrc .newsbeuter .zshrc-extra .ctags .tmux.conf"
+files=".vimrc .vim .psqlrc .newsbeuter .zshrc-extra .ctags .tmux.conf be.aktau.vpn"
 # .bashrc .zshrc .oh-my-zsh .Xresources
 
 ##########

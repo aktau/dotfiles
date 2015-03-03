@@ -1,0 +1,57 @@
+# This is a pf firewall config, its purpose is to make sure that the system
+# uses the OpenVPN connection for everything (this is controlled by
+# OpenVPN/Tunnelblick's routing) and not to communicate unencrypted when the
+# VPN connection goes down. Therefore, everything on the physical interfaces
+# except for ICMP, DHCP, DNS and the VPN connection is blocked.
+
+# original source: https://gist.github.com/scy/8122924
+
+# Define interfaces. I'm on a MacBook Air, so en0 is WiFi and en1 my (optional)
+# USB Ethernet adapter.
+wifi=en1
+ether=en0
+vpn=tap0
+
+# TODO: find out if I can connec to my VPN provider over a tun interface
+# vpn=tun0
+
+# Default block policy is sending a RST. This allows applications to quickly
+# notice that they are not allowed to connect.
+set block-policy return
+
+# Don't filter on local loopback or the VPN interface.
+set skip on { lo0 $vpn }
+
+# Scrub all incoming packets.
+scrub in all
+
+# Don't allow IPv6 at all. This is sad, but IPredator doesn't support it.
+# TODO: review if my VPN host does support it (UPDATE: yes, but only if you
+# connect with their app, ugh...)
+block quick inet6
+
+# By default, don't allow anything on the actual physical links.
+block on { $wifi $ether }
+
+# Allow ICMP.
+# If you're looking for stealthy ping blocking or the like, this config is not
+# for you.
+pass quick proto icmp
+
+# Allow DHCP.
+# I could probably be more specific than "from any", but didn't find a way to
+# specify the link's local network universally. "from $wifi:network" works, but
+# "from $ether:network" for example doesn't as long as $ether does not exist.
+pass quick on { $wifi $ether } proto udp from any port 67:68
+
+# Allow DNS to Google, although on a rogue network they could still easily
+# redirect you to another DNS server.
+pass out quick proto udp to { 8.8.8.8 8.8.4.4 } port 53
+
+# Allow VPN.
+# The destination address specification is a bit loose, but I couldn't get a
+# complete list of hosts. Only allowing UDP 1194 should be enough to keep
+# possible risks to a minimum.
+pass quick proto udp to { 85.17.136.249 85.17.136.250 85.17.136.251 46.166.162.68 46.246.93.16 212.117.165.18 } port { 1194 443 53 80 }
+
+# vim: ft=pf
