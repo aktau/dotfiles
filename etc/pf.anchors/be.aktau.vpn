@@ -46,12 +46,12 @@ pass quick on { $wifi $ether } proto udp from any port 67:68
 
 # Allow DNS to Google, although on a rogue network they could still easily
 # redirect you to another DNS server.
-pass out quick proto udp to { 8.8.8.8 8.8.4.4 } port 53
+pass out quick proto udp to { 8.8.8.8, 8.8.4.4, 1.2.3.4, 192.168.179.1, 192.168.1.1 } port 53
 
 # Allow VPN.
 # The destination address specification is a bit loose, but I couldn't get a
 # complete list of hosts. Only allowing UDP 1194 should be enough to keep
 # possible risks to a minimum.
-pass quick proto udp to { 85.17.136.249 85.17.136.250 85.17.136.251 46.166.162.68 46.246.93.16 212.117.165.18 } port { 1194 443 53 80 }
+pass quick proto udp to { 85.17.136.249, 85.17.136.250, 85.17.136.251, 46.166.162.68, 46.246.93.16, 212.117.165.18, 184.75.214.42, 184.75.220.162 } port { 1194, 443, 53, 80 }
 
 # vim: ft=pf
