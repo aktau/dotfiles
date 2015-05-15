@@ -72,6 +72,39 @@ fetch-website () {
          "$url"
 }
 
+# Run git-diff on files outside of a repository, to be able to make use of
+# its superior diffing ability. Takes care of replacing pipe arguments with
+# temporary files, because git diff chokes on those. Includes some handy git
+# diff options (that I like) by default.
+gdiff() {
+    (
+    # git diff doesn't accept pipes, so do a temporary copy of any pipes
+    # passed as input.
+    #
+    # Iterating over the positional arguments actually iterates over a copy
+    # of the positional arguments in ksh, bash and zsh.
+    export TMPDIR=$(mktemp -d)
+    trap "rm -rf $TMPDIR" EXIT
+    for arg; do
+      case "$arg" in
+        -*) ;;
+        *)
+          # Copy the positional argument to a temporary file if it's a pipe.
+          if [ -p "${arg}" ] ; then
+            f="$(mktemp)" || exit
+            cp "${arg}" "$f"
+            arg="$f"
+          fi
+          ;;
+      esac
+      set -- "$@" "${arg}"
+      shift
+    done
+
+    git diff --patience --word-diff --no-index "$@"
+    )
+}
+
 # git and github related functions/aliases
 
 # Start working on a pull request, this requires a .git/user-repo file
