@@ -294,6 +294,23 @@ let g:go_highlight_methods = 1
 let g:go_highlight_structs = 1
 let g:go_fmt_command = "goimports"
 
+" tabularize
+" some keybinds taken from the excellent vimcasts episode on Tabularize
+nmap <Leader>a= :Tabularize /=<CR>
+vmap <Leader>a= :Tabularize /=<CR>
+nmap <Leader>a: :Tabularize /:\zs<CR>
+vmap <Leader>a: :Tabularize /:\zs<CR>
+nmap <Leader>a<bar> :Tabularize /\|<CR>
+vmap <Leader>a<bar> :Tabularize /\|<CR>
+nmap <Leader>a<tab> :Tabularize /\<tab><CR>
+vmap <Leader>a<tab> :Tabularize /\<tab><CR>
+
+" vim-unimpaired (not actually part of the plugin, but similar in spirit)
+nmap <silent> [g :tabprevious<CR>
+nmap <silent> ]g :tabnext<CR>
+nmap <silent> [G :tabrewind<CR>
+nmap <silent> ]G :tablast<CR>
+
 """"""""""""""""""""
 " filetype detection
 """"""""""""""""""""
@@ -348,6 +365,11 @@ if has('autocmd')
     au BufRead,BufNewFile *.coffee set ft=coffee
 
     au BufRead,BufNewFile mutt{ng,}-*-\w\+ set ft=mail
+
+    " tidy up HTML
+    let pandoc_pipeline = "pandoc -f html -t markdown"
+    let pandoc_pipeline .= " | pandoc -f markdown -t html"
+    au FileType html let &formatprg=pandoc_pipeline
 
     " Python file specific options
     au FileType python set omnifunc=pythoncomplete#Complete
