@@ -48,6 +48,7 @@ Plugin 'danro/rename.vim'
 Plugin 'xuhdev/SingleCompile'
 Plugin 'editorconfig/editorconfig-vim'
 Plugin 'godlygeek/tabular'
+Plugin 'b4winckler/vim-angry'
 
 " themes
 Plugin 'altercation/vim-colors-solarized'
