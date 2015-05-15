@@ -92,7 +92,7 @@ set nosmarttab                    " really get rid of tabs
 set backspace=indent,eol,start    " backspace through everything in insert mode"
 set autoindent                    " match indentation of previous line
 set textwidth=76                  " in new gvim windows
-set colorcolumn=85
+set colorcolumn=80
 set pastetoggle=<F2>
 
 " show invisible characters
