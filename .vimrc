@@ -62,6 +62,8 @@ Plugin 'exu/pgsql.vim'
 Plugin 'ivalkeen/vim-simpledb'
 Plugin 'fatih/vim-go'
 
+let mapleader = ","
+
 " Enable any local modifications
 if filereadable($HOME . '/.local_config/local.vim')
   source ~/.local_config/local.vim
@@ -164,8 +166,6 @@ autocmd FileType python setlocal tabstop=8 expandtab shiftwidth=4 softtabstop=4
 " clear trailing spaces on save
 autocmd BufWritePre * kz|:%s/\s\+$//e|'z
 
-let mapleader = ","
-
 " indent/unindent visual mode selection with tab/shift+tab
 vmap <tab> >gv
 vmap <s-tab> <gv
@@ -220,13 +220,12 @@ nnoremap <leader>/ //e<Enter>v??<Enter>
 " make and open quickfix window
 map <silent> <F7> :make %<CR>:copen<CR>
 
+" see what unsaved changes you have
+nnoremap <leader>u :w !diff - %<CR>
+
 " % is hard to type
 " nnoremap <tab> %
 " vnoremap <tab> %
-
-" quit insert-mode by pressing jj, most people don't type jj's very often
-" inoremap jj <ESC>
-inoremap ;; <Esc>
 
 " enable the dot command in visual mode
 vnoremap . :norm.<CR>
