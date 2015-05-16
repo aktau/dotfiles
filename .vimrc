@@ -28,6 +28,7 @@ Plugin 'tpope/vim-eunuch'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'tpope/vim-commentary'
 Plugin 'tpope/vim-repeat'
+Plugin 'tpope/vim-sleuth'
 Plugin 'Lokaltog/vim-powerline'
 Plugin 'Lokaltog/vim-easymotion'
 Plugin 'airblade/vim-gitgutter'
@@ -44,7 +45,6 @@ Plugin 'scrooloose/syntastic'
 Plugin 'justinmk/vim-sneak'
 Plugin 'xolox/vim-misc'
 Plugin 'aktau/vim-easytags'
-Plugin 'ciaranm/detectindent'
 Plugin 'danro/rename.vim'
 Plugin 'xuhdev/SingleCompile'
 Plugin 'editorconfig/editorconfig-vim'
@@ -285,12 +285,6 @@ let g:syntastic_go_checkers=['go', 'govet']
 " set tags=./tags;/,tags;/
 let g:easytags_dynamic_files = 2
 let g:easytags_file = "~/.easytags"
-
-" detectindent
-let detectindent_blacklist = ['go']
-autocmd BufReadPost * if index(detectindent_blacklist, &ft) < 0 | :DetectIndent | endif
-let g:detectindent_preferred_expandtab = 1
-let g:detectindent_preferred_indent = 4
 
 " SingleCompile
 nnoremap <leader>r :SCCompileRun<cr>
