@@ -182,9 +182,6 @@ nnoremap <leader>w :%s/\s\+$//<cr>:let @/=''<CR>
 " map sort function to a key
 vnoremap <leader>s :sort<CR>
 
-" search with ag
-nnoremap <leader>a :Ag<space>
-
 " save on ctrl-s in every mode, does not work under tmux
 noremap <C-S> :update<CR>
 vnoremap <C-S> <C-C>:update<CR>
