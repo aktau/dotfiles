@@ -1,3 +1,4 @@
+auto-reload yes
 browser open
 reload-threads 4
 show-read-feeds no
