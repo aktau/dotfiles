@@ -143,10 +143,12 @@ set sidescrolloff=7
 set splitbelow
 set splitright
 
+set sidescroll=1
 set mouse-=a
 set mousehide
-set ttymouse=xterm2
-set sidescroll=1
+if !has("nvim")
+  set ttymouse=xterm2
+endif
 
 set nobackup                      " Don't make a backup before overwriting a file.
 set nowritebackup                 " And again.
