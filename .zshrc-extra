@@ -11,6 +11,12 @@ setopt HIST_IGNORE_SPACE
 # bindkey '^[[A' history-substring-search-up
 # bindkey '^[[B' history-substring-search-down
 
+# use trusty OSX names for clipboard interaction
+if [[ "$OSTYPE" == 'linux-gnu' ]] ; then
+  alias pbcopy='xsel --clipboard --input'
+  alias pbpaste='xsel --clipboard --output'
+fi
+
 # make LuaJIT nicer to use from the CLI
 alias luajit="rlwrap luajit"
 
