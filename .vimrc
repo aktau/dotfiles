@@ -6,8 +6,7 @@ set nocompatible               " be iMproved
 set modelines=0
 
 if has('mac')
-    " fix clipboard on osx, do note that
-    " when running from within tmux, you
+    " fix clipboard on osx, do note that when running from within tmux, you
     " might need something like
     " https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard
     set clipboard+=unnamed
@@ -31,12 +30,9 @@ Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-sleuth'
 Plugin 'Lokaltog/vim-powerline'
 Plugin 'airblade/vim-gitgutter'
-" Plugin 'terryma/vim-multiple-cursors'
-" Plugin 'junegunn/vim-easy-align'
 Plugin 'kien/ctrlp.vim'
 Plugin 'rking/ag.vim'
 Plugin 'ajh17/VimCompletesMe'
-" Plugin 'tomtom/tcomment_vim'
 Plugin 'mattn/webapi-vim'
 Plugin 'mattn/gist-vim'
 Plugin 'scrooloose/syntastic'
@@ -272,10 +268,6 @@ let g:syntastic_c_include_dirs = [
 let g:syntastic_c_compiler_options = '-std=gnu99 -DINCLUDE_GENERATED_DECLARATIONS'
 
 let g:syntastic_go_checkers=['go', 'govet']
-
-" vim-easy-align
-" vnoremap <silent> <Enter> :EasyAlign<Enter>
-" nnoremap <silent> <Leader>\ :EasyAlign<Enter>
 
 " vim-easytags
 " don't enable this for now... editing a file in $HOME wrecks the HDD
