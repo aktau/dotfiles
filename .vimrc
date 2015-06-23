@@ -222,6 +222,11 @@ nnoremap <leader>u :w !diff - %<CR>
 " nnoremap <tab> %
 " vnoremap <tab> %
 
+" go to the end of the copied/yank text
+vnoremap <silent> y y`]
+vnoremap <silent> p p`]
+nnoremap <silent> p p`]
+
 " enable the dot command in visual mode
 vnoremap . :norm.<CR>
 
