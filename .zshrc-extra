@@ -14,6 +14,15 @@ setopt HIST_IGNORE_SPACE
 # make LuaJIT nicer to use from the CLI
 alias luajit="rlwrap luajit"
 
+# Searches text for a string but highlights instead of filtering. If you
+# want to combine this with a pager, it can be piped to less because it has
+# --color=always. Alternatively, one can use less -p PATTERN.
+greph () {
+  local pat="$1"
+  shift
+  grep --color=always -E "$pat|$" $@
+}
+
 # quickly find folders or files in a subdirectory
 fname () {
   find . -iname "*$@*"
