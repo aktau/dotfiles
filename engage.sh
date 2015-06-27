@@ -1,6 +1,8 @@
 #!/bin/bash
 
-set -u
+set -euo pipefail
+
+umask 022
 
 ########## Colors
 
@@ -14,11 +16,13 @@ ENDCOLOR="\033[0m"
 
 ########## Variables
 
+scriptdir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
 dir=~/dotfiles                                      # dotfiles directory
 olddir=~/dotfiles_old                               # old dotfiles backup directory
 olddir_current=$olddir/"$(date +%d-%m-%Y)"
-files=".vimrc .vim .psqlrc .newsbeuter .zshrc-extra .ctags .tmux.conf be.aktau.vpn"
-# .bashrc .zshrc .oh-my-zsh .Xresources
+files=".vimrc .vim .psqlrc .newsbeuter .zshrc-extra .ctags .tmux.conf"
+folders="etc"
 
 ##########
 
@@ -46,19 +50,7 @@ function setup_link {
     orig="$1"
     file="$2"
 
-    if [[ -L ~/$file ]] ; then
-        rm -f ~/$file
-    elif [[ -e ~/$file ]]; then
-        printf '%b\n' ${ERRCOLOR}"~/$file exists, backing up to $olddir_current"${ENDCOLOR}
-        rm -rf $olddir_current/$file || true
-        mv ~/$file $olddir_current
-    else
-        echo "~/$file not present"
-    fi
-
-    printf '%b' ${SRCCOLOR}
-    ln -sv $dir/$orig ~/$file
-    printf '%b' ${ENDCOLOR}
+    "$scriptdir/safelink.sh" "$dir/$orig" "$HOME/$file" "$olddir_current"
 }
 
 function setup_neovim {
@@ -83,6 +75,32 @@ function setup_dotfiles {
     for file in $files; do
         setup_link "$file" "$file"
     done
+}
+
+# This function creates the hierarchies to the passed in folders in the
+# destination path, but symlinks the files contained within. Useful for
+# rapid prototyping, but I'd like to find a more ideal solution at some
+# point (overlayfs?).
+function setup_folders {
+    local src="$1"
+    local dst="$2"
+
+    pushd "$src" >/dev/null
+    while read folder ; do
+        printf '%b' "${SRCCOLOR}"
+
+        # mirror the directory structure, if necessary
+        find "$folder" -type d \
+            -exec echo DIR "${src}"/{} -\> "${dst}/"{} \; \
+            -exec mkdir -p "${dst}/"{} \;
+
+        printf '%b' "${ENDCOLOR}"
+
+        # symlink the files (leafs)
+        find "$folder" -not -type d \
+            -exec "$scriptdir/safelink.sh" "${src}/"{} "${dst}/"{} "$olddir_current" \;
+    done
+    popd >/dev/null
 }
 
 function setup_git {
@@ -154,6 +172,7 @@ function config_zsh {
 #install_zsh
 config_zsh
 setup_dotfiles "$files"
+setup_folders "$dir" "$HOME" <<< "$folders"
 setup_git
 setup_ssh
 setup_vim
