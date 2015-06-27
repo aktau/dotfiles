@@ -57,6 +57,7 @@ Plugin 'rodjek/vim-puppet'
 Plugin 'exu/pgsql.vim'
 Plugin 'ivalkeen/vim-simpledb'
 Plugin 'fatih/vim-go'
+Plugin 'nfnty/vim-nftables'
 
 let mapleader = ","
 
