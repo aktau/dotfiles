@@ -31,6 +31,7 @@ Plugin 'tpope/vim-sleuth'
 Plugin 'Lokaltog/vim-powerline'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'kien/ctrlp.vim'
+Plugin 'ivalkeen/vim-ctrlp-tjump'
 Plugin 'rking/ag.vim'
 Plugin 'ajh17/VimCompletesMe'
 Plugin 'mattn/webapi-vim'
@@ -244,6 +245,11 @@ map <Down> :echo "no!"<cr>
 " ctrlp.vim
 set wildignore+=*/.git/objects/*,*/.git/refs/*,*/.hg/*,*/.svn/*   " for Linux/MacOSX
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip
+
+" vim-ctrlp-tjump
+let g:ctrlp_tjump_only_silent = 1
+nnoremap <c-]> :CtrlPtjump<cr>
+vnoremap <c-]> :CtrlPtjumpVisual<cr>
 
 " vim-gitguttter
 highlight clear SignColumn
