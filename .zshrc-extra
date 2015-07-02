@@ -11,6 +11,17 @@ setopt HIST_IGNORE_SPACE
 # bindkey '^[[A' history-substring-search-up
 # bindkey '^[[B' history-substring-search-down
 
+# use ag to supply fzf with filenames instead of find, it's faster
+export FZF_DEFAULT_COMMAND="ag -i --nocolor --nogroup --hidden \
+  --ignore .git \
+  --ignore .svn \
+  --ignore .hg \
+  --ignore .DS_Store \
+  --ignore '**/*.pyc' \
+  --ignore .git5_specs \
+  --ignore review \
+  -g ''"
+
 # use trusty OSX names for clipboard interaction
 if [[ "$OSTYPE" == 'linux-gnu' ]] ; then
   alias pbcopy='xsel --clipboard --input'
