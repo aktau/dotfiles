@@ -255,10 +255,6 @@ vnoremap <c-]> :CtrlPtjumpVisual<cr>
 highlight clear SignColumn
 "let g:gitgutter_sign_column_always = 1
 
-" yankring.vim
-nnoremap <silent> <F3> :YRShow<cr>
-inoremap <silent> <F3> <ESC>:YRShow<cr>
-
 " gist-vim
 let g:gist_detect_filetype = 1
 
