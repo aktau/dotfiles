@@ -64,6 +64,29 @@ ssh-reagent () {
    echo "Cannot find ssh agent - maybe you should reconnect and forward it?"
 }
 
+# evaluate something in lua
+luae () {
+  # dirty hack to force printing of the passed in expression
+  local expr="$*"
+  case "$expr" in
+    *print*|*write*) ;;
+    *) expr="print($expr)" ;;
+  esac
+
+  eval "$(luarocks path)" &&
+    luajit -e "ml = require('ml'); fun = require('fun'); printf = ml.compose(io.write, string.format); $expr"
+}
+
+# start a luajit interpreter with some libraries preloaded
+luaj () {
+  echo "Loading Microlight"
+  echo "  Usage: ml.tstring(val), ml.split('hello dolly'), ml.readfile(fname), ..."
+  echo "Loading Luafun"
+  echo "  Usage: print(fun.range(100):map(function(x) return x^2 end):reduce(operator.add, 0))"
+  eval "$(luarocks path)" &&
+    rlwrap luajit -e"ml = require('ml'); fun = require('fun'); printf = ml.compose(io.write, string.format)" -i
+}
+
 domain-from-url () {
     local url="$1"
     python -c "from urlparse import urlparse
