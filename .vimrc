@@ -36,6 +36,7 @@ Plugin 'rking/ag.vim'
 Plugin 'ajh17/VimCompletesMe'
 Plugin 'mattn/webapi-vim'
 Plugin 'mattn/gist-vim'
+Plugin 'chrisbra/vim-diff-enhanced'
 Plugin 'scrooloose/syntastic'
 Plugin 'justinmk/vim-sneak'
 Plugin 'rhysd/clever-f.vim'
@@ -254,6 +255,9 @@ vnoremap <c-]> :CtrlPtjumpVisual<cr>
 " vim-gitguttter
 highlight clear SignColumn
 "let g:gitgutter_sign_column_always = 1
+
+" vim-diff-enhanced
+let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
 
 " gist-vim
 let g:gist_detect_filetype = 1
