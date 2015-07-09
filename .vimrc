@@ -252,7 +252,7 @@ let g:ctrlp_tjump_only_silent = 1
 nnoremap <c-]> :CtrlPtjump<cr>
 vnoremap <c-]> :CtrlPtjumpVisual<cr>
 
-" vim-gitguttter
+" vim-gitgutter
 highlight clear SignColumn
 "let g:gitgutter_sign_column_always = 1
 
@@ -406,9 +406,6 @@ if has('autocmd')
     au BufReadPre *.doc set ro
     au BufReadPre *.doc set hlsearch!
     au BufReadPost *.doc %!antiword "%"
-
-    " Reload vimrc when we edit it
-    au! BufWritePost .vimrc source %
 endif
 
 """"""""""""""""""""""""
