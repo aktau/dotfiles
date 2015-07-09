@@ -275,9 +275,9 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
 	call <SID>X("Operator", s:foreground, "", "none")
 	call <SID>X("Type", s:blue, "", "none")
 	call <SID>X("Define", s:purple, "", "none")
-	call <SID>X("Include", s:blue, "", "") 
+	call <SID>X("Include", s:blue, "", "")
 	"call <SID>X("Ignore", "666666", "", "")
-	
+
 	" Vim Highlighting
 	call <SID>X("vimCommand", s:red, "", "none")
 
@@ -292,7 +292,7 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
 	call <SID>X("phpConditional", s:purple, "", "")
 	call <SID>X("phpStatement", s:purple, "", "")
 	call <SID>X("phpMemberSelector", s:foreground, "", "")
-	
+
 	" Ruby Highlighting
 	call <SID>X("rubySymbol", s:orange, "", "")
 	call <SID>X("rubyConstant", s:yellow, "", "")
@@ -310,6 +310,33 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
 
 	call <SID>X("Conditional", s:purple, "", "")
 	call <SID>X("Repeat", s:purple, "", "")
+
+	" Diff Highlighting
+
+	" a calm green for added lines
+	let s:addbg = "88aa88"
+	let s:adddarkbg = "669966"
+	let s:addfg = "003300"
+
+	" a faint red that doesn't hurt the eyes
+	let s:delbg = "aa8888"
+	let s:delfg = "440000"
+
+	call <SID>X("diffAdded", s:addfg, s:addbg, "")
+	call <SID>X("diffRemoved", s:delfg, s:delbg, "")
+
+	call <SID>X("DiffAdd", s:addfg, s:addbg, "")
+	call <SID>X("DiffDelete", s:delbg, s:delbg, "")
+
+	" can't decide which of the two is better, all green (more harmony) or
+	" better separation between added and changed. Vim's default diffing
+	" algorithm seems to be poor which makes it even harder to choose. I
+	" think I'll need to look at Christian Brabandt
+	call <SID>X("DiffChange", s:addfg, s:addbg, "")
+	call <SID>X("DiffText", s:addfg, s:adddarkbg, "")
+
+	" call <SID>X("DiffChange", s:foreground, s:background, "")
+	" call <SID>X("DiffText", s:foreground, "666699", "")
 
 	" Delete Functions
 	delf <SID>X
