@@ -70,7 +70,7 @@ luae () {
   local expr="$*"
   case "$expr" in
     *print*|*write*) ;;
-    *) expr="print($expr)" ;;
+    *) expr="printf($expr)" ;;
   esac
 
   eval "$(luarocks path)" &&
