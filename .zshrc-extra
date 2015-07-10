@@ -26,7 +26,50 @@ export FZF_DEFAULT_COMMAND="ag -i --nocolor --nogroup --hidden \
 # one level deeper, et cetera.
 cdf () {
   local depth=${1:-1}
-  cd "$(find . -mindepth 0 -maxdepth "$depth" -type d -printf '%P\n' 2>/dev/null | fzf)"
+  cd "$(find . -mindepth 0 -maxdepth "$depth" -type d -printf '%P\n' 2>/dev/null | fzf --select-1 --exit-0)"
+}
+
+# Recursive fuzzy cd without limit, uses a depth-first search algorithm so
+# that even on very slow filesystems you can navigate piecemeal. You will
+# need to acquire this mythical bfsfind monster somewhere though ;).
+fd () {
+  local dir
+  dir="$(bfsfind -type=d . 2>/dev/null | fzf --select-1 --exit-0 )" || {
+    return 1
+  }
+  if [ -z "$dir" ] ; then
+    echo "no more directories to enter" >&2
+    return 1
+  fi
+  cd "$dir"
+}
+
+# A souped up version of fd that keeps going until you actually quit. Good
+# for drilling down into deep hierarchies where even bfsfind has a problem.
+#
+# Suppose you need to go 6 folders deep, but after 3 the hierarchy because
+# too unwieldy and it gets progressively slower: then just select the
+# correct folder in the 3rd level and fdr will cd into that and rerun fd.
+fdr () {
+    while fd ; do : ; done
+}
+
+# fe [FUZZY PATTERN] - Open the selected file with the default editor
+#   - Bypass fuzzy finder if there's only one match (--select-1)
+#   - Exit if there's no match (--exit-0)
+fe () {
+  local file
+  file=$(fzf --query="$1" --select-1 --exit-0)
+  [ -n "$file" ] && ${EDITOR:-vim} "$file"
+}
+
+# fkill - kill process
+fkill () {
+  pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
+
+  if [ "x$pid" != "x" ] ; then
+    kill -${1:-9} "$pid"
+  fi
 }
 
 # use trusty OSX names for clipboard interaction
