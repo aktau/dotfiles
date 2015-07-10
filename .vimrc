@@ -21,6 +21,7 @@ call vundle#begin()
 Plugin 'gmarik/vundle'
 
 " original repos on github
+Plugin 'tpope/vim-abolish'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-eunuch'
