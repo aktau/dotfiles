@@ -11,6 +11,28 @@ setopt HIST_IGNORE_SPACE
 # bindkey '^[[A' history-substring-search-up
 # bindkey '^[[B' history-substring-search-down
 
+# finds the zsh-syntax-highlighting plugin in a few well-known directories
+findsynhl () {
+  local root=""
+  if command -v brew >/dev/null 2>&1 ; then
+    root="$(brew --prefix)/share/zsh-syntax-highlighting"
+  fi
+  if [ -d "$root" ] ; then echo -n "$root" ; return 0 ; fi
+  root="$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+  if [ -d "$root" ] ; then echo -n "$root" ; return 0 ; fi
+  return 1
+}
+
+# enable zsh syntax highlighting if available
+synhl=$(findsynhl)
+if [ $? -eq 0 ] ; then
+  export ZSH_HIGHLIGHT_HIGHLIGHTERS_DIR="$synhl/highlighters"
+  ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
+  source "$synhl/zsh-syntax-highlighting.zsh"
+fi
+
+unset -f findsynhl
+
 # fzf
 
 # use ag to supply fzf with filenames instead of find, it's faster
