@@ -136,6 +136,11 @@ ssh-reagent () {
    echo "Cannot find ssh agent - maybe you should reconnect and forward it?"
 }
 
+# print out some luajit init code
+luainit () {
+  echo "ml = require('ml'); fun = require('fun'); has_graph, graph = pcall(require, 'graph'); printf = ml.compose(io.write, string.format)"
+}
+
 # evaluate something in lua
 luae () {
   # dirty hack to force printing of the passed in expression
@@ -146,7 +151,7 @@ luae () {
   esac
 
   eval "$(luarocks path)" &&
-    luajit -e "ml = require('ml'); fun = require('fun'); printf = ml.compose(io.write, string.format); $expr"
+    luajit -e "$(luainit); $expr"
 }
 
 # start a luajit interpreter with some libraries preloaded
@@ -155,8 +160,10 @@ luaj () {
   echo "  Usage: ml.tstring(val), ml.split('hello dolly'), ml.readfile(fname), ..."
   echo "Loading Luafun"
   echo "  Usage: print(fun.range(100):map(function(x) return x^2 end):reduce(operator.add, 0))"
+  echo "Loading graph-toolkit"
+  echo "  Usage: p = graph.plot('y = sin(x) * x^2'); p:addline(graph.fxline(function(x) return math.sin(x) * x^2 end, 0, 25), 'red'); p:show()"
   eval "$(luarocks path)" &&
-    rlwrap luajit -e"ml = require('ml'); fun = require('fun'); printf = ml.compose(io.write, string.format)" -i
+    rlwrap luajit -e "$(luainit)" -i
 }
 
 domain-from-url () {
