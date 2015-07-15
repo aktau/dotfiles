@@ -142,7 +142,7 @@ luainit () {
 }
 
 # evaluate something in lua
-luae () {
+le () {
   # dirty hack to force printing of the passed in expression
   local expr="$*"
   case "$expr" in
@@ -155,7 +155,7 @@ luae () {
 }
 
 # start a luajit interpreter with some libraries preloaded
-luaj () {
+lj () {
   echo "Loading Microlight"
   echo "  Usage: ml.tstring(val), ml.split('hello dolly'), ml.readfile(fname), ..."
   echo "Loading Luafun"
