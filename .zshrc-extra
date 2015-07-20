@@ -138,7 +138,19 @@ ssh-reagent () {
 
 # print out some luajit init code
 luainit () {
-  echo "for k,v in pairs(math) do _G[k] = v end; ml = require('ml'); fun = require('fun'); has_graph, graph = pcall(require, 'graph'); printf = ml.compose(io.write, string.format)"
+  # Utility functions that are nice when using lua as a souped-up bc(1).
+  echo "function b2kb(b) return b / 1024 end"
+  echo "function b2mb(b) return b / 1024 / 1024 end"
+  echo "function b2gb(b) return b / 1024 / 1024 / 1024 end"
+  echo "function b2tb(b) return b / 1024 / 1024 / 1024 / 1024 end"
+
+  # Make all math functions part of the global namespace, reduces typing.
+  echo "for k,v in pairs(math) do _G[k] = v end"
+
+  echo "has_graph, graph = pcall(require, 'graph')"
+  echo "fun = require('fun')"
+  echo "ml = require('ml')"
+  echo "printf = ml.compose(io.write, string.format)"
 }
 
 # evaluate something in lua
