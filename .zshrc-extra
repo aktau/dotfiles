@@ -253,11 +253,13 @@ pr () {
         echo "Already working on pull request $pr_num, delete branch '$branch' and try again" >&2
         return 1
     fi
-    (
-    set -e
     git checkout -b $branch
-    curl "https://github.com/$user_repo/pull/$pr_num.patch" 2> /dev/null | git am --3way
-    )
+    if ! curl -L "https://github.com/$user_repo/pull/$pr_num.patch" 2> /dev/null | git am --3way ; then
+        echo "Downloading patch or patching failed, please resolve manually"
+        git am --abort
+        git checkout master
+        git branch -D $branch
+    fi
 }
 
 # Finish working on a pull request, besides the .git/user-repo file,
