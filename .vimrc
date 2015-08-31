@@ -14,6 +14,8 @@ else
     set clipboard=unnamedplus
 endif
 
+exe 'set rtp+=' . $GOPATH . '/src/github.com/junegunn/fzf'
+
 set rtp+=~/.vim/bundle/vundle/
 call vundle#begin()
 
@@ -31,7 +33,6 @@ Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-sleuth'
 Plugin 'Lokaltog/vim-powerline'
 Plugin 'airblade/vim-gitgutter'
-Plugin 'kien/ctrlp.vim'
 Plugin 'ivalkeen/vim-ctrlp-tjump'
 Plugin 'rking/ag.vim'
 Plugin 'ajh17/VimCompletesMe'
@@ -314,6 +315,9 @@ nmap <silent> [g :tabprevious<CR>
 nmap <silent> ]g :tabnext<CR>
 nmap <silent> [G :tabrewind<CR>
 nmap <silent> ]G :tablast<CR>
+
+" fzf
+nmap <silent> <c-p> :FZF<CR>
 
 """"""""""""""""""""
 " filetype detection
