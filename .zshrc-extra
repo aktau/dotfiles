@@ -51,12 +51,11 @@ cdf () {
   cd "$(find . -mindepth 0 -maxdepth "$depth" -type d -printf '%P\n' 2>/dev/null | fzf --select-1 --exit-0)"
 }
 
-# Recursive fuzzy cd without limit, uses a depth-first search algorithm so
-# that even on very slow filesystems you can navigate piecemeal. You will
-# need to acquire this mythical bfsfind monster somewhere though ;).
+# Recursive fuzzy cd without limit, uses a depth-first search so that even
+# on very slow filesystems you can navigate piecemeal. This requires bfs(1).
 fd () {
   local dir
-  dir="$(bfsfind -type=d . 2>/dev/null | fzf --select-1 --exit-0 )" || {
+  dir="$(bfs -type d . 2>/dev/null | fzf --select-1 --exit-0 )" || {
     return 1
   }
   if [ -z "$dir" ] ; then
@@ -67,7 +66,7 @@ fd () {
 }
 
 # A souped up version of fd that keeps going until you actually quit. Good
-# for drilling down into deep hierarchies where even bfsfind has a problem.
+# for drilling down into deep hierarchies where even bfs(1) has a problem.
 #
 # Suppose you need to go 6 folders deep, but after 3 the hierarchy because
 # too unwieldy and it gets progressively slower: then just select the
