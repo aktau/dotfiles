@@ -104,6 +104,11 @@ if [[ "$OSTYPE" == 'linux-gnu' ]] ; then
   alias pbpaste='xsel --clipboard --output'
 fi
 
+# Act like pbpaste if stdin is a terminal, otherwise act like pbcopy.
+clip () {
+  [ -t 0 ] && pbpaste || pbcopy
+}
+
 # make LuaJIT nicer to use from the CLI
 alias luajit="rlwrap luajit"
 
