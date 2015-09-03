@@ -46,7 +46,7 @@ export FZF_DEFAULT_COMMAND="ag -i --nocolor --nogroup --hidden \
 # Global fuzzy bookmark directory changer. Adapted from
 # http://dmitryfrank.com/articles/shell_shortcuts.
 cdg () {
-   local dst=$(cdglist | fzf)
+   local dst="$(cdglist | fzf -0 -1 --query="$*")"
    [ -d "$dst" ] && cd "$dst"
 }
 
