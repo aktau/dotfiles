@@ -1,0 +1,21 @@
+aktau's dotfiles
+================
+
+Note to all
+-----------
+
+Just run `./engage.sh` and you should be ready to go. A backup of any existing
+dotfiles that got replaced should be created.
+
+Note to others (not aktau)
+--------------------------
+
+This sets up some things that are _really_ specific to me (aktau), so please
+inspect `engage.sh` before running it.
+
+About the /bin folder
+---------------------
+
+I know those are not dotfiles or even non-dot configuration files. But I still
+like that I can clone and apply one git repository to make an environment feel
+much more familiar.

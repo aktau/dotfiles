@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# Filters out comments and empty lines.
+#
+# Based on cdscuts_list_echo(1) from
+# http://dmitryfrank.com/articles/shell_shortcuts
+
+exec sed -e 's/^\W*#.*//g' -e '/^\s*$/d'

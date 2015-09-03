@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# Based on cdscuts_glob_echo(1) from
+# http://dmitryfrank.com/articles/shell_shortcuts
+
+set -euo pipefail
+
+if [ -r /etc/cdg_paths ]; then
+   uncomment < /etc/cdg_paths
+fi
+if [ -r ~/.cdg_paths ]; then
+   uncomment < ~/.cdg_paths
+fi

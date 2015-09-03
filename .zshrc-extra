@@ -43,6 +43,15 @@ export FZF_DEFAULT_COMMAND="ag -i --nocolor --nogroup --hidden \
   --ignore .DS_Store \
   -g ''"
 
+# Global fuzzy bookmark directory changer. Adapted from
+# http://dmitryfrank.com/articles/shell_shortcuts.
+cdg() {
+   local dest_dir=$(cdglist | fzf)
+   if [[ $dest_dir != '' ]]; then
+      cd "$dest_dir"
+   fi
+}
+
 # Fuzzy cd, powered by fzf. The first argument determines the depth of the
 # fuzzy search. 0 is the default and search the current directory only, 1 is
 # one level deeper, et cetera.
