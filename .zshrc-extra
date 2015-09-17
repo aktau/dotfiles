@@ -185,7 +185,7 @@ le () {
   local expr="$*"
   case "$expr" in
     *print*|*write*) ;;
-    *) expr="printf($expr)" ;;
+    *) expr="printf(ml.tstring($expr))" ;;
   esac
 
   eval "$(luarocks path)" &&
