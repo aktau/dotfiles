@@ -177,6 +177,17 @@ luainit () {
   echo "fun = require('fun')"
   echo "ml = require('ml')"
   echo "printf = ml.compose(io.write, string.format)"
+
+  # If we could use table.pack and table.unpack, we could generalize this
+  # to:
+  #
+  #  function curry(fn, ...)
+  #    local up = table.pack(...)
+  #    return function(...) return fn(table.unpack(up), ...) end
+  #  end
+  #
+  # However, luajit without the LUA52COMPAT option doesn't have this.
+  echo "function curry(fn, arg) return function(...) return fn(arg, ...) end end"
 }
 
 # evaluate something in lua
