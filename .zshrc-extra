@@ -167,37 +167,9 @@ ssh-reagent () {
    echo "Cannot find ssh agent - maybe you should reconnect and forward it?"
 }
 
-# print out some luajit init code
-luainit () {
-  # Utility functions that are nice when using lua as a souped-up bc(1).
-  echo "function b2kb(b) return b / 1024 end"
-  echo "function b2mb(b) return b / 1024 / 1024 end"
-  echo "function b2gb(b) return b / 1024 / 1024 / 1024 end"
-  echo "function b2tb(b) return b / 1024 / 1024 / 1024 / 1024 end"
-
-  # Make all math functions part of the global namespace, reduces typing.
-  echo "for k,v in pairs(math) do _G[k] = v end"
-
-  echo "has_graph, graph = pcall(require, 'graph')"
-  echo "fun = require('fun')"
-  echo "ml = require('ml')"
-  echo "printf = ml.compose(io.write, string.format)"
-
-  # If we could use table.pack and table.unpack, we could generalize this
-  # to:
-  #
-  #  function curry(fn, ...)
-  #    local up = table.pack(...)
-  #    return function(...) return fn(table.unpack(up), ...) end
-  #  end
-  #
-  # However, luajit without the LUA52COMPAT option doesn't have this.
-  echo "function curry(fn, arg) return function(...) return fn(arg, ...) end end"
-}
-
-# evaluate something in lua
+# Evaluate something in lua.
 le () {
-  # dirty hack to force printing of the passed in expression
+  # Dirty hack to force printing of the passed in expression.
   local expr="$*"
   case "$expr" in
     *print*|*write*) ;;
@@ -205,19 +177,15 @@ le () {
   esac
 
   eval "$(luarocks path)" &&
-    luajit -e "$(luainit); $expr"
+    LUA_INIT="@$HOME/.lua/init.lua" luajit -e "$expr"
 }
 
-# start a luajit interpreter with some libraries preloaded
+# Start a luajit interpreter with some libraries preloaded.
 lj () {
-  echo "Loading Microlight"
-  echo "  Usage: ml.tstring(val), ml.split('hello dolly'), ml.readfile(fname), ..."
-  echo "Loading Luafun"
-  echo "  Usage: print(fun.range(100):map(function(x) return x^2 end):reduce(operator.add, 0))"
-  echo "Loading graph-toolkit"
-  echo "  Usage: p = graph.plot('y = sin(x) * x^2'); p:addline(graph.fxline(function(x) return math.sin(x) * x^2 end, 0, 25), 'red'); p:show()"
+  # Add local and global rocks to the lua search path, then preload those
+  # libraries and some other helper code from init.lua.
   eval "$(luarocks path)" &&
-    rlwrap luajit -e "$(luainit)" -i
+    LUA_INIT="@$HOME/.lua/init.lua" luajit -i
 }
 
 domain-from-url () {
