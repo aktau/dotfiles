@@ -185,7 +185,7 @@ lj () {
   # Add local and global rocks to the lua search path, then preload those
   # libraries and some other helper code from init.lua.
   eval "$(luarocks path)" &&
-    LUA_INIT="@$HOME/.lua/init.lua" luajit -i
+    luajit -i $HOME/.lua/init.lua --examples
 }
 
 domain-from-url () {
