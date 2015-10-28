@@ -13,6 +13,7 @@ has_fun, fun     = pcall(require, 'fun')
 has_ml, ml       = pcall(require, 'ml')
 has_syscall, sys = pcall(require, 'syscall')
 has_graph, graph = pcall(require, 'graph')
+has_ffi, ffi     = pcall(require, 'ffi')
 
 -- Detect luajit.
 has_lj           = type(jit) == 'table'
@@ -22,17 +23,38 @@ printf = function(s,...) return io.write(s:format(...)) end
 
 -- Benchmarking support.
 if has_syscall and has_lj and jit.os == "Linux" then
-  -- Return elapsed time in CPU cycles for this thread in nanoseconds.
-  function tick()
-    local ts = sys.clock_gettime(sys.c.CLOCK.THREAD_CPUTIME_ID)
-    return ts.tv_sec * 1000000000 + ts.tv_nsec
+  -- Return a point in time. This timestamp will only advance when this
+  -- thread (process for LuaJIT) is on-CPU. The data type of the return
+  -- value is system dependent. Use tick_diff() to get a number value.
+  --
+  --   local start = tick_user()
+  --   heavy_function()
+  --   local ns_passed = tick_diff(start, tick_user())
+  function tick_user()
+    return sys.clock_gettime(sys.c.CLOCK.THREAD_CPUTIME_ID)
+  end
+
+  -- Returns a timestamp that advances with wall-clock time.
+  function tick_wall()
+    return sys.clock_gettime(sys.c.CLOCK.MONOTONIC_RAW)
+  end
+
+  local function ts_to_u64(ts)
+    return ffi.cast("uint64_t", ts.tv_sec), ffi.cast("uint64_t", ts.tv_nsec)
+  end
+
+  -- Returns the difference between two ticks (b - a) in nanoseconds.
+  function tick_diff(a, b)
+    local seca, nseca = ts_to_u64(a)
+    local secb, nsecb = ts_to_u64(b)
+    return tonumber((secb - seca) * 1000000000ULL + (nsecb - nseca))
   end
 
   -- Benchmark function <fn>. Pass rest of the arguments to it (like
-  -- Bernstein chaining).
+  -- Bernstein chaining). Returns the elapsed time in nanoseconds.
   function bench(fn, ...)
-    local a, val, b = tick(), fn(...), tick()
-    return b - a
+    local a, val, b = tick_user(), fn(...), tick_user()
+    return tick_diff(a, b)
   end
 end
 
