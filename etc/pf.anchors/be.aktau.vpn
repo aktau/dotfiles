@@ -54,4 +54,9 @@ pass out quick proto udp to { 8.8.8.8, 8.8.4.4, 1.2.3.4, 192.168.179.1, 192.168.
 # possible risks to a minimum.
 pass quick proto udp to { 85.17.136.249, 85.17.136.250, 85.17.136.251, 46.166.162.68, 46.246.93.16, 212.117.165.18, 184.75.214.42, 184.75.220.162 } port { 1194, 443, 53, 80 }
 
-# vim: ft=pf
+# Allow traffic on the local network
+pass quick to 192.168.0.0/16
+
+# Allow broadcasting packets (for Chromecast et al. discovery)
+pass quick proto udp from any to 239.255.255.250 port 1900
+pass quick proto udp from any to 224.0.0.251 port 5353
