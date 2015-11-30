@@ -31,7 +31,7 @@ Plugin 'tpope/vim-unimpaired'
 Plugin 'tpope/vim-commentary'
 Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-sleuth'
-Plugin 'Lokaltog/vim-powerline'
+Plugin 'itchyny/lightline.vim' " try bling/vim-airline if this doesn't work out.
 Plugin 'airblade/vim-gitgutter'
 Plugin 'kien/ctrlp.vim'
 Plugin 'ivalkeen/vim-ctrlp-tjump'
@@ -159,7 +159,6 @@ set noswapfile
 set timeoutlen=500
 
 set laststatus=2                  " Show the status line all the time
-set statusline=[%n]\ %<%.99f\ %h%w%m%r%y\ %{exists('*CapsLockStatusline')?CapsLockStatusline():''}%=%-16(\ %l,%c-%v\ %)%P
 
 set t_Co=256                      " Set terminal to 256 colors
 colorscheme static_tomorrownight
