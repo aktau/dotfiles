@@ -111,6 +111,7 @@ set hlsearch                      " Highlight search terms
 set ignorecase                    " Case-insensitive searching.
 set smartcase                     " But case-sensitive if expression contains a capital letter.
 set gdefault                      " Set the global flag on substitute commands by default
+set matchpairs+=<:>               " Match < and > as well.
 " set showmatch                     " When a bracket is inserted, briefly jump to the matching one
 
 " undo
