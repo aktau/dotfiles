@@ -14,7 +14,13 @@ else
     set clipboard=unnamedplus
 endif
 
-exe 'set rtp+=' . $GOPATH . '/src/github.com/junegunn/fzf'
+if executable('fzf')
+  if isdirectory($GOPATH . '/src/github.com/junegunn/fzf')
+    exe 'set rtp+=' . $GOPATH . '/src/github.com/junegunn/fzf'
+  else
+    exe 'set rtp+=' . fnamemodify(resolve(systemlist('which fzf')[0]), ':h:h')
+  endif
+endif
 
 set rtp+=~/.vim/bundle/vundle/
 call vundle#begin()
