@@ -335,6 +335,7 @@ nmap <silent> <c-p> :FZF<CR>
 if has('autocmd')
     au WinEnter * setlocal cursorline
     au WinLeave * setlocal nocursorline
+    au VimResized * wincmd = " Resize splits on window resize.
     hi ExtraWhitespace ctermbg=red guibg=red
     au ColorScheme * hi ExtraWhitespace ctermbg=red guibg=red
     match ExtraWhitespace /\s\+$\| \+\ze\t/
