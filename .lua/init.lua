@@ -81,6 +81,14 @@ function isin(val, ...)
   return false
 end
 
+function round(n)
+  return math.floor(n + 0.5)
+end
+
+function log2(n)
+  return math.log(n) / math.log(2)
+end
+
 -- Make all math functions part of the global namespace, reduces typing.
 -- Nice when using lua as a souped-up bc(1).
 for k,v in pairs(math) do
