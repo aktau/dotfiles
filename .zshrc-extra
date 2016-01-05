@@ -169,8 +169,15 @@ ssh-reagent () {
 
 # Evaluate something in lua.
 le () {
+  # If no arguments are given, evaluate stdin as a lua expression. We can't
+  # use "lua -" as specified in the man page because that would avoid
+  # printing the result if the user didn't specifically call print(),
+  # write() or others. It's cumbersome to type those all the time, so do it
+  # by default.
+  local expr
+  (( $# == 0 )) && expr="$(</dev/stdin)" || expr="$*"
+
   # Dirty hack to force printing of the passed in expression.
-  local expr="$*"
   case "$expr" in
     *print*|*write*) ;;
     *) expr="printf(ml.tstring($expr))" ;;
