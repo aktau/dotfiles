@@ -187,6 +187,54 @@ le () {
     LUA_INIT="@$HOME/.lua/init.lua" luajit -e "$expr"
 }
 
+# Use Lua as a UNIX filter. By default, if no "print" or "write" substrings
+# are found in the passed Lua code, :each(print) will be appended. This
+# prints out the result of the operators/reducers/... to stdout.
+#
+# When the required operation is really simple: no Lua pipelines, just a
+# single operation, lefs(1) can be used with less typing.
+#
+# Usage: lef <lua>
+# Examples:
+#
+#   # Add 5 to every line and print.
+#   ( echo 2 ; echo 3 ) | lef "map(function(x) return x + 5 end)"
+#
+#   # Filter lines that are not 3.
+#   ( echo 2 ; echo 3 ; echo 4) | lef "filter(function(x) return x ~= '3' end)"
+#
+#   # If you want to compare to the number 3 instead of the string "3", the
+#   # input needs to be converted to a number with tonumber() or adding 0.
+#   ( echo 2 ; echo 3 ; echo 4) | lef "filter(function(x) return x+0 ~= 3 end)"
+lef () {
+  # Add each(print) at the end if there's no print or io.write in the
+  # command.
+  local expr="$@"
+  case "$expr" in
+    *print*|*write*) ;;
+    *) expr="${expr}:each(print)" ;;
+  esac
+
+  eval "$(luarocks path)" &&
+    LUA_INIT="@$HOME/.lua/init.lua" luajit -e \
+    "fun.wrap(stiter(io.lines())):$expr"
+}
+
+# Simpler invocation of lef(1) when only one operation is necessary.
+# Arguments are denoted by x[1], x[2], ...
+#
+# Example:
+#
+#   # Add 5 to every line and print.
+#   ( echo '2 5' ; echo '3 6' ; echo '4 7' ) | lefs "x[1] + 5"
+#
+# TODO(aktau): Implement string splitting.
+lefs () {
+  eval "$(luarocks path)" &&
+    LUA_INIT="@$HOME/.lua/init.lua" luajit -e \
+    "fun.wrap(stiter(io.lines())):map(function(...) local x = table.pack(...) ; return $@ end):each(print)"
+}
+
 # Start a luajit interpreter with some libraries preloaded.
 lj () {
   # Add local and global rocks to the lua search path, then preload those

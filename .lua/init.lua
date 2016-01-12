@@ -58,6 +58,42 @@ if has_syscall and has_lj and jit.os == "Linux" then
   end
 end
 
+-- Stiter turns a stateful iterator like io.lines() into an iterator
+-- accepted by luafun. It generates a "fake" state and returns the actual
+-- output (value) as the second parameter (instead of the first). This
+-- avoids the output from being mistaken as the state.
+--
+-- Example: lua.each(print, stiter(io.lines()))
+function stiter(it)
+  return function()
+    local v = it()
+    if v == nil then return nil end -- Break if iterator is done.
+    return 1, v
+  end
+end
+
+-- Define table.pack() for Lua 5.1.
+--
+-- Curious note, if, in Lua 5.1 the ... notation is used, arg will not be
+-- defined.
+--
+--   lua -e 'function x(...) return arg end ; print(x(1,2,3))'
+--   table: 0x18036e0
+--
+--   lua -e 'function x(...) return ... end ; print(x(1,2,3))'
+--   1    2   3
+--
+--   lua -e 'function x(...) print(...) ; return arg end ; print(x(1,2,3))'
+--   1  2   3
+--   nil
+--
+-- Wat?!
+if table.pack == nil then
+  function table.pack(...)
+    return { n = select("#", ...), ... }
+  end
+end
+
 -- If we could use table.pack and table.unpack, we could generalize this to:
 --
 --   function curry(fn, ...)
