@@ -47,18 +47,24 @@ function setup_vim {
 }
 
 function setup_link {
-    orig="$1"
-    file="$2"
+    local orig="$1"
+    local file="$2"
 
-    "$scriptdir/safelink.sh" "$dir/$orig" "$HOME/$file" "$olddir_current"
+    if [[ "${file:0:1}" == "/" ]] ; then
+        "$scriptdir/safelink.sh" "$dir/$orig" "$file" "$olddir_current"
+    else
+        "$scriptdir/safelink.sh" "$dir/$orig" "$HOME/$file" "$olddir_current"
+    fi
 }
 
 function setup_neovim {
     printf "%b %b\n" ${MAKECOLOR}"Creating"${ENDCOLOR} "neovim aliases..."
 
     # neovim uses the same config as vanilla
-    setup_link ".vimrc" ".nvimrc"
-    setup_link ".vim" ".nvim"
+    : "${XDG_CONFIG_HOME:=$HOME/.config}"
+    mkdir -p "$XDG_CONFIG_HOME/nvim"
+    setup_link ".vim" "$XDG_CONFIG_HOME/nvim"
+    setup_link ".vimrc" "$XDG_CONFIG_HOME/nvim/init.vim"
 }
 
 function setup_dotfiles {
