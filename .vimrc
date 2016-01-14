@@ -374,12 +374,7 @@ if has('autocmd')
     au BufRead,BufNewFile *.sql set ft=pgsql
     au BufRead,BufNewFile *.svg set ft=svg
     au BufRead,BufNewFile *.dasc set ft=c
-
     au BufRead,BufNewFile *.vimp set ft=vimperator
-
-    au BufRead,BufNewFile *.md set ft=mkd tw=72 ts=2 sw=2 expandtab
-    au BufRead,BufNewFile *.markdown set ft=mkd tw=72 ts=2 sw=2 expandtab
-
     au BufRead,BufNewFile *.coffee set ft=coffee
 
     au BufRead,BufNewFile mutt{ng,}-*-\w\+ set ft=mail
