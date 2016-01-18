@@ -1,0 +1,122 @@
+#!/bin/bash
+#
+# memo(1), memoizes the output of your command-line, so you can do:
+#
+#   $ memo <some long running command> | ...
+#
+# Instead of
+#
+#  $ <some long running command> > tmpfile
+#  $ cat tmpfile | ...
+#  $ rm tmpfile
+#
+# Provides some nice to haves, like transparant (de)compressing of the output so
+# you're less likely to be disk I/O bound and save some space. The order of
+# preferred compression algorithms is: lz4, xz, gzip. If none of these programs
+# are present on the system, the output is stored uncompressed.
+#
+# If you think this is handy, you're right. Yet, there are good reasons why this
+# sort of tool isn't distributed by default on distributions: it can give
+# surprising effects. Suppose the <command> you're trying to memoize depends on
+# the current working directory. Changing the directory and running the same
+# memo invocation will now paste the wrong data to stdout. Use this only if you
+# know what it's doing.
+#
+# That said, I myself use it a lot, I really can't be bothered to create
+# arbitrarily named temporary files all the time when I'm grabbing output from
+# some slow networked program.
+#
+# TODO(aktau): also provide memo(1) as a shell function such that aliases can be
+# used as part of the command-line.
+
+set -euo pipefail
+shopt -s nullglob
+
+usage() {
+    echo "memo [-c] <command>"
+    echo ""
+    echo "Memoizes the output of <command> and pastes if back to you if run"
+    echo "multiple times, without re-running commands. Use memo -c to clear all"
+    echo "saved invocation, use memo -c <command> to clear only one invocation."
+    exit 1
+}
+
+# Ensures that the memodir for $USER exists. If it doesn't exist, tries to
+# create it with the right permissions.
+ensuredir() {
+    local dir="${TMPDIR:-/tmp}/memo"
+    [ -d "$dir" ] || mkdir -p "$dir" -m 0777
+    dir="$dir/$USER"
+    [ -d "$dir" ] || mkdir "$dir" -m 0700
+    echo -n "$dir"
+}
+
+# Generates a hashed path inside of the memodir. The hash is based on the
+# arguments of this script.
+path() {
+    # Output the first part
+    ensuredir
+    # Output a separator
+    echo -n "/"
+    # Output the hashed arguments and use it as the filename The shasum family
+    # of utilities tend to output the hashes in hex format, so no need to fear
+    # strange characters being output.
+    echo -n "$@" | sha512sum | cut -d' ' -f1
+}
+
+# Cats a file, decompressing if necessary.
+catfile() {
+  if [ -f "$1.lz4" ] && hash lz4 2>/dev/null ; then
+    lz4 -dc < "$1.lz4"
+  elif [ -f "$1.xz" ] && hash xz 2>/dev/null ; then
+    xz -dc < "$1.xz"
+  elif [ -f "$1.gz" ] && hash gzip 2>/dev/null ; then
+    gzip -dc < "$1.gz"
+  elif [ -f "$1" ] ; then
+    cat "$1"
+  else
+    # Cache not found, sad face.
+    return 1
+  fi
+}
+
+# Compress standard input to $1.<ext> (.ext is based on the best compression
+# program found).
+compressfile() {
+  if hash lz4 2>/dev/null ; then
+    lz4 -9 > "$1.lz4"
+  elif hash xz 2>/dev/null ; then
+    xz > "$1.xz"
+  elif hash gzip 2>/dev/null ; then
+    gzip > "$1.gz"
+  else
+    cat - > "$1"
+  fi
+}
+
+# Process options.
+opt_clear=0
+while getopts :ch opt ; do
+  case $opt in
+    c) opt_clear=1 ;;
+    h) usage ;;
+    ?) (( --OPTIND )) ; break ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+# Blast the entire folder if -c was passed and nothing more.
+if (( opt_clear )) && (( $# == 0 )) ; then
+    rm -rf "$(ensuredir)"
+    exit 0
+fi
+
+readonly file=$(path "$@")
+
+# Remove all versions of this hash if -c was passed.
+(( opt_clear )) && rm -rf "$file"*
+
+# Output the cached file or generate a new one.
+catfile "$file" || {
+  "$@" | tee >(compressfile "$file")
+}
