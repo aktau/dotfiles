@@ -328,6 +328,36 @@ nmap <silent> ]G :tablast<CR>
 " fzf
 nmap <silent> <c-p> :FZF<CR>
 
+" lightline
+if !exists('g:lightline')
+  " A sane default config for lightline. This ugliness (with the later
+  " extending) is necessary because I conditionally include local configs that
+  " may override g:lightline.
+  let g:lightline = {
+    \ 'active': {
+    \   'left': [ [ 'mode', 'paste' ],
+    \             [ 'readonly', 'filename', 'modified' ] ]
+    \ },
+    \ }
+endif
+
+" Change filename component -> relativepath component if filename is present,
+" which is nicer for my use-case. I should loop over all components, but meh.
+let s:llIdx = index(g:lightline.active.left[1], 'filename')
+if s:llIdx != -1
+  let g:lightline.active.left[1][s:llIdx] = 'relativepath'
+endif
+
+" Add fugitive if it wasn't set yet.
+let s:llIdx = index(g:lightline.active.left[1], 'fugitive')
+if s:llIdx == -1
+  if !has_key(g:lightline, 'component_function')
+    let g:lightline['component_function'] = {}
+  endif
+  let g:lightline.component_function.fugitive = 'fugitive#statusline'
+  call extend(g:lightline.active.left[1], ['fugitive'], 0)
+endif
+
 """"""""""""""""""""
 " filetype detection
 """"""""""""""""""""
