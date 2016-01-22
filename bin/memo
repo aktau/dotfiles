@@ -26,97 +26,122 @@
 # arbitrarily named temporary files all the time when I'm grabbing output from
 # some slow networked program.
 #
-# TODO(aktau): also provide memo(1) as a shell function such that aliases can be
-# used as part of the command-line.
+# If you want to memo'ize shell aliases and functions, then you can source this
+# script instead of executing it. This will define a function called memo() that
+# you can use in exactly the same way. It made the implementation much uglier,
+# but at least I can use aliases now.
+#
+# Don't let the /bin/bash shebang at the top fool you, it runs just fine in zsh.
 
+# Detect being sourced from zsh and bash.
+sourced=0
+([[ -n $ZSH_EVAL_CONTEXT && $ZSH_EVAL_CONTEXT =~ :file$ ]] ||
+ [[ -n $KSH_VERSION && $(cd "$(dirname -- "$0")" &&
+    printf '%s' "${PWD%/}/")$(basename -- "$0") != "${.sh.file}" ]] ||
+ [[ -n $BASH_VERSION && $0 != "$BASH_SOURCE" ]]) && sourced=1
+
+memo() {
+  __memo_usage() {
+      echo "memo [-c] <command>"
+      echo ""
+      echo "Memoizes the output of <command> and pastes if back to you if run "
+      echo "multiple times, without re-running commands. Use memo -c to clear "
+      echo "all saved invocation, use memo -c <command> to clear only one "
+      echo "invocation."
+  }
+
+  # Process options.
+  local opt_clear=0
+  while getopts :ch opt ; do
+    case $opt in
+      c) opt_clear=1 ;;
+      h) __memo_usage ; return 1 ;;
+      ?) (( --OPTIND )) ; break ;;
+    esac
+  done
+  shift $(( OPTIND - 1 ))
+
+  # Ensures that the memodir for $USER exists. If it doesn't exist, tries to
+  # create it with the right permissions.
+  __memo_ensuredir() {
+      local dir="${TMPDIR:-/tmp}/memo"
+      [ -d "$dir" ] || mkdir -p "$dir" -m 0777
+      dir="$dir/$USER"
+      [ -d "$dir" ] || mkdir "$dir" -m 0700
+      echo -n "$dir"
+  }
+
+  # Generates a hashed __memo_path inside of the memodir. The hash is based on the
+  # arguments of this script.
+  __memo_path() {
+      # Output the first part
+      __memo_ensuredir
+      # Output a separator
+      echo -n "/"
+      # Output the hashed arguments and use it as the filename The shasum family
+      # of utilities tend to output the hashes in hex format, so no need to fear
+      # strange characters being output.
+      echo -n "$@" | sha512sum | cut -d' ' -f1
+  }
+
+  # Cats a file, decompressing if necessary.
+  __memo_catfile() {
+    if [ -f "$1.lz4" ] && hash lz4 2>/dev/null ; then
+      lz4 -dc < "$1.lz4" || true
+    elif [ -f "$1.xz" ] && hash xz 2>/dev/null ; then
+      xz -dc < "$1.xz" || true
+    elif [ -f "$1.gz" ] && hash gzip 2>/dev/null ; then
+      gzip -dc < "$1.gz" || true
+    elif [ -f "$1" ] ; then
+      cat "$1" || true
+    else
+      # Cache not found, sad face.
+      return 1
+    fi
+  }
+  # Compress standard input to $1.<ext> (.ext is based on the best compression
+  # program found).
+  __memo_compressfile() {
+    if hash lz4 2>/dev/null ; then
+      lz4 -9 > "$1.lz4"
+    elif hash xz 2>/dev/null ; then
+      xz > "$1.xz"
+    elif hash gzip 2>/dev/null ; then
+      gzip > "$1.gz"
+    else
+      cat - > "$1"
+    fi
+  }
+
+  # Blast the entire folder if -c was passed and nothing more.
+  if (( opt_clear )) && (( $# == 0 )) ; then
+    rm -rf "$(__memo_ensuredir)"
+  else
+    local file=$(__memo_path "$@")
+
+    # Remove all versions of this hash if -c was passed.
+    (( opt_clear )) &&
+      find "$(dirname "$file")" -type f -name "$(basename "$file")*" -delete
+
+    # Output the cached file or generate a new one.
+    __memo_catfile "$file" || {
+      "$@" | tee >(__memo_compressfile "$file")
+    }
+  fi
+
+  # Clean up
+  unset -f __memo_usage
+  unset -f __memo_ensuredir
+  unset -f __memo_path
+  unset -f __memo_catfile
+  unset -f __memo_compressfile
+}
+
+(( sourced )) && {
+  unset sourced
+  return 0
+}
+
+# If we reach here, we're not being sourced.
 set -euo pipefail
-shopt -s nullglob
-
-usage() {
-    echo "memo [-c] <command>"
-    echo ""
-    echo "Memoizes the output of <command> and pastes if back to you if run"
-    echo "multiple times, without re-running commands. Use memo -c to clear all"
-    echo "saved invocation, use memo -c <command> to clear only one invocation."
-    exit 1
-}
-
-# Ensures that the memodir for $USER exists. If it doesn't exist, tries to
-# create it with the right permissions.
-ensuredir() {
-    local dir="${TMPDIR:-/tmp}/memo"
-    [ -d "$dir" ] || mkdir -p "$dir" -m 0777
-    dir="$dir/$USER"
-    [ -d "$dir" ] || mkdir "$dir" -m 0700
-    echo -n "$dir"
-}
-
-# Generates a hashed path inside of the memodir. The hash is based on the
-# arguments of this script.
-path() {
-    # Output the first part
-    ensuredir
-    # Output a separator
-    echo -n "/"
-    # Output the hashed arguments and use it as the filename The shasum family
-    # of utilities tend to output the hashes in hex format, so no need to fear
-    # strange characters being output.
-    echo -n "$@" | sha512sum | cut -d' ' -f1
-}
-
-# Cats a file, decompressing if necessary.
-catfile() {
-  if [ -f "$1.lz4" ] && hash lz4 2>/dev/null ; then
-    lz4 -dc < "$1.lz4" || true
-  elif [ -f "$1.xz" ] && hash xz 2>/dev/null ; then
-    xz -dc < "$1.xz" || true
-  elif [ -f "$1.gz" ] && hash gzip 2>/dev/null ; then
-    gzip -dc < "$1.gz" || true
-  elif [ -f "$1" ] ; then
-    cat "$1" || true
-  else
-    # Cache not found, sad face.
-    return 1
-  fi
-}
-
-# Compress standard input to $1.<ext> (.ext is based on the best compression
-# program found).
-compressfile() {
-  if hash lz4 2>/dev/null ; then
-    lz4 -9 > "$1.lz4"
-  elif hash xz 2>/dev/null ; then
-    xz > "$1.xz"
-  elif hash gzip 2>/dev/null ; then
-    gzip > "$1.gz"
-  else
-    cat - > "$1"
-  fi
-}
-
-# Process options.
-opt_clear=0
-while getopts :ch opt ; do
-  case $opt in
-    c) opt_clear=1 ;;
-    h) usage ;;
-    ?) (( --OPTIND )) ; break ;;
-  esac
-done
-shift $(( OPTIND - 1 ))
-
-# Blast the entire folder if -c was passed and nothing more.
-if (( opt_clear )) && (( $# == 0 )) ; then
-    rm -rf "$(ensuredir)"
-    exit 0
-fi
-
-readonly file=$(path "$@")
-
-# Remove all versions of this hash if -c was passed.
-(( opt_clear )) && rm -rf "$file"*
-
-# Output the cached file or generate a new one.
-catfile "$file" || {
-  "$@" | tee >(compressfile "$file")
-}
+memo "$@"
