@@ -10,10 +10,17 @@
 #  $ cat tmpfile | ...
 #  $ rm tmpfile
 #
-# Provides some nice to haves, like transparant (de)compressing of the output so
-# you're less likely to be disk I/O bound and save some space. The order of
-# preferred compression algorithms is: lz4, xz, gzip. If none of these programs
-# are present on the system, the output is stored uncompressed.
+# You can even use it in the middle of a pipe if you know that the input is not
+# extremely long. Just supply the -s switch:
+#
+#  $ cat sitelist | memo -s parallel curl | grep "server:"
+#
+# As long as "sitelist" isn't changed, the curl(1) invocation will not be rerun.
+#
+# Memo provides some nice to haves, like transparant (de)compressing of the
+# output so you're less likely to be disk I/O bound and save some space. The
+# order of preferred compression algorithms is: lz4, xz, gzip. If none of these
+# programs are present on the system, the output is stored uncompressed.
 #
 # If you think this is handy, you're right. Yet, there are good reasons why this
 # sort of tool isn't distributed by default on distributions: it can give
@@ -22,40 +29,54 @@
 # memo invocation will now paste the wrong data to stdout. Use this only if you
 # know what it's doing.
 #
-# That said, I myself use it a lot, I really can't be bothered to create
-# arbitrarily named temporary files all the time when I'm grabbing output from
-# some slow networked program.
+# That said, I use it a lot, I really can't be bothered to create arbitrarily
+# named temporary files all the time when I'm grabbing output from some slow
+# networked program. Additionally, memo transparantly compresses.
 #
 # If you want to memo'ize shell aliases and functions, then you can source this
 # script instead of executing it. This will define a function called memo() that
 # you can use in exactly the same way. It made the implementation much uglier,
-# but at least I can use aliases now.
+# but at least I can memo'ize aliases now.
 #
 # Don't let the /bin/bash shebang at the top fool you, it runs just fine in zsh.
 
 # Detect being sourced from zsh and bash.
-sourced=0
+__memo_sourced=0
 ([[ -n $ZSH_EVAL_CONTEXT && $ZSH_EVAL_CONTEXT =~ :file$ ]] ||
  [[ -n $KSH_VERSION && $(cd "$(dirname -- "$0")" &&
     printf '%s' "${PWD%/}/")$(basename -- "$0") != "${.sh.file}" ]] ||
- [[ -n $BASH_VERSION && $0 != "$BASH_SOURCE" ]]) && sourced=1
+ [[ -n $BASH_VERSION && $0 != "$BASH_SOURCE" ]]) && __memo_sourced=1
 
 memo() {
-  __memo_usage() {
-      echo "memo [-c] <command>"
+  (
+  set -euo pipefail
+
+  usage() {
+      echo "SYNOPSIS"
+      echo "    memo [-chs] <command>"
       echo ""
-      echo "Memoizes the output of <command> and pastes if back to you if run "
-      echo "multiple times, without re-running commands. Use memo -c to clear "
-      echo "all saved invocation, use memo -c <command> to clear only one "
-      echo "invocation."
+      echo "DESCRIPTION"
+      echo ""
+      echo "Memoizes the output of <command> and outputs it."
+      echo ""
+      echo "OPTIONS"
+      echo
+      echo "-c  Clean the cache, if no command is specified, clean everything."
+      echo "-h  Usage message."
+      echo "-s  Take stdin as an input to the command. Note, that this requires"
+      echo "    buffering up all the input before memo is able to decide"
+      echo "    whether to replay the cached version or not. So don't do this"
+      echo "    for huge input streams."
   }
 
   # Process options.
   local opt_clear=0
-  while getopts :ch opt ; do
+  local opt_stdin=0
+  while getopts :chs opt ; do
     case $opt in
       c) opt_clear=1 ;;
-      h) __memo_usage ; return 1 ;;
+      h) usage ; return 1 ;;
+      s) opt_stdin=1 ;;
       ?) (( --OPTIND )) ; break ;;
     esac
   done
@@ -63,7 +84,7 @@ memo() {
 
   # Ensures that the memodir for $USER exists. If it doesn't exist, tries to
   # create it with the right permissions.
-  __memo_ensuredir() {
+  ensuredir() {
       local dir="${TMPDIR:-/tmp}/memo"
       [ -d "$dir" ] || mkdir -p "$dir" -m 0777
       dir="$dir/$USER"
@@ -71,21 +92,42 @@ memo() {
       echo -n "$dir"
   }
 
-  # Generates a hashed __memo_path inside of the memodir. The hash is based on the
-  # arguments of this script.
-  __memo_path() {
-      # Output the first part
-      __memo_ensuredir
-      # Output a separator
-      echo -n "/"
-      # Output the hashed arguments and use it as the filename The shasum family
-      # of utilities tend to output the hashes in hex format, so no need to fear
-      # strange characters being output.
-      echo -n "$@" | sha512sum | cut -d' ' -f1
+  # Generates a hashed path inside of the memodir. The hash is based on the
+  # stdin of this function.
+  path() {
+    # Output the first part
+    ensuredir
+    # Output a separator
+    echo -n "/"
+    # Finally, output the hashed arguments and use it as the filename The shasum
+    # family of utilities tend to output the hashes in hex format, so no need to
+    # fear strange characters being output.
+    sha512sum | cut -d' ' -f1
   }
 
-  # Cats a file, decompressing if necessary.
-  __memo_catfile() {
+  # Echo memo's preferred compressor, must take input on stdin and output
+  # a compressed stream on stdout.
+  compressor() {
+    if hash lz4 2>/dev/null ; then echo "lz4 -9"
+    elif hash xz 2>/dev/null ; then echo "xz"
+    elif hash gzip 2>/dev/null ; then echo "gzip"
+    else echo "cat -"
+    fi
+  }
+
+  # Same as compressor, but in reverse. Keep these two in sync.
+  decompressor() {
+    if hash lz4 2>/dev/null ; then echo "lz4 -dc"
+    elif hash xz 2>/dev/null ; then echo "xz -dc"
+    elif hash gzip 2>/dev/null ; then echo "gzip -dc"
+    else echo "cat -"
+    fi
+  }
+
+  # Cats a file, decompressing if necessary. The filename is the first argument,
+  # and it will get a compression extension (.gz, ...) applied for every
+  # available decompressor to see if the file exists.
+  catfile() {
     if [ -f "$1.lz4" ] && hash lz4 2>/dev/null ; then
       lz4 -dc < "$1.lz4" || true
     elif [ -f "$1.xz" ] && hash xz 2>/dev/null ; then
@@ -99,9 +141,10 @@ memo() {
       return 1
     fi
   }
+
   # Compress standard input to $1.<ext> (.ext is based on the best compression
   # program found).
-  __memo_compressfile() {
+  compressfile() {
     if hash lz4 2>/dev/null ; then
       lz4 -9 > "$1.lz4"
     elif hash xz 2>/dev/null ; then
@@ -115,30 +158,58 @@ memo() {
 
   # Blast the entire folder if -c was passed and nothing more.
   if (( opt_clear )) && (( $# == 0 )) ; then
-    rm -rf "$(__memo_ensuredir)"
+    rm -rf "$(ensuredir)"
   else
-    local file=$(__memo_path "$@")
+    # If stdin needs to be part of the unique command fingerprint, we need to
+    # save it somewhere so we can first hash it and then check if we already
+    # have a cache. Let's create a temporary file.
+    local stdinsave
+    if (( opt_stdin )) ; then
+      # Create a temporary file, open a file descriptor to it and remove it,
+      # so it gets cleaned up when this process exits.
+      local stdinsave=$(mktemp)
+      exec 3< "$stdinsave"
+      rm "$stdinsave"
+
+      # Get the PID of this subshell, in a portable way, use it to provide a
+      # stable file path to the file descriptor we just opened.
+      local pid=$(sh -c 'echo $PPID')
+      stdinsave="/proc/$pid/fd/3"
+    fi
+
+    # in the following block we construct the unique path to save the output of
+    # the command in.
+    local file=$({
+      # the command and its arguments are always part of the hash.
+      echo -n "$@"
+
+      # Save the input while compressing it and pass it through with tee(1).
+      local compressor="$(compressor)"
+      (( opt_stdin )) && tee >($compressor > "$stdinsave")
+    } | path)
 
     # Remove all versions of this hash if -c was passed.
     (( opt_clear )) &&
       find "$(dirname "$file")" -type f -name "$(basename "$file")*" -delete
 
     # Output the cached file or generate a new one.
-    __memo_catfile "$file" || {
-      "$@" | tee >(__memo_compressfile "$file")
+    catfile "$file" || {
+      if (( opt_stdin )) ; then
+        # It appears we don't have a cached file, but we already absorbed stdin,
+        # so we need to produce it again.
+        local decompressor="$(decompressor)"
+        $decompressor < "$stdinsave" |
+          "$@" | tee >(compressfile "$file")
+      else
+        "$@" | tee >(compressfile "$file")
+      fi
     }
   fi
-
-  # Clean up
-  unset -f __memo_usage
-  unset -f __memo_ensuredir
-  unset -f __memo_path
-  unset -f __memo_catfile
-  unset -f __memo_compressfile
+  )
 }
 
-(( sourced )) && {
-  unset sourced
+(( __memo_sourced )) && {
+  unset __memo_sourced
   return 0
 }
 
