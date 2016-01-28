@@ -102,6 +102,7 @@ set autoindent                    " match indentation of previous line
 set textwidth=76                  " in new gvim windows
 set colorcolumn=80
 set pastetoggle=<F2>
+set formatoptions+=n              " format numbered lists properly
 
 " show invisible characters
 set list
