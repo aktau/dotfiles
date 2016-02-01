@@ -108,19 +108,19 @@ memo() {
   # Echo memo's preferred compressor, must take input on stdin and output
   # a compressed stream on stdout.
   compressor() {
-    if hash lz4 2>/dev/null ; then echo "lz4 -9"
-    elif hash xz 2>/dev/null ; then echo "xz"
-    elif hash gzip 2>/dev/null ; then echo "gzip"
-    else echo "cat -"
+    if hash lz4 2>/dev/null ; then lz4 -9
+    elif hash xz 2>/dev/null ; then xz
+    elif hash gzip 2>/dev/null ; then gzip
+    else cat -
     fi
   }
 
   # Same as compressor, but in reverse. Keep these two in sync.
   decompressor() {
-    if hash lz4 2>/dev/null ; then echo "lz4 -dc"
-    elif hash xz 2>/dev/null ; then echo "xz -dc"
-    elif hash gzip 2>/dev/null ; then echo "gzip -dc"
-    else echo "cat -"
+    if hash lz4 2>/dev/null ; then lz4 -dc
+    elif hash xz 2>/dev/null ; then xz -dc
+    elif hash gzip 2>/dev/null ; then gzip -dc
+    else cat -
     fi
   }
 
@@ -184,8 +184,7 @@ memo() {
       echo -n "$@"
 
       # Save the input while compressing it and pass it through with tee(1).
-      local compressor="$(compressor)"
-      (( opt_stdin )) && tee >($compressor > "$stdinsave")
+      (( opt_stdin )) && tee >(compressor > "$stdinsave")
     } | path)
 
     # Remove all versions of this hash if -c was passed.
@@ -197,8 +196,7 @@ memo() {
       if (( opt_stdin )) ; then
         # It appears we don't have a cached file, but we already absorbed stdin,
         # so we need to produce it again.
-        local decompressor="$(decompressor)"
-        exec < <($decompressor < "$stdinsave")
+        exec < <(decompressor < "$stdinsave")
       fi
       "$@" | tee >(compressfile "$file")
     }
