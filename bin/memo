@@ -177,10 +177,10 @@ memo() {
       stdinsave="/proc/$pid/fd/3"
     fi
 
-    # in the following block we construct the unique path to save the output of
+    # In the following block we construct the unique path to save the output of
     # the command in.
     local file=$({
-      # the command and its arguments are always part of the hash.
+      # The command and its arguments are always part of the hash.
       echo -n "$@"
 
       # Save the input while compressing it and pass it through with tee(1).
@@ -198,11 +198,9 @@ memo() {
         # It appears we don't have a cached file, but we already absorbed stdin,
         # so we need to produce it again.
         local decompressor="$(decompressor)"
-        $decompressor < "$stdinsave" |
-          "$@" | tee >(compressfile "$file")
-      else
-        "$@" | tee >(compressfile "$file")
+        exec < <($decompressor < "$stdinsave")
       fi
+      "$@" | tee >(compressfile "$file")
     }
   fi
   )
