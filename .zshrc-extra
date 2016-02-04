@@ -122,6 +122,9 @@ clip () {
   [ -t 0 ] && pbpaste || pbcopy
 }
 
+# Return the current UNIX timestamp.
+alias stamp="date +'%s'"
+
 # make LuaJIT nicer to use from the CLI
 alias luajit="rlwrap luajit"
 
