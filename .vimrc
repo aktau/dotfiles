@@ -411,7 +411,7 @@ if has('autocmd')
     au FileType go nmap <leader>c <Plug>(go-coverage)
     au FileType go nmap <leader>i <Plug>(go-info)
     au FileType go nmap <leader>d <Plug>(go-doc)
-    au FileType go nmap <leader>m <Plug>(go-rename)
+    au FileType go nmap <leader>n <Plug>(go-rename)
 
     " useful, but dangerous in a work environment
     " au FileType go noremap <leader>p :GoPlay<CR>
