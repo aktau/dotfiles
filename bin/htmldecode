@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+#
+# Piper content with HTML entities through this script to transform them
+# into regular text.
+#
+# NOTE: find how to set the '-C' switch from inside a script, as then it
+# would generate proper UTF-8.
+#
+# The (almost) equivalent one-liner:
+#   perl -C -MHTML::Entities -pe 'decode_entities($_);'
+
+use HTML::Entities;
+while (<>) {
+  decode_entities($_);
+} continue {
+  print or die "-p destination: $!\n";
+}
