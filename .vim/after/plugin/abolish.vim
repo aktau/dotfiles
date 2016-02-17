@@ -3,10 +3,13 @@ if !exists(":Abolish")
   finish
 endif
 
+Abolish mil{,l}isecond{,s}                           mil{l}isecond{}
+Abolish com{,m}it{,t}{ed,ing}                        com{m}it{t}{}
 Abolish defin{a,i,o}t{,e,i,o}l{i,y}                  defin{i}t{e}l{y}
 Abolish wierd{,ed}                                   weird{}
 Abolish mis{,s}pel{,l}ing{,s}                        mis{s}pel{l}ing{}
 Abolish an{e,o}ursym{,s}                             an{e}urysm{}
+Abolish dif{,f}er{,e}nt{,ly,y}                       dif{f}er{e}nt{,ly,ly}
 Abolish suc{,c}esful{,ly,y}                          suc{c}essful{,ly,ly}
 Abolish itnerface{,s}                                interface{}
 Abolish arugment{,s}                                 argument{}
