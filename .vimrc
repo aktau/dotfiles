@@ -56,6 +56,7 @@ Plugin 'xuhdev/SingleCompile'
 Plugin 'editorconfig/editorconfig-vim'
 Plugin 'godlygeek/tabular'
 Plugin 'b4winckler/vim-angry'
+Plugin 'nhooyr/neoman.vim'
 
 " themes
 Plugin 'altercation/vim-colors-solarized'
@@ -330,6 +331,12 @@ nmap <silent> ]G :tablast<CR>
 
 " fzf
 nmap <silent> <c-p> :FZF<CR>
+
+" neoman.vim
+" Vanilla vim doesn't support keywordprg being an Ex command.
+if has('nvim')
+  set keywordprg=:Nman
+endif
 
 " lightline
 if !exists('g:lightline')
