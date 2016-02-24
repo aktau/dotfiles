@@ -2,6 +2,8 @@
 .vim/init.vim
 
 .vim/bundle/*
+.vim/undo
+.vim/view
 .newsbeuter/*.db
 .newsbeuter/*.lock
 .newsbeuter/history.*
