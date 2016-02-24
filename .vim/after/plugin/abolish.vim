@@ -3,6 +3,8 @@ if !exists(":Abolish")
   finish
 endif
 
+Abolish oc{,c}ur{,s,red,ed}                          oc{c}ur{,s,red,red}
+Abolish exmaple{,s}                                  example{}
 Abolish mil{,l}isecond{,s}                           mil{l}isecond{}
 Abolish com{,m}it{,t}{ed,ing}                        com{m}it{t}{}
 Abolish defin{a,i,o}t{,e,i,o}l{i,y}                  defin{i}t{e}l{y}
