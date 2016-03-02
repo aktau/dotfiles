@@ -37,17 +37,14 @@ Plugin 'tpope/vim-unimpaired'
 Plugin 'tpope/vim-commentary'
 Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-sleuth'
-Plugin 'itchyny/lightline.vim' " try bling/vim-airline if this doesn't work out.
+Plugin 'itchyny/lightline.vim'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'kien/ctrlp.vim'
 Plugin 'ivalkeen/vim-ctrlp-tjump'
 Plugin 'rking/ag.vim'
 Plugin 'ajh17/VimCompletesMe'
-Plugin 'mattn/webapi-vim'
-Plugin 'mattn/gist-vim'
 Plugin 'chrisbra/vim-diff-enhanced'
 Plugin 'scrooloose/syntastic'
-Plugin 'justinmk/vim-sneak'
 Plugin 'rhysd/clever-f.vim'
 Plugin 'xolox/vim-misc'
 Plugin 'aktau/vim-easytags'
@@ -57,17 +54,14 @@ Plugin 'editorconfig/editorconfig-vim'
 Plugin 'godlygeek/tabular'
 Plugin 'b4winckler/vim-angry'
 Plugin 'nhooyr/neoman.vim'
+Plugin 'ivalkeen/vim-simpledb'
 
 " themes
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'chriskempson/tomorrow-theme', {'rtp': 'vim/'}
-Plugin 'tomasr/molokai'
 Plugin 'jnurmine/Zenburn'
 
 " language support
 Plugin 'rodjek/vim-puppet'
 Plugin 'exu/pgsql.vim'
-Plugin 'ivalkeen/vim-simpledb'
 Plugin 'fatih/vim-go'
 Plugin 'nfnty/vim-nftables'
 
