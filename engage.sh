@@ -36,16 +36,6 @@ printf '%b %b %b%b' ${MAKECOLOR}"Changing"${ENDCOLOR} "working directory to" ${B
 cd $dir
 echo "done"
 
-function setup_vim {
-    if [[ ! -d "$dir/.vim/bundle/vundle" ]] ; then
-        mkdir -p ~/.vim/bundle && cd ~/.vim/bundle && git clone https://github.com/gmarik/vundle
-    else
-        cd "$dir/.vim/bundle/vundle" && git pull --ff-only
-    fi
-
-    vim +BundleInstall +qall
-}
-
 function setup_link {
     local orig="$1"
     local file="$2"
@@ -181,7 +171,6 @@ setup_dotfiles "$files"
 setup_folders "$dir" "$HOME" <<< "$folders"
 setup_git
 setup_ssh
-setup_vim
 setup_neovim
 
 # add patches against upstream, if necessary

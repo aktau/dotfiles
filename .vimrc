@@ -22,57 +22,60 @@ if executable('fzf')
   endif
 endif
 
-set rtp+=~/.vim/bundle/vundle/
-call vundle#begin()
+" Install vim-plug if it's missing. Need curl(1) though.
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall | source $MYVIMRC
+endif
 
-" let vundle manage vundle
-Plugin 'gmarik/vundle'
+call plug#begin('~/.vim/bundle')
 
 " original repos on github
-Plugin 'tpope/vim-abolish'
-Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-surround'
-Plugin 'tpope/vim-eunuch'
-Plugin 'tpope/vim-unimpaired'
-Plugin 'tpope/vim-commentary'
-Plugin 'tpope/vim-repeat'
-Plugin 'tpope/vim-sleuth'
-Plugin 'itchyny/lightline.vim'
-Plugin 'airblade/vim-gitgutter'
-Plugin 'kien/ctrlp.vim'
-Plugin 'ivalkeen/vim-ctrlp-tjump'
-Plugin 'rking/ag.vim'
-Plugin 'ajh17/VimCompletesMe'
-Plugin 'chrisbra/vim-diff-enhanced'
-Plugin 'scrooloose/syntastic'
-Plugin 'rhysd/clever-f.vim'
-Plugin 'xolox/vim-misc'
-Plugin 'aktau/vim-easytags'
-Plugin 'danro/rename.vim'
-Plugin 'xuhdev/SingleCompile'
-Plugin 'editorconfig/editorconfig-vim'
-Plugin 'godlygeek/tabular'
-Plugin 'b4winckler/vim-angry'
-Plugin 'nhooyr/neoman.vim'
-Plugin 'ivalkeen/vim-simpledb'
+Plug 'airblade/vim-gitgutter'
+Plug 'ajh17/VimCompletesMe'
+Plug 'aktau/vim-easytags'
+Plug 'b4winckler/vim-angry'
+Plug 'chrisbra/vim-diff-enhanced'
+Plug 'danro/rename.vim'
+Plug 'editorconfig/editorconfig-vim'
+Plug 'godlygeek/tabular'
+Plug 'itchyny/lightline.vim'
+Plug 'ivalkeen/vim-ctrlp-tjump'
+Plug 'ivalkeen/vim-simpledb'
+Plug 'kien/ctrlp.vim'
+Plug 'nhooyr/neoman.vim'
+Plug 'rhysd/clever-f.vim'
+Plug 'rking/ag.vim'
+Plug 'scrooloose/syntastic'
+Plug 'tpope/vim-abolish'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-eunuch'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-sleuth'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-unimpaired'
+Plug 'xolox/vim-misc'
+Plug 'xuhdev/SingleCompile'
 
 " themes
-Plugin 'jnurmine/Zenburn'
+Plug 'jnurmine/Zenburn'
 
 " language support
-Plugin 'rodjek/vim-puppet'
-Plugin 'exu/pgsql.vim'
-Plugin 'fatih/vim-go'
-Plugin 'nfnty/vim-nftables'
+Plug 'exu/pgsql.vim'
+Plug 'fatih/vim-go'
+Plug 'nfnty/vim-nftables'
+Plug 'rodjek/vim-puppet'
 
 let mapleader = ","
-
 " Enable any local modifications
 if filereadable($HOME . '/.local_config/local.vim')
   source ~/.local_config/local.vim
 endif
 
-call vundle#end()
+call plug#end()
+
 filetype plugin indent on         " load file type plugins + indentation
 syntax enable
 
