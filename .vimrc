@@ -247,6 +247,15 @@ map <Right> :echo "no!"<cr>
 map <Up> :echo "no!"<cr>
 map <Down> :echo "no!"<cr>
 
+" visual-at. Allow running macro's over a visual selection, just type @<reg>
+" while in visual mode.
+xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
+
+function! ExecuteMacroOverVisualRange()
+  echo "@".getcmdline()
+  execute ":'<,'>normal @".nr2char(getchar())
+endfunction
+
 """"""""""""""""""""""
 " plugin customization
 """"""""""""""""""""""
