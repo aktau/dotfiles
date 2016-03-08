@@ -387,23 +387,10 @@ if has('autocmd')
     au ColorScheme * hi ExtraWhitespace ctermbg=red guibg=red
     match ExtraWhitespace /\s\+$\| \+\ze\t/
 
-    " Fix filetype detection
-    au BufNewFile,BufRead *.inc set filetype=php
-    au BufNewFile,BufRead *.sys set filetype=php
-    au BufNewFile,BufRead grub.conf set filetype=grub
-    au BufNewFile,BufRead *.blog set filetype=blog
-
     " C file specific options
     au FileType c,cpp set cindent
     au FileType c,cpp set formatoptions+=roj
     au FileType c,cpp setlocal comments^=:///
-
-    " Go file specific options
-    au FileType go setlocal formatoptions+=j
-
-    " Ruby file specific options
-    au Filetype ruby set textwidth=80 ts=2
-    au Filetype haml set ts=2 sw=2 sts=0 expandtab tw=120
 
     au FileType javascript setlocal nocindent
 
@@ -411,39 +398,17 @@ if has('autocmd')
     au BufRead,BufNewFile *.rxls set ft=ruby
     au BufRead,BufNewFile *.ru set ft=ruby
     au BufRead,BufNewFile *.god set ft=ruby
-    au BufRead,BufNewFile *.rtxt set ft=html spell
-    au BufRead,BufNewFile *.rl set ft=ragel
-    au BufRead,BufNewFile *.haml set ft=haml
-    au BufRead,BufNewFile *.mustache set ft=mustache
-    au BufRead,BufNewFile *.ron set ft=mkd tw=65 ts=2 sw=2 expandtab
-
-    " Others..
     au BufRead,BufNewFile *.sql set ft=pgsql
     au BufRead,BufNewFile *.svg set ft=svg
     au BufRead,BufNewFile *.dasc set ft=c
-    au BufRead,BufNewFile *.vimp set ft=vimperator
     au BufRead,BufNewFile *.coffee set ft=coffee
-
     au BufRead,BufNewFile mutt{ng,}-*-\w\+ set ft=mail
 
-    " tidy up HTML
-    let pandoc_pipeline = "pandoc -f html -t markdown"
-    let pandoc_pipeline .= " | pandoc -f markdown -t html"
-    au FileType html let &formatprg=pandoc_pipeline
-
-    " Python file specific options
-    au FileType python set omnifunc=pythoncomplete#Complete
-
-    " Compile and run keymappings
-    au FileType php map <leader>r :!php -f %<CR>
-    au FileType python map <leader>r :!python %<CR>
-    au FileType perl map <leader>r :!perl %<CR>
-    au FileType ruby map <leader>r :!ruby %<CR>
-    au FileType lua map <leader>r :!lua %<CR>
-    au FileType html,xhtml map <leader>r :!firefox %<CR>
+    " Go file specific options
+    au FileType go setlocal formatoptions+=j
 
     au FileType go setlocal makeprg=go\ build
-    au FileType go setlocal noexpandtab shiftwidth=4 tabstop=4 softtabstop=4 nolist
+    au FileType go setlocal shiftwidth=4 tabstop=4 softtabstop=4 nolist
     au FileType go let g:SuperTabDefaultCompletionType = "context"
 
     au FileType go unmap <leader>r
@@ -456,13 +421,9 @@ if has('autocmd')
     au FileType go nmap <leader>d <Plug>(go-doc)
     au FileType go nmap <leader>n <Plug>(go-rename)
 
-    " useful, but dangerous in a work environment
-    " au FileType go noremap <leader>p :GoPlay<CR>
-
     " MS Word document reading
-    au BufReadPre *.doc set ro
-    au BufReadPre *.doc set hlsearch!
-    au BufReadPost *.doc %!antiword "%"
+    au BufReadPre *.doc setlocal ro
+    au BufReadPre *.doc setlocal hlsearch!
 endif
 
 """"""""""""""""""""""""
