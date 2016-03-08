@@ -101,6 +101,7 @@ set textwidth=76                  " in new gvim windows
 set colorcolumn=80
 set pastetoggle=<F2>
 set formatoptions+=n              " format numbered lists properly
+set nojoinspaces                  " Don't add extra spaces after join/fmt.
 
 " show invisible characters
 set list
