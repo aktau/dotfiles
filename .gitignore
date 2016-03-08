@@ -4,7 +4,7 @@
 .vim/bundle/*
 .vim/undo
 .vim/view
-.vim/autoload/plug.vim
+.vim/autoload/plug.vim*
 .newsbeuter/*.db
 .newsbeuter/*.lock
 .newsbeuter/history.*
