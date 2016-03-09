@@ -108,7 +108,7 @@ memo() {
   # Echo memo's preferred compressor, must take input on stdin and output
   # a compressed stream on stdout.
   compressor() {
-    if hash lz4 2>/dev/null ; then lz4 -9
+    if hash lz4 2>/dev/null ; then lz4
     elif hash xz 2>/dev/null ; then xz
     elif hash gzip 2>/dev/null ; then gzip
     else cat -
