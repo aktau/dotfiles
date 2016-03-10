@@ -3,6 +3,12 @@ if !exists(":Abolish")
   finish
 endif
 
+" Both existant and existent exist. However, non-existent doesn't. So it is
+" better to convert existant to existent (can't abolish words with dashes in
+" them).
+Abolish existant                                     existent
+Abolish garbace                                      garbage
+Abolish worksapce                                    workspace
 Abolish oc{,c}ur{,s,red,ed}                          oc{c}ur{,s,red,red}
 Abolish exmaple{,s}                                  example{}
 Abolish mil{,l}isecond{,s}                           mil{l}isecond{}
