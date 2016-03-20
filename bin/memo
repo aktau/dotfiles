@@ -92,6 +92,12 @@ memo() {
       echo -n "$dir"
   }
 
+  # Generate a sha512, done this way to account for differences between most
+  # Linux distros and OSX.
+  genhash() {
+    hash sha512sum 2>/dev/null && sha512sum || shasum -a 512
+  }
+
   # Generates a hashed path inside of the memodir. The hash is based on the
   # stdin of this function.
   path() {
@@ -102,7 +108,7 @@ memo() {
     # Finally, output the hashed arguments and use it as the filename The shasum
     # family of utilities tend to output the hashes in hex format, so no need to
     # fear strange characters being output.
-    sha512sum | cut -d' ' -f1
+    genhash | cut -d' ' -f1
   }
 
   # Echo memo's preferred compressor, must take input on stdin and output
