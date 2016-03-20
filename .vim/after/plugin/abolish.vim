@@ -6,6 +6,8 @@ endif
 " Both existant and existent exist. However, non-existent doesn't. So it is
 " better to convert existant to existent (can't abolish words with dashes in
 " them).
+Abolish critiscism                                   criticism
+Abolish embar{,r}as{,s}ing                           embarrassing
 Abolish existant                                     existent
 Abolish garbace                                      garbage
 Abolish worksapce                                    workspace
