@@ -61,6 +61,8 @@ Plug 'xuhdev/SingleCompile'
 
 " themes
 Plug 'jnurmine/Zenburn'
+Plug 'git@bitbucket.org:kisom/eink.vim.git'
+Plug 'robertmeta/nofrils'
 
 " language support
 Plug 'exu/pgsql.vim'
@@ -413,17 +415,12 @@ if has('autocmd')
 
     au FileType go unmap <leader>r
     au FileType go nmap <leader>r <Plug>(go-run)
-    " au FileType go map <leader>b :update<bar>:!go build -o go-app && ./go-app<CR>
     au FileType go nmap <leader>b <Plug>(go-build)
     au FileType go nmap <leader>t <Plug>(go-test)
     au FileType go nmap <leader>c <Plug>(go-coverage)
     au FileType go nmap <leader>i <Plug>(go-info)
     au FileType go nmap <leader>d <Plug>(go-doc)
     au FileType go nmap <leader>n <Plug>(go-rename)
-
-    " MS Word document reading
-    au BufReadPre *.doc setlocal ro
-    au BufReadPre *.doc setlocal hlsearch!
 endif
 
 """"""""""""""""""""""""
