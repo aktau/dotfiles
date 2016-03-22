@@ -9,7 +9,7 @@ BEGIN {
     exit(1)
   }
   col = ARGV[1]
-  ARGV[1]=""
+  ARGV[1]="-"
 }
 
 {
