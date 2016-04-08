@@ -389,9 +389,11 @@ if has('autocmd')
     au ColorScheme * hi ExtraWhitespace ctermbg=red guibg=red
     match ExtraWhitespace /\s\+$\| \+\ze\t/
 
+    " C-language family options.
+    au FileType c,cpp,go set formatoptions+=roj
+
     " C file specific options
     au FileType c,cpp set cindent
-    au FileType c,cpp set formatoptions+=roj
     au FileType c,cpp setlocal comments^=:///
 
     au FileType javascript setlocal nocindent
@@ -407,8 +409,6 @@ if has('autocmd')
     au BufRead,BufNewFile mutt{ng,}-*-\w\+ set ft=mail
 
     " Go file specific options
-    au FileType go setlocal formatoptions+=j
-
     au FileType go setlocal makeprg=go\ build
     au FileType go setlocal shiftwidth=4 tabstop=4 softtabstop=4 nolist
     au FileType go let g:SuperTabDefaultCompletionType = "context"
