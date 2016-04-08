@@ -199,8 +199,16 @@ noremap <C-S> :update<CR>
 vnoremap <C-S> <C-C>:update<CR>
 inoremap <C-S> <C-O>:update<CR>
 
-" re-hardwrap paragraphs
+" Rewrap the current paragraph.
 nnoremap <leader>q gqip
+" Rewrap the current comment block. Necessary because paragraphs don't work
+" properly inside of comment blocks, so we re-use tpope's comment block text
+" object. nnoremap doesn't work. I have _no_ idea why, maybe because gc isn't
+" builtin?. It appears to set a cursor to the end of the block, which I fix with
+" marks. Overrides mark `q`, which I hope I wasn't using. Normally I'd use the
+" `'` mark but that gets overriden during the `gc` movement, probably because of
+" a jump.
+nmap <leader>e mjgqgc`j
 vmap Q gq
 nmap Q gqap
 
