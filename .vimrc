@@ -392,6 +392,11 @@ if has('autocmd')
     " C-language family options.
     au FileType c,cpp,go set formatoptions+=roj
 
+    " This is the same formatlistpat as found in the Markdown filetype. Unlike
+    " the default one, it doesn't just recognize numbered lists, but also
+    " -*+ (unordered) lists.
+    au FileType c,cpp,go setlocal formatlistpat=^\\s*\\d\\+\\.\\s\\+\\\|^[-*+]\\s\\+
+
     " C file specific options
     au FileType c,cpp set cindent
     au FileType c,cpp setlocal comments^=:///
