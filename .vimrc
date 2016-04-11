@@ -169,6 +169,12 @@ set timeoutlen=500
 
 set laststatus=2                  " Show the status line all the time
 
+" Set a colorscheme. This is really stupid though, static_tomorrownight changes
+" some values. Then changing the background changes the colorscheme back to the
+" default (because g:colors_name in static_tomorrownight doesn't match the name
+" of the file). This results in something I find pleasant to use. Removing the
+" colorscheme invocation should work, but there are apparently some things the
+" default scheme doesn't override which I like.
 set t_Co=256                      " Set terminal to 256 colors
 colorscheme static_tomorrownight
 set background=dark

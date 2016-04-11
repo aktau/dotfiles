@@ -3,7 +3,7 @@
 "
 " Hex colour conversion functions borrowed from the theme "Desert256""
 
-let g:colors_name = "Tomorrow-Night"
+let g:colors_name = "static_tomorrownight"
 
 " Default GUI Colours
 let s:foreground = "c5c8c6"
