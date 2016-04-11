@@ -182,9 +182,6 @@ autocmd BufWritePre * kz|:%s/\s\+$//e|'z
 vmap <tab> >gv
 vmap <s-tab> <gv
 
-" F7 reformats the whole file and leaves you where you were (unlike gg)
-map <silent> <F7> mzgg=G'z :delmarks z<CR>:echo "Reformatted."<CR>
-
 " open the definition in a new split
 nnoremap <c-\> <c-w>g<c-]>
 
@@ -233,9 +230,6 @@ nnoremap <leader><space> :noh<cr>
 
 " select last matched item
 nnoremap <leader>/ //e<Enter>v??<Enter>
-
-" make and open quickfix window
-map <silent> <F7> :make %<CR>:copen<CR>
 
 " see what unsaved changes you have
 nnoremap <leader>u :w !diff - %<CR>
