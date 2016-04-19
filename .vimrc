@@ -42,7 +42,6 @@ Plug 'editorconfig/editorconfig-vim'
 Plug 'godlygeek/tabular'
 Plug 'itchyny/lightline.vim'
 Plug 'ivalkeen/vim-ctrlp-tjump'
-Plug 'ivalkeen/vim-simpledb'
 Plug 'kien/ctrlp.vim'
 Plug 'nhooyr/neoman.vim'
 Plug 'rhysd/clever-f.vim'
@@ -411,14 +410,11 @@ if has('autocmd')
 
     au FileType javascript setlocal nocindent
 
-    au BufRead,BufNewFile *.rpdf set ft=ruby
-    au BufRead,BufNewFile *.rxls set ft=ruby
-    au BufRead,BufNewFile *.ru set ft=ruby
-    au BufRead,BufNewFile *.god set ft=ruby
-    au BufRead,BufNewFile *.sql set ft=pgsql
+    " Only set the filetype of *.sql files to pgsql if it has been set to 'sql'
+    " before. To avoid overwriting earlier autocmds peculiar to a local config.
+    au BufRead,BufNewFile *.sql if !exists("g:filetype_sql") | set ft=pgsql | endif
     au BufRead,BufNewFile *.svg set ft=svg
     au BufRead,BufNewFile *.dasc set ft=c
-    au BufRead,BufNewFile *.coffee set ft=coffee
     au BufRead,BufNewFile mutt{ng,}-*-\w\+ set ft=mail
 
     " Go file specific options
