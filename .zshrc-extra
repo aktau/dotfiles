@@ -183,7 +183,7 @@ le () {
   # Dirty hack to force printing of the passed in expression.
   case "$expr" in
     *print*|*write*) ;;
-    *) expr="printf(ml.tstring($expr))" ;;
+    *) expr="print($expr)" ;;
   esac
 
   eval "$(luarocks path)" &&
