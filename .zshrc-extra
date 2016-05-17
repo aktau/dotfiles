@@ -62,7 +62,7 @@ cdf () {
 # on very slow filesystems you can navigate piecemeal. This requires bfs(1).
 fd () {
   local dir
-  dir="$(bfs . -type d -mindepth 1 2>/dev/null | fzf -0 -1 -q "$*")" || {
+  dir="$(bfs . -type d -mindepth 1 2>/dev/null | fzf -0 -q "$*")" || {
     return 1
   }
   if [ -z "$dir" ] ; then
