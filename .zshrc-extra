@@ -92,6 +92,15 @@ fe () {
   [ -n "$file" ] && ${EDITOR:-vim} "$file"
 }
 
+# Edit a file in your $PATH. Alternative future implementation:
+#
+# which "$1" | vimin.
+vimp() {
+  local file
+  file=$(which "$1")
+  [ -e "$file" ] && ${EDITOR:-vim} "$file"
+}
+
 # fh - repeat history
 fh() {
   print -z $(fc -ln 1 | fzf --tac -0 -1 -q "$*")
