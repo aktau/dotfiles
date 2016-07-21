@@ -271,14 +271,21 @@ function isin(val, ...)
 end
 
 if math.round == nil then
-  function math.round(n)
-    return math.floor(n + 0.5)
-  end
+  function math.round(n) return math.floor(n + 0.5) end
 end
 
 if math.log2 == nil then
-  function math.log2(n)
-    return math.log(n) / math.log(2)
+  function math.log2(n) return math.log(n) / math.log(2) end
+end
+
+if math.fact == nil then
+  function math.fact(n)
+    assert(n > 0)
+    local r = 1
+    for i = 2,n do
+      r = r * i
+    end
+    return r
   end
 end
 
