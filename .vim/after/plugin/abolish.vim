@@ -6,6 +6,7 @@ endif
 " Both existant and existent exist. However, non-existent doesn't. So it is
 " better to convert existant to existent (can't abolish words with dashes in
 " them).
+Abolish ac{,c}es{,s}{i,a}ble                         a{cc}e{ss}{i}ble
 Abolish dis{,s}ap{,p}ear{,s,ing}                     dis{,}ap{p}ear{}
 Abolish cancelation                                  cancellation
 Abolish over{,r}id{e,de,des,ing,ding,en,den}         over{r}id{e,e,es,ing,ing,den,den}
