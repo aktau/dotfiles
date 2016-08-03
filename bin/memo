@@ -112,22 +112,23 @@ memo() {
   }
 
   # Echo memo's preferred compressor, must take input on stdin and output
-  # a compressed stream on stdout.
+  # a compressed stream on stdout. Replaces current shell.
   compressor() {
-    if hash lz4 2>/dev/null ; then lz4
-    elif hash xz 2>/dev/null ; then xz
-    elif hash gzip 2>/dev/null ; then gzip
-    else cat -
+    if hash lz4 2>/dev/null ; then exec lz4 -9
+    elif hash xz 2>/dev/null ; then exec xz
+    elif hash gzip 2>/dev/null ; then exec gzip
     fi
+    exec cat -
   }
 
-  # Same as compressor, but in reverse. Keep these two in sync.
+  # Same as compressor, but in reverse. Keep these two in sync. Replaces current
+  # shell.
   decompressor() {
-    if hash lz4 2>/dev/null ; then lz4 -dc
-    elif hash xz 2>/dev/null ; then xz -dc
-    elif hash gzip 2>/dev/null ; then gzip -dc
-    else cat -
+    if hash lz4 2>/dev/null ; then exec lz4 -dc
+    elif hash xz 2>/dev/null ; then exec xz -dc
+    elif hash gzip 2>/dev/null ; then exec gzip -dc
     fi
+    exec cat -
   }
 
   # Cats a file, decompressing if necessary. The filename is the first argument,
@@ -149,16 +150,17 @@ memo() {
   }
 
   # Compress standard input to $1.<ext> (.ext is based on the best compression
-  # program found).
+  # program found). Calling this function will replace the current shell with
+  # the decompressor, so make sure this is a terminal statement.
   compressfile() {
     if hash lz4 2>/dev/null ; then
-      lz4 -9 > "$1.lz4"
+      exec lz4 -9 > "$1.lz4"
     elif hash xz 2>/dev/null ; then
-      xz > "$1.xz"
+      exec xz > "$1.xz"
     elif hash gzip 2>/dev/null ; then
-      gzip > "$1.gz"
+      exec gzip > "$1.gz"
     else
-      cat - > "$1"
+      exec cat - > "$1"
     fi
   }
 
