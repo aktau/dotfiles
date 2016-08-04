@@ -114,7 +114,7 @@ memo() {
   # Echo memo's preferred compressor, must take input on stdin and output
   # a compressed stream on stdout. Replaces current shell.
   compressor() {
-    if hash lz4 2>/dev/null ; then exec lz4 -9
+    if hash lz4 2>/dev/null ; then exec lz4
     elif hash xz 2>/dev/null ; then exec xz
     elif hash gzip 2>/dev/null ; then exec gzip
     fi
@@ -154,7 +154,7 @@ memo() {
   # the decompressor, so make sure this is a terminal statement.
   compressfile() {
     if hash lz4 2>/dev/null ; then
-      exec lz4 -9 > "$1.lz4"
+      exec lz4 > "$1.lz4"
     elif hash xz 2>/dev/null ; then
       exec xz > "$1.xz"
     elif hash gzip 2>/dev/null ; then
