@@ -114,7 +114,8 @@ memo() {
   # Echo memo's preferred compressor, must take input on stdin and output
   # a compressed stream on stdout. Replaces current shell.
   compressor() {
-    if hash lz4 2>/dev/null ; then exec lz4
+    if hash zstd 2>/dev/null ; then exec zstd
+    elif hash lz4 2>/dev/null ; then exec lz4
     elif hash xz 2>/dev/null ; then exec xz
     elif hash gzip 2>/dev/null ; then exec gzip
     fi
@@ -124,7 +125,8 @@ memo() {
   # Same as compressor, but in reverse. Keep these two in sync. Replaces current
   # shell.
   decompressor() {
-    if hash lz4 2>/dev/null ; then exec lz4 -dc
+    if hash zstd 2>/dev/null ; then exec zstd -dc
+    elif hash lz4 2>/dev/null ; then exec lz4 -dc
     elif hash xz 2>/dev/null ; then exec xz -dc
     elif hash gzip 2>/dev/null ; then exec gzip -dc
     fi
@@ -135,7 +137,9 @@ memo() {
   # and it will get a compression extension (.gz, ...) applied for every
   # available decompressor to see if the file exists.
   catfile() {
-    if [ -f "$1.lz4" ] && hash lz4 2>/dev/null ; then
+    if [ -f "$1.zst" ] && hash zstd 2>/dev/null ; then
+      zstd -dc < "$1.zst" || true
+    elif [ -f "$1.lz4" ] && hash lz4 2>/dev/null ; then
       lz4 -dc < "$1.lz4" || true
     elif [ -f "$1.xz" ] && hash xz 2>/dev/null ; then
       xz -dc < "$1.xz" || true
@@ -153,7 +157,9 @@ memo() {
   # program found). Calling this function will replace the current shell with
   # the decompressor, so make sure this is a terminal statement.
   compressfile() {
-    if hash lz4 2>/dev/null ; then
+    if hash zstd 2>/dev/null ; then
+      exec zstd > "$1.zst"
+    elif hash lz4 2>/dev/null ; then
       exec lz4 > "$1.lz4"
     elif hash xz 2>/dev/null ; then
       exec xz > "$1.xz"
