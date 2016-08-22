@@ -1,6 +1,11 @@
 export EDITOR=vim
 export LESS="-R -S"
 
+# Set manpager to nvim if possible. Highlighted linkable mampages!
+if command -v nvim >/dev/null 2>&1 ; then
+  export MANPAGER="nvim '+set ft=man' -"
+fi
+
 # disable the extremely annoying auto-correct
 unsetopt correct_all
 
