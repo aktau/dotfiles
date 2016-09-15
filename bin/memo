@@ -33,10 +33,10 @@
 # named temporary files all the time when I'm grabbing output from some slow
 # networked program. Additionally, memo transparantly compresses.
 #
-# If you want to memo'ize shell aliases and functions, then you can source this
-# script instead of executing it. This will define a function called memo() that
-# you can use in exactly the same way. It made the implementation much uglier,
-# but at least I can memo'ize aliases now.
+# If you want to memo'ize shell functions, then you can source this script
+# instead of executing it. This will define a function called memo() that you
+# can use in exactly the same way. It made the implementation much uglier, but
+# at least I can memo'ize functions.
 #
 # Don't let the /bin/bash shebang at the top fool you, it runs just fine in zsh.
 
@@ -53,20 +53,17 @@ memo() {
 
   usage() {
       echo "SYNOPSIS"
-      echo "    memo [-chs] <command>"
+      echo "  memo [-chs] <command>"
       echo ""
       echo "DESCRIPTION"
-      echo ""
-      echo "Memoizes the output of <command> and outputs it."
+      echo "  Memoizes the output of <command> and outputs it."
       echo ""
       echo "OPTIONS"
-      echo
-      echo "-c  Clean the cache, if no command is specified, clean everything."
-      echo "-h  Usage message."
-      echo "-s  Take stdin as an input to the command. Note, that this requires"
-      echo "    buffering up all the input before memo is able to decide"
-      echo "    whether to replay the cached version or not. So don't do this"
-      echo "    for huge input streams."
+      echo "  -c  Clean the cache, if no command is specified, clean everything."
+      echo "  -h  Usage message."
+      echo "  -s  Take stdin as an input to the command. Note, that this"
+      echo "      requires buffering up all the input before memo is able to"
+      echo "      decide whether to replay the cached version or not."
   }
 
   # Process options.
