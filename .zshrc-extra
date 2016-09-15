@@ -109,7 +109,12 @@ vimp() {
 
 # fh - repeat history
 fh() {
-  print -z $(fc -ln 1 | fzf --tac -0 -1 -q "$*")
+  # If stdout is a TTY, fuzzy select. If not, just output all history.
+  if [ -t 1 ] ; then
+    print -z $(fc -ln 1 | fzf --tac -0 -1 -q "$*")
+  else
+    fc -ln 1
+  fi
 }
 
 # fkill - kill process
