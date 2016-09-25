@@ -52,7 +52,7 @@ pass out quick proto udp to { 8.8.8.8, 8.8.4.4, 1.2.3.4, 192.168.179.1, 192.168.
 # The destination address specification is a bit loose, but I couldn't get a
 # complete list of hosts. Only allowing UDP 1194 should be enough to keep
 # possible risks to a minimum.
-pass quick proto udp to { 94.242.255.193, 87.236.215.160, 85.17.136.249, 85.17.136.250, 85.17.136.251, 46.246.93.16, 184.75.214.42, 184.75.220.162 } port { 1194, 443, 53, 80 }
+pass quick proto udp to { 162.253.128.82, 184.75.214.114, 184.75.214.42, 184.75.215.122, 184.75.220.162, 185.94.192.26, 188.120.238.110, 192.121.82.54, 192.121.82.58, 192.121.82.67, 213.183.54.64, 46.246.93.16, 85.17.136.249, 85.17.136.250, 85.17.136.251, 87.236.215.160, 91.231.84.93, 91.231.84.94, 94.242.255.193 } port { 1194, 443, 53, 80 }
 
 # Allow traffic on the local network
 pass quick to 192.168.0.0/16
