@@ -6,7 +6,10 @@ endif
 " Both existant and existent exist. However, non-existent doesn't. So it is
 " better to convert existant to existent (can't abolish words with dashes in
 " them).
-Abolish fol{,l}ow{,w}ed                              followed
+
+" American spelling for dialed, to be consistent.
+Abolish dial{,l}{ed,ing}                             dia{l}{}
+Abolish fol{,l}ow{,w}ed                              fol{l}o{w}ed
 Abolish ac{,c}es{,s}{i,a}ble                         a{cc}e{ss}{i}ble
 Abolish dis{,s}ap{,p}ear{,s,ing}                     dis{,}ap{p}ear{}
 Abolish cancelation                                  cancellation
