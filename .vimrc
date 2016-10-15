@@ -347,12 +347,6 @@ nmap <silent> ]G :tablast<CR>
 " fzf
 nmap <silent> <c-p> :FZF<CR>
 
-" neoman.vim
-" Vanilla vim doesn't support keywordprg being an Ex command.
-if has('nvim')
-  set keywordprg=:Nman
-endif
-
 " lightline
 if !exists('g:lightline')
   " A sane default config for lightline. This ugliness (with the later
