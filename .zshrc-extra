@@ -1,23 +1,19 @@
 export EDITOR=vim
 export LESS="-R -S"
 
-# Set manpager to nvim if possible. Highlighted linkable mampages!
+# Set manpager to nvim if possible. Highlighted linkable manpages!
 if command -v nvim >/dev/null 2>&1 ; then
   export MANPAGER="nvim '+set ft=man' -"
 fi
 
-# disable the extremely annoying auto-correct
+# Disable the extremely annoying auto-correct.
 unsetopt correct_all
 
-# command with a space (' ') before them will not be remembered in
-# $HISTFILE, handy for secret commands
+# Command with a space (' ') before them will not be remembered in
+# $HISTFILE, handy for secret commands.
 setopt HIST_IGNORE_SPACE
 
-# seems to be necessary to make vim mode work right
-# bindkey '^[[A' history-substring-search-up
-# bindkey '^[[B' history-substring-search-down
-
-# finds the zsh-syntax-highlighting plugin in a few well-known directories
+# Finds the zsh-syntax-highlighting plugin in a few well-known directories.
 findsynhl () {
   local root=""
   if command -v brew >/dev/null 2>&1 ; then
@@ -29,7 +25,7 @@ findsynhl () {
   return 1
 }
 
-# enable zsh syntax highlighting if available
+# Enable zsh syntax highlighting if available.
 synhl=$(findsynhl)
 if [ $? -eq 0 ] ; then
   export ZSH_HIGHLIGHT_HIGHLIGHTERS_DIR="$synhl/highlighters"
@@ -41,7 +37,7 @@ unset -f findsynhl
 
 # fzf
 
-# use ag to supply fzf with filenames instead of find, it's faster
+# Use ag to supply fzf with filenames instead of find, it's faster.
 export FZF_DEFAULT_COMMAND="ag -i --nocolor --nogroup --hidden \
   --ignore .git \
   --ignore .svn \
@@ -51,7 +47,7 @@ export FZF_DEFAULT_COMMAND="ag -i --nocolor --nogroup --hidden \
 
 # Global fuzzy bookmark directory changer. Adapted from
 # http://dmitryfrank.com/articles/shell_shortcuts.
-cdg () {
+cdg() {
    local dst="$(cdglist | fzf -0 -1 --query="$*")"
    [ -d "$dst" ] && cd "$dst"
 }
@@ -59,14 +55,14 @@ cdg () {
 # Fuzzy cd, powered by fzf. The first argument determines the depth of the
 # fuzzy search. 0 is the default and search the current directory only, 1 is
 # one level deeper, et cetera.
-cdf () {
+cdf() {
   local depth=${1:-1}
   cd "$(find . -mindepth 0 -maxdepth "$depth" -type d -printf '%P\n' 2>/dev/null | fzf --select-1 --exit-0)"
 }
 
 # Recursive fuzzy cd without limit, uses a depth-first search so that even
 # on very slow filesystems you can navigate piecemeal. This requires bfs(1).
-fd () {
+fd() {
   local dir
   dir="$(bfs . -type d -mindepth 1 2>/dev/null | fzf -0 -q "$*")" || {
     return 1
@@ -84,7 +80,7 @@ fd () {
 # Suppose you need to go 6 folders deep, but after 3 the hierarchy because
 # too unwieldy and it gets progressively slower: then just select the
 # correct folder in the 3rd level and fdr will cd into that and rerun fd.
-fdr () {
+fdr() {
     while fd "$@" ; do
       # make arguments empty
       set -- ""
@@ -92,7 +88,7 @@ fdr () {
 }
 
 # fe [FUZZY PATTERN] - Open the selected file with the default editor
-fe () {
+fe() {
   local file
   file=$(fzf -0 -1 --query="$1")
   [ -n "$file" ] && ${EDITOR:-vim} "$file"
@@ -118,7 +114,7 @@ fh() {
 }
 
 # fkill - kill process
-fkill () {
+fkill() {
   pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
 
   if [ "x$pid" != "x" ] ; then
@@ -138,7 +134,7 @@ if [[ "$OSTYPE" == 'linux-gnu' ]] ; then
 fi
 
 # Act like pbpaste if stdin is a terminal, otherwise act like pbcopy.
-clip () {
+clip() {
   [ -t 0 ] && pbpaste || pbcopy
 }
 
@@ -151,7 +147,7 @@ alias luajit="rlwrap luajit"
 # Print the header (the first line of input) and then run the specified
 # command on the body (the rest of the input) use it in a pipeline, e.g. ps
 # | body grep somepattern
-body () {
+body() {
   IFS= read -r header
   printf '%s\n' "$header"
   "$@"
@@ -160,24 +156,24 @@ body () {
 # Searches text for a string but highlights instead of filtering. If you
 # want to combine this with a pager, it can be piped to less because it has
 # --color=always. Alternatively, one can use less -p PATTERN.
-greph () {
+greph() {
   local pat="$1"
   shift
   grep --color=always -E "$pat|$" $@
 }
 
 # quickly find folders or files in a subdirectory
-fname () {
+fname() {
   find . -iname "*$@*"
 }
 
 # quickly find folders or files in a subdirectory
-fname0 () {
+fname0() {
   find . -iname "*$@*" -print0
 }
 
 # Quickly find folders or files by regex in a subdirectory.
-fnamere () {
+fnamere() {
   (
     # Make '*' glob match hidden files as well.
     setopt globdots
@@ -189,21 +185,21 @@ fnamere () {
 }
 
 # execute this to try to import any running ssh-agent sessions
-ssh-reagent () {
-    for agent in /tmp/ssh-*/agent.*; do
-       export SSH_AUTH_SOCK=$agent
-       if ssh-add -l 2>&1 > /dev/null; then
-           echo "Found working SSH Agent:"
-           ssh-add -l
-           return
-       fi
-   done
+ssh-reagent() {
+  for agent in /tmp/ssh-*/agent.*; do
+    export SSH_AUTH_SOCK=$agent
+    if ssh-add -l 2>&1 > /dev/null; then
+      echo "Found working SSH Agent:"
+      ssh-add -l
+      return
+    fi
+  done
 
-   echo "Cannot find ssh agent - maybe you should reconnect and forward it?"
+  echo "Cannot find ssh agent - maybe you should reconnect and forward it?"
 }
 
 # Evaluate something in lua.
-le () {
+le() {
   # If no arguments are given, evaluate stdin as a lua expression. We can't
   # use "lua -" as specified in the man page because that would avoid
   # printing the result if the user didn't specifically call print(),
@@ -241,7 +237,7 @@ le () {
 #   # If you want to compare to the number 3 instead of the string "3", the
 #   # input needs to be converted to a number with tonumber() or adding 0.
 #   ( echo 2 ; echo 3 ; echo 4) | lef "filter(function(x) return x+0 ~= 3 end)"
-lef () {
+lef() {
   # Add each(print) at the end if there's no print or io.write in the
   # command.
   local expr="$@"
@@ -264,52 +260,18 @@ lef () {
 #   ( echo '2 5' ; echo '3 6' ; echo '4 7' ) | lefs "x[1] + 5"
 #
 # TODO(aktau): Implement string splitting.
-lefs () {
+lefs() {
   eval "$(luarocks path)" &&
     LUA_INIT="@$HOME/.lua/init.lua" luajit -e \
     "fun.wrap(stiter(io.lines())):map(function(...) local x = table.pack(...) ; return $@ end):each(print)"
 }
 
 # Start a luajit interpreter with some libraries preloaded.
-lj () {
+lj() {
   # Add local and global rocks to the lua search path, then preload those
   # libraries and some other helper code from init.lua.
   eval "$(luarocks path)" &&
     luajit -i $HOME/.lua/init.lua --examples
-}
-
-domain-from-url () {
-    local url="$1"
-    python -c "from urlparse import urlparse
-if '$url'.find('://') == -1:
-  url = urlparse('//$url','http')
-else:
-  url = urlparse('$url')
-print url.netloc"
-}
-
-fetch-website () {
-    local dom
-    local url
-
-    if [[ "$#" -eq 2 ]]; then
-        url="$2"
-        dom="$1"
-    else
-        url="$1"
-        dom=$(domain-from-url $url)
-    fi
-
-    wget \
-         --recursive \
-         --no-clobber \
-         --page-requisites \
-         --html-extension \
-         --convert-links \
-         --restrict-file-names=windows \
-         --domains "$dom" \
-         --no-parent \
-         "$url"
 }
 
 # Run git-diff on files outside of a repository, to be able to make use of
@@ -349,7 +311,7 @@ gdiff() {
 
 # Start working on a pull request, this requires a .git/user-repo file
 # containing the string "user/repository"
-pr () {
+pr() {
     if [[ ! -r .git/user-repo ]]; then
         echo "Need to setup user/repo" >&2
         return 1
@@ -377,7 +339,7 @@ pr () {
 # Finish working on a pull request, besides the .git/user-repo file,
 # this requires a .git/ghtok file containing the oauth token for accessing the
 # repository
-mpr () {
+mpr() {
     if [[ ! -r .git/user-repo ]]; then
         echo "Need to setup user/repo" >&2
         return 1
