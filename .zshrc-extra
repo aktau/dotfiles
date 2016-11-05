@@ -45,11 +45,39 @@ export FZF_DEFAULT_COMMAND="ag -i --nocolor --nogroup --hidden \
   --ignore .DS_Store \
   -g ''"
 
+# Basically the same as xargs(1) but implemented as a shell function so you
+# don't have ugly long-running xargs processes all over the place. Forces
+# stdin to be the TTY (because the real stdin are the filenames, of course).
+runargs() {
+  local -a args
+  if [ -n "$ZSH_VERSION" ] ; then
+    # Stupid hack to get Vim's sh filetype to not barf on the quotes. Which
+    # I require because I want shellcheck to run on all my shell files, but
+    # setting the zsh filetype disables shellcheck because shellcheck
+    # removed support for zsh...
+    local in=/dev/stdin
+    args=(${(@f)"$(<$in)"})
+  elif [ -n "$BASH_VERSION" ] ; then
+    readarray -t args
+  else
+    return 1
+  fi
+
+  (( ${#args[@]} == 0 )) && return 0
+
+  "$@" "${args[@]}" </dev/tty
+}
+
+# Open files passed on stdin in the best editor money can buy (in splits).
+vimin() {
+  runargs "${EDITOR:-vim}" -O
+}
+
 # Global fuzzy bookmark directory changer. Adapted from
 # http://dmitryfrank.com/articles/shell_shortcuts.
 cdg() {
-   local dst="$(cdglist | fzf -0 -1 --query="$*")"
-   [ -d "$dst" ] && cd "$dst"
+  local dst="$(cdglist | fzf -0 -1 --query="$*")"
+  [ -d "$dst" ] && cd "$dst"
 }
 
 # Fuzzy cd, powered by fzf. The first argument determines the depth of the
@@ -87,20 +115,25 @@ fdr() {
     done
 }
 
-# fe [FUZZY PATTERN] - Open the selected file with the default editor
+# fe <file|pattern>... - Open the selected file(s) with the default editor
 fe() {
-  local file
-  file=$(fzf -0 -1 --query="$1")
-  [ -n "$file" ] && ${EDITOR:-vim} "$file"
+  declare -al query
+  declare -al paths
+
+  for arg ; do
+    if [[ "$arg" = */ ]] ; then
+      paths+=("$arg")
+    else
+      query+=("$arg")
+    fi
+  done
+
+  ag -g '' "${paths[@]}" | fzf -0 -1 -m --query="${query[@]}" | vimin
 }
 
-# Edit a file in your $PATH. Alternative future implementation:
-#
-# which "$1" | vimin.
+# Edit a file in your $PATH.
 vimp() {
-  local file
-  file=$(which "$1")
-  [ -e "$file" ] && ${EDITOR:-vim} "$file"
+  which "$1" | vimin
 }
 
 # fh - repeat history
