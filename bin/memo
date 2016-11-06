@@ -82,11 +82,11 @@ memo() {
   # Ensures that the memodir for $USER exists. If it doesn't exist, tries to
   # create it with the right permissions.
   ensuredir() {
-      local dir="${TMPDIR:-/tmp}/memo"
-      [ -d "$dir" ] || mkdir -p "$dir" -m 0777
-      dir="$dir/$USER"
-      [ -d "$dir" ] || mkdir "$dir" -m 0700
-      echo -n "$dir"
+    local dir="${TMPDIR:-/tmp}/memo"
+    [ -d "$dir" ] || mkdir -p -m 0777 "$dir"
+    dir="$dir/$USER"
+    [ -d "$dir" ] || mkdir -m 0700 "$dir"
+    echo -n "$dir"
   }
 
   # Generate a sha512, done this way to account for differences between most
