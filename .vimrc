@@ -158,6 +158,9 @@ set mousehide
 if !has("nvim")
   set ttymouse=xterm2
 endif
+if exists("+inccommand")
+  set inccommand=nosplit
+endif
 
 set nobackup                      " Don't make a backup before overwriting a file.
 set nowritebackup                 " And again.
