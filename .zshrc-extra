@@ -1,40 +1,102 @@
+##########################################################################
+# Zsh sensible configuration                                             #
+# (https://github.com/hanjianwei/zsh-sensible/blob/master/sensible.zsh). #
+##########################################################################
+
+# Keep a very long history.
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=500000
+SAVEHIST=500000
+
+setopt BANG_HIST                 # Treat the '!' character specially during expansion.
+setopt EXTENDED_HISTORY          # Write the history file in the ':start:elapsed;command' format.
+setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
+setopt SHARE_HISTORY             # Share history between all sessions.
+setopt HIST_EXPIRE_DUPS_FIRST    # Expire a duplicate event first when trimming history.
+setopt HIST_IGNORE_DUPS          # Do not record an event that was just recorded again.
+setopt HIST_IGNORE_ALL_DUPS      # Delete an old recorded event if a new event is a duplicate.
+setopt HIST_IGNORE_SPACE         # Commands prefixed with space are not recorded.
+setopt HIST_FIND_NO_DUPS         # Do not display a previously found event.
+setopt HIST_IGNORE_SPACE         # Do not record an event starting with a space.
+setopt HIST_SAVE_NO_DUPS         # Do not write a duplicate event to the history file.
+setopt HIST_VERIFY               # Do not execute immediately upon history expansion.
+setopt HIST_BEEP                 # Beep when accessing non-existent history.
+setopt COMPLETE_IN_WORD          # Complete from both ends of a word.
+setopt PATH_DIRS                 # Perform path search even on command names with slashes.
+setopt TRANSIENTRPROMPT          # Clear the right prompt (RPS1) on command entry (only useful when using themes that actually define RPS1).
+setopt PROMPT_SUBST              # Interpret variables/functions every time when rendering a prompt.
+
+unsetopt correct_all             # Disable the extremely annoying auto-correct.
+unsetopt CASE_GLOB               # Case-insensitive matching.
+
+# Colors.
+LS_COLORS="rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.axa=00;36:*.oga=00;36:*.spx=00;36:*.xspf=00;36:"
+if [[ "$OSTYPE" == darwin* ]]; then
+  alias ls="ls -G"
+else
+  alias ls="ls --color=tty"
+fi
+
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+
+# Partial-word, and then substring completion.
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+
+# Allow arrow selection.
+zstyle ':completion:*:*:*:*:*' menu select
+
+# Edit the current command in $EDITOR, press <ctrl-X><ctrl-E>. I'm using
+# this longish shortcut because it's the same as bash's. Hoping I'll get
+# used to it...
+autoload -z edit-command-line
+zle -N edit-command-line
+bindkey "^X^E" edit-command-line
+
+# Make search up and down work, so partially type and hit up/down to find
+# relevant stuff. The defaults are (zsh -d -f "bindkey | less"):
+# (up|down)-line-or-history, which I like less.
+#
+# $ man zshzle      # Search for "History Control".
+# $ man zshcontrib  # Search for "up-line-or-beginning-search".
+autoload -U up-line-or-beginning-search
+zle -N up-line-or-beginning-search
+bindkey '^[[A' up-line-or-beginning-search
+
+autoload -U down-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey '^[[B' down-line-or-beginning-search
+
+##############################
+# Random user configuration. #
+##############################
+
+# Aliases
+
+alias gl='git pull'
+alias l='ls -lah'
+alias grep='grep --color=auto'
+alias stamp="date +'%s'"
+alias luajit="rlwrap luajit"
+
+# Misc
+
+# Allow expanding aliases in zsh. Press ctrl-alt-e, just like in Bash.
+expand-aliases() {
+  unset 'functions[_expand-aliases]'
+  functions[_expand-aliases]=$BUFFER
+  (($+functions[_expand-aliases])) &&
+    BUFFER=${functions[_expand-aliases]#$'\t'} &&
+    CURSOR=$#BUFFER
+}
+zle -N expand-aliases
+bindkey '\e^E' expand-aliases
+
 export LESS="-R -S"
 
 # Set manpager to nvim if possible. Highlighted linkable manpages!
 if command -v nvim >/dev/null 2>&1 ; then
   export MANPAGER="nvim '+set ft=man' -"
 fi
-
-# Disable the extremely annoying auto-correct.
-unsetopt correct_all
-
-# Command with a space (' ') before them will not be remembered in
-# $HISTFILE, handy for secret commands.
-setopt HIST_IGNORE_SPACE
-
-# Finds the zsh-syntax-highlighting plugin in a few well-known directories.
-findsynhl () {
-  local root=""
-  if command -v brew >/dev/null 2>&1 ; then
-    root="$(brew --prefix)/share/zsh-syntax-highlighting"
-  fi
-  if [ -d "$root" ] ; then echo -n "$root" ; return 0 ; fi
-  root="$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
-  if [ -d "$root" ] ; then echo -n "$root" ; return 0 ; fi
-  return 1
-}
-
-# Enable zsh syntax highlighting if available.
-synhl=$(findsynhl)
-if [ $? -eq 0 ] ; then
-  export ZSH_HIGHLIGHT_HIGHLIGHTERS_DIR="$synhl/highlighters"
-  ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
-  source "$synhl/zsh-syntax-highlighting.zsh"
-fi
-
-unset -f findsynhl
-
-# fzf
 
 # Use ag to supply fzf with filenames instead of find, it's faster.
 export FZF_DEFAULT_COMMAND="ag -i --nocolor --nogroup --hidden \
@@ -44,9 +106,10 @@ export FZF_DEFAULT_COMMAND="ag -i --nocolor --nogroup --hidden \
   --ignore .DS_Store \
   -g ''"
 
-# Basically the same as xargs(1) but implemented as a shell function so you
-# don't have ugly long-running xargs processes all over the place. Forces
-# stdin to be the TTY (because the real stdin are the filenames, of course).
+# runargs is basically the same as xargs(1) but implemented as a shell
+# function so you don't have ugly long-running xargs processes all over the
+# place. Forces stdin to be the TTY (because the real stdin are the
+# filenames, of course).
 runargs() {
   local -a args
   if [ -n "$ZSH_VERSION" ] ; then
@@ -67,16 +130,9 @@ runargs() {
   "$@" "${args[@]}" </dev/tty
 }
 
-# Open files passed on stdin in the best editor money can buy (in splits).
+# vimin opens files passed on stdin in $EDITOR (in splits, so needs vimlike).
 vimin() {
   runargs "${EDITOR:-vim}" -O
-}
-
-# Global fuzzy bookmark directory changer. Adapted from
-# http://dmitryfrank.com/articles/shell_shortcuts.
-cdg() {
-  local dst="$(cdglist | fzf -0 -1 --query="$*")"
-  [ -d "$dst" ] && cd "$dst"
 }
 
 # Fuzzy cd, powered by fzf. The first argument determines the depth of the
@@ -101,15 +157,16 @@ fd() {
   cd "$dir"
 }
 
-# A souped up version of fd that keeps going until you actually quit. Good
-# for drilling down into deep hierarchies where even bfs(1) has a problem.
+# fdr is a souped up version of fd that keeps going until you actually quit.
+# Good for drilling down into deep hierarchies where even bfs(1) has a
+# problem.
 #
 # Suppose you need to go 6 folders deep, but after 3 the hierarchy because
 # too unwieldy and it gets progressively slower: then just select the
 # correct folder in the 3rd level and fdr will cd into that and rerun fd.
 fdr() {
     while fd "$@" ; do
-      # make arguments empty
+      # Empty arguments.
       set -- ""
     done
 }
@@ -130,7 +187,7 @@ fe() {
   ag -g '' "${paths[@]}" | fzf -0 -1 -m --query="${query[@]}" | vimin
 }
 
-# Edit a file in your $PATH.
+# vimp opens the argument if it can be found your $PATH.
 vimp() {
   which "$1" | vimin
 }
@@ -154,7 +211,7 @@ fkill() {
   fi
 }
 
-# Make a directory and cd into it, a combination of mkdir(1) and cd.
+# mkcd creates and cd's into a directory.
 mkcd() {
   [ -n "$1" ] && mkdir -p "$@" && cd "$1"
 }
@@ -169,12 +226,6 @@ fi
 clip() {
   [ -t 0 ] && pbpaste || pbcopy
 }
-
-# Return the current UNIX timestamp.
-alias stamp="date +'%s'"
-
-# make LuaJIT nicer to use from the CLI
-alias luajit="rlwrap luajit"
 
 # Print the header (the first line of input) and then run the specified
 # command on the body (the rest of the input) use it in a pipeline, e.g. ps
@@ -459,15 +510,3 @@ mpr() {
     echo "Done"
     )
 }
-
-# Allow expanding aliases in zsh. Press ctrl-alt-e, just like in Bash.
-expand-aliases() {
-  unset 'functions[_expand-aliases]'
-  functions[_expand-aliases]=$BUFFER
-  (($+functions[_expand-aliases])) &&
-    BUFFER=${functions[_expand-aliases]#$'\t'} &&
-    CURSOR=$#BUFFER
-}
-
-zle -N expand-aliases
-bindkey '\e^E' expand-aliases

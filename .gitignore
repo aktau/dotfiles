@@ -9,3 +9,5 @@
 .newsbeuter/*.lock
 .newsbeuter/history.*
 .netrwhist
+
+tags
