@@ -3,6 +3,10 @@
 # (https://github.com/hanjianwei/zsh-sensible/blob/master/sensible.zsh). #
 ##########################################################################
 
+# It's likely I'll be setting EDITOR=nvim somewhere in my zsh, which will
+# cause zsh to switch to vi-mode if I re-exec (exec zsh). Prevent this.
+bindkey -e
+
 # Keep a very long history.
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=500000
