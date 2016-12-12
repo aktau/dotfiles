@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# Makes it easier to manager your plan files.
+
+set -euo pipefail
+
+if [[ -f ~/.plan ]] ; then
+  # Archive the plan every time.
+  [ -d ~/plan ] || mkdir -m 0755 ~/plan
+  declare -r modified=$(stat -c %Y ~/.plan)
+  declare -r day=$(date -d @"$modified" +'%F')
+  cp ~/.plan "$HOME/plan/${day}.plan"
+fi
+
+exec $EDITOR ~/.plan
