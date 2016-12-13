@@ -517,3 +517,25 @@ mpr() {
     echo "Done"
     )
 }
+
+# Take csv input, output aligned columns (with missing fields filled out as
+# NULL).
+csv2col() {
+  # 1. (csvtool) Replace comma with field separator values, to reduce
+  #    false-postive columns (it's very unlikely that input text contains
+  #    the field separator).
+  # 2. (awk) Fill empty rows. Determine the number columns from the first
+  #    column.
+  # 3. (column) Print in neat columns.
+  csvtool cat -u $'\f' - |
+    awk -F $'\f' '
+      BEGIN { OFS = FS }
+      NR == 1 { ncols = NF }
+      {
+        for (i = 0 ; i <= ncols ; i++ ) {
+          if ($i == "") $i = "NULL"
+        }
+        print
+      }
+    ' | column -ts $'\f'
+}
