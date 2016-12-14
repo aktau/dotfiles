@@ -52,6 +52,12 @@ zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:
 # Allow arrow selection.
 zstyle ':completion:*:*:*:*:*' menu select
 
+# Keybindings
+#
+# NOTE: In order to reliabibly configure keybinds for your current terminal
+# when you can't use the $terminfo array, use <ctrl-V><key-combination> to
+# see the raw value.
+
 # Edit the current command in $EDITOR, press <ctrl-X><ctrl-E>. I'm using
 # this longish shortcut because it's the same as bash's. Hoping I'll get
 # used to it...
@@ -67,11 +73,19 @@ bindkey "^X^E" edit-command-line
 # $ man zshcontrib  # Search for "up-line-or-beginning-search".
 autoload -U up-line-or-beginning-search
 zle -N up-line-or-beginning-search
-bindkey '^[[A' up-line-or-beginning-search
+bindkey '^[[A' up-line-or-beginning-search    # [UpArrow]
 
 autoload -U down-line-or-beginning-search
 zle -N down-line-or-beginning-search
-bindkey '^[[B' down-line-or-beginning-search
+bindkey '^[[B' down-line-or-beginning-search  # [DownArrow]
+
+# xterm bindings for ctrl-right/left arrow.
+bindkey '^[[1;5C' forward-word                # [Ctrl-RightArrow] - move forward one word
+bindkey '^[[1;5D' backward-word               # [Ctrl-LeftArrow] - move backward one word
+
+# Apparently my urxvt has the following...
+bindkey '^[Oc' forward-word                   # [Ctrl-RightArrow] - move forward one word
+bindkey '^[Od' backward-word                  # [Ctrl-LeftArrow] - move backward one word
 
 ##############################
 # Random user configuration. #
