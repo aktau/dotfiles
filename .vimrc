@@ -55,6 +55,7 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'xolox/vim-misc'
 Plug 'xuhdev/SingleCompile'
+Plug 'luochen1990/rainbow'
 
 " themes
 Plug 'jnurmine/Zenburn'
@@ -378,6 +379,10 @@ if s:llIdx == -1
   let g:lightline.component_function.fugitive = 'fugitive#statusline'
   call extend(g:lightline.active.left[1], ['fugitive'], 0)
 endif
+
+" rainbow
+let g:rainbow_active = 0 " Disabled by default, toggle with :RainbowToggle.
+map <F4> :RainbowToggle<CR>
 
 """"""""""""""""""""
 " filetype detection
