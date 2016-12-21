@@ -257,6 +257,13 @@ body() {
   "$@"
 }
 
+# Enhanced less invocation that will keep a single header line around in the
+# prompt.
+hless() {
+  IFS= read -r header
+  less -PM"$header" -M
+}
+
 # Searches text for a string but highlights instead of filtering. If you
 # want to combine this with a pager, it can be piped to less because it has
 # --color=always. Alternatively, one can use less -p PATTERN.
