@@ -95,6 +95,7 @@ bindkey '^[Od' backward-word                  # [Ctrl-LeftArrow] - move backward
 
 alias gl='git pull'
 alias l='ls -lah'
+alias ll='ls -lh'
 alias grep='grep --color=auto'
 alias stamp="date +'%s'"
 alias luajit="rlwrap luajit"
