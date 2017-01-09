@@ -16,9 +16,13 @@
 # quick succession even though it's unlikely to have changed. To alleviate this,
 # we store the git status in a cache (see below).
 
+# Show host (add $USER by prepending with %n) if connected over SSH.
+_MVMN_HOST=""
+((${+SSH_CONNECTION})) && _MVMN_HOST=" %B%F{yellow}@%m%f%b"
+
 # To prepend an ISO 8601 date, use %D{%F %T}, %* is shorthand for %D{%T}.
 # See `man zshall`, go to "SIMPLE PROMPT ESCAPES".
-PROMPT='%F{green}%*%f %B%F{blue}%2~%f%b ${_MVMN_GIT_CACHE}%B»%b '
+PROMPT='%F{green}%*%f${_MVMN_HOST} %B%F{blue}%2~%f%b ${_MVMN_GIT_CACHE}%B»%b '
 
 # For some reason, when not loading all of oh-my-zsh, I need to autoload
 # colors right before these statements... I have to figure out what that's
