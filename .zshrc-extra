@@ -87,6 +87,10 @@ bindkey '^[[1;5D' backward-word               # [Ctrl-LeftArrow] - move backward
 bindkey '^[Oc' forward-word                   # [Ctrl-RightArrow] - move forward one word
 bindkey '^[Od' backward-word                  # [Ctrl-LeftArrow] - move backward one word
 
+# iTerm2, bind fn-right/left arrow.
+bindkey '^[[H' backward-word
+bindkey '^[[F' forward-word
+
 ##############################
 # Random user configuration. #
 ##############################
