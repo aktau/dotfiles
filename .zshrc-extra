@@ -279,6 +279,12 @@ greph() {
   grep --color=always -E "$pat|$" $@
 }
 
+# Takes a single (!) AWK condition with no body, and highlights lines that
+# match.
+awkh() {
+  awk "$@"'{ print "\033[1;31m" $0 "\033[0m " ; next}1'
+}
+
 # quickly find folders or files in a subdirectory
 fname() {
   ${FIND:-find} . -iname "*$@*"
