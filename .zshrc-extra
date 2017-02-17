@@ -162,6 +162,11 @@ vimin() {
   runargs "${EDITOR:-vim}" -O
 }
 
+# cdto changed the working directory to the argument passed on stdin.
+cdto() {
+  runargs cd
+}
+
 # Fuzzy cd, powered by fzf. The first argument determines the depth of the
 # fuzzy search. 0 is the default and search the current directory only, 1 is
 # one level deeper, et cetera.
