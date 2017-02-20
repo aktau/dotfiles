@@ -1,0 +1,27 @@
+#!/bin/bash
+#
+# USAGE
+#
+#   rfc3339 <time-description>
+#
+# DESCRIPTION
+#
+#   Tiny shim that allows you to enter some unspecific format accepted by
+#   date(1) and output it as a RFC3339 timestamp.
+#
+# EXAMPLE
+#
+#     $ rfc3339 1 week ago
+#     2017-02-13 16:21:49+01:00
+#
+#     $ rfc3339 5 years
+#     2022-02-20 16:22:24+01:00
+#
+#     $ rfc3339 5 years ago
+#     2012-02-20 16:22:54+01:00
+
+if (( $# != 0 )) ; then
+    date --rfc-3339=seconds -d "$*"
+else
+    date --rfc-3339=seconds
+fi
