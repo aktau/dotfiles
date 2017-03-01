@@ -289,6 +289,19 @@ if math.fact == nil then
   end
 end
 
+-- Split by positive match (defaults to matching full words). I haven't
+-- figured out how to make it split on delimiters AND not ignore the last
+-- match...
+function split(s, pat)
+  -- Match words by default.
+  pat = pat or "%S+"
+  result = {};
+  for match in s:gmatch(pat) do
+      table.insert(result, match);
+  end
+  return result;
+end
+
 -- Make all math functions part of the global namespace, reduces typing.
 -- Nice when using lua as a souped-up bc(1).
 for k,v in pairs(math) do

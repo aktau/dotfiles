@@ -396,7 +396,7 @@ lef() {
 lefs() {
   eval "$(luarocks path)" &&
     LUA_INIT="@$HOME/.lua/init.lua" luajit -e \
-    "fun.wrap(stiter(io.lines())):map(function(...) local x = table.pack(...) ; return $@ end):each(print)"
+    "fun.wrap(stiter(io.lines())):map(function(line) local x = split(line) ; return $@ end):each(print)"
 }
 
 # Start a luajit interpreter with some libraries preloaded.
