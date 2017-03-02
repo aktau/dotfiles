@@ -66,6 +66,7 @@ Plug 'exu/pgsql.vim'
 Plug 'fatih/vim-go'
 Plug 'nfnty/vim-nftables'
 Plug 'rodjek/vim-puppet'
+Plug 'rust-lang/rust.vim'
 
 let mapleader = ","
 " Enable any local modifications
@@ -338,6 +339,13 @@ let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
 let g:go_highlight_structs = 1
 let g:go_fmt_command = "goimports"
+
+" rust.vim
+let g:rustfmt_autosave = 1
+" Rust uses textwidth=99, to disable this, use let g:rust_recommended_style = 0.
+" Otherwise adjust colorcolumn to match.
+au FileType rust setlocal colorcolumn=100
+au FileType rust let g:syntastic_rust_checkers = ['rustc']
 
 " tabularize
 " some keybinds taken from the excellent vimcasts episode on Tabularize
