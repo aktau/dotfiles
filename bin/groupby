@@ -1,0 +1,62 @@
+#!/usr/bin/gawk -f
+#
+# USAGE
+#
+#   groupby <group-col> <agg-col> [<aggregator>]
+#
+# DESCRIPTION
+#
+#   Very primitive groupby operators. The only aggregation operation it
+#   supports right now is to contatenate the fields that group under the same
+#   key.
+#
+#   Aggregator can be: concat, sum (default).
+#
+#   Requires gawk (because of indirect calls).
+#
+# EXAMPLES
+#
+#     $ { echo "adam 5" ; echo "kathy 3" ; echo "adam 7" } | groupby 1 2
+#     kathy  3
+#     adam  5 7
+#
+#     $ { echo "adam 5" ; echo "kathy 3" ; echo "adam 7" } | groupby 1 2 sum
+#     kathy 3
+#     adam 12
+
+
+function sum(acc, val) {
+  return acc + val
+}
+
+function concat(acc, val) {
+  return acc "  " val
+}
+
+BEGIN {
+  if (ARGC < 3) {
+    print "Usage: groupby <group-col> <agg-col>" > "/dev/stderr"
+    exit(1)
+  }
+  if (ARGC == 4) {
+    aggregator = "sum"
+    ARGV[3]=""
+  }
+  else {
+    aggregator = "concat"
+  }
+  groupcol = ARGV[1]
+  aggcol = ARGV[2]
+  ARGV[1]="-"
+  ARGV[2]=""
+}
+
+{
+  arr[$groupcol] = @aggregator(arr[$groupcol], $aggcol)
+}
+
+END {
+  for (key in arr) {
+    print key, arr[key]
+  }
+}
