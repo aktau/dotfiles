@@ -32,7 +32,6 @@ endif
 call plug#begin('~/.vim/bundle')
 
 " original repos on github
-Plug 'airblade/vim-gitgutter'
 Plug 'ajh17/VimCompletesMe'
 Plug 'b4winckler/vim-angry'
 Plug 'chrisbra/vim-diff-enhanced'
@@ -72,6 +71,11 @@ let mapleader = ","
 " Enable any local modifications
 if filereadable($HOME . '/.local_config/local.vim')
   source ~/.local_config/local.vim
+endif
+
+" If the local overrides didn't load vim-signify, load gitgutter.
+if !exists('g:loaded_signify')
+  Plug 'airblade/vim-gitgutter'
 endif
 
 call plug#end()
