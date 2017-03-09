@@ -221,7 +221,7 @@ fe() {
 
 # vimp opens the argument if it can be found your $PATH.
 vimp() {
-  which "$1" | vimin
+  which -p "$1" | vimin
 }
 
 # fh - repeat history
