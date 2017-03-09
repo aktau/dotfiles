@@ -1,0 +1,86 @@
+#!/usr/bin/gawk -f
+#
+# USAGE
+#
+#   colorkey [AWK-OPTIONS] <colnr> [<regex>]
+#
+# DESCRIPTION
+#
+#   Colorize every line with a unique key. The key is decided by both the
+#   column to match (<colnr) and an optional regex that searches within the
+#   column. Column 0 means the entire line. If using <regex>, lines that
+#   don't match will not be colorized.
+#
+# EXAMPLES
+#
+#   Suppose input lines are like this:
+#
+#     2017/03/08-01:29:00.000#10.106.46.78   |        7           95 | 0.01   |      1.21       0.00  |      0.02       0.96
+#                             ------------
+#                                 key
+#
+#   And you want to colorize on the IP address. There's two ways to do this.
+#   The first uses AWK record separators.
+#
+#     $ colorkey -F'#| ' 2
+#
+#   Or:
+#
+#     $ colorkey 1 '#.*'
+#
+#   The first one is faster, since it doesn't use capture groups.
+
+
+function printc(key, line) {
+  if (!(key in keys)) {
+    keys[key] = colors[offset]
+    # Increment global counter of which color we should choose on the next
+    # unique line.
+    offset = (offset+1) % ncolors
+  }
+  print keys[key] line "\033[0m "
+}
+
+BEGIN {
+  if (ARGC < 2 || ARGC > 3) {
+    print "Usage: colorkey [AWK-OPTIONS] <colnr> [<regex>]" > "/dev/stderr"
+    exit(1)
+  }
+  col = ARGV[1]
+  ARGV[1] = "-"
+
+  # If a second argument is present, we assume it's a regex. Surround it in
+  # parentheses in order to capture the match later.
+  if (ARGC == 3) {
+    re = "(" ARGV[2] ")"
+    delete ARGV[2]
+  }
+
+  # Initialize static array of colors. Everything after 231 until 255 is
+  # basically grayscales, 0 and 256 are black. See
+  # http://misc.flogisoft.com/bash/tip_colors_and_formatting.
+  ncolors = 0
+  for (c = 1; c < 231; c++) {
+    # 16 is also black. 17 is too dark, et cetera.
+    if (c >= 16 && c <= 20) { continue }
+    colors[ncolors++] = " \033[38;5;" c "m"
+  }
+  offset = 0
+}
+
+# Determine key by taking <colnr>.
+!re {
+  printc($col, $0)
+  next
+}
+
+# Determine key by matching <regex> on <colnr>.
+match($col, re, matches) {
+  printc(matches[1], $0)
+  next
+}
+
+# No matches found, print without colorizing.
+{
+  print
+}
