@@ -2,15 +2,14 @@
 #
 # USAGE
 #
-#   groupby <group-col> <agg-col> [<aggregator>]
+#   groupby [AWK-OPTIONS] <group-col1,groupcol2,...> <agg-col> [<aggregator>]
 #
 # DESCRIPTION
 #
-#   Very primitive groupby operators. The only aggregation operation it
-#   supports right now is to contatenate the fields that group under the same
-#   key.
-#
-#   Aggregator can be: concat, sum (default).
+#   Shell groupby filter. Combines all lines with the same key (<group-col>)
+#   by aggregating <agg-col> with <aggregator>. Aggregator can be: concat
+#   (default), sum. Multi-column keys are specified by separating the column
+#   indexes with commas. For example: '1,4,5'.
 #
 #   Requires gawk (because of indirect calls).
 #
@@ -23,6 +22,13 @@
 #     $ { echo "adam 5" ; echo "kathy 3" ; echo "adam 7" } | groupby 1 2 sum
 #     kathy 3
 #     adam 12
+#
+#   Group by the first two columns and sum the last column:
+#
+#     $ printf "10:50 mike 49\n10:30 lisa 1\n10:50 mike 100" | groupby 1,2 3 sum
+#     10:30 lisa 1
+#     10:50 mike 149
+
 
 
 function sum(acc, val) {
@@ -35,22 +41,36 @@ function concat(acc, val) {
 
 BEGIN {
   if (ARGC < 3) {
-    print "Usage: groupby <group-col> <agg-col>" > "/dev/stderr"
+    print "Usage: groupby [AWK-OPTIONS] <group-col1,group-col2,...> <agg-col>" > "/dev/stderr"
     exit(1)
   }
   if (ARGC == 4) {
     aggregator = "sum"
-    ARGV[3]=""
+    ARGV[3] = ""
   }
   else {
     aggregator = "concat"
   }
   groupcol = ARGV[1]
   aggcol = ARGV[2]
-  ARGV[1]="-"
-  ARGV[2]=""
+  if (groupcol ~ /,/) {
+    ngroupcols = split(groupcol, groupcols, ",")
+  }
+  ARGV[1] = "-"
+  ARGV[2] = ""
 }
 
+# Grouping on multiple columns.
+ngroupcols {
+  key = $groupcols[1]
+  for (i = 2 ; i <= ngroupcols ; i++) {
+    key = key OFS $groupcols[i]
+  }
+  arr[key] = @aggregator(arr[key], $aggcol)
+  next
+}
+
+# Grouping on a single column (faster).
 {
   arr[$groupcol] = @aggregator(arr[$groupcol], $aggcol)
 }
