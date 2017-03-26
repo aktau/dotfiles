@@ -103,6 +103,7 @@ alias ll='ls -lh'
 alias grep='grep --color=auto'
 alias stamp="date +'%s'"
 alias luajit="rlwrap luajit"
+alias rg='rg -S'                              # Default to smart-case.
 
 # Misc
 
