@@ -281,7 +281,12 @@ greph() {
 
 # quickly find folders or files in a subdirectory
 fname() {
-  find . -iname "*$@*"
+  ${FIND:-find} . -iname "*$@*"
+}
+
+# Quickly find folders.
+fdir() {
+  ${FIND:-find} . -type d -iname "*$@*"
 }
 
 # quickly find folders or files in a subdirectory
