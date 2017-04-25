@@ -35,7 +35,7 @@ call plug#begin('~/.vim/bundle')
 Plug 'ajh17/VimCompletesMe'
 Plug 'b4winckler/vim-angry'
 Plug 'chrisbra/vim-diff-enhanced'
-Plug 'editorconfig/editorconfig-vim'
+Plug 'sgur/vim-editorconfig'
 Plug 'godlygeek/tabular'
 Plug 'itchyny/lightline.vim'
 Plug 'ivalkeen/vim-ctrlp-tjump'
