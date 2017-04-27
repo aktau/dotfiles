@@ -206,8 +206,36 @@ if has_syscall and has_lj and jit.os == "Linux" then
   -- Benchmark function <fn>. Pass rest of the arguments to it (like
   -- Bernstein chaining). Returns the elapsed time in nanoseconds.
   function bench(fn, ...)
-    local a, val, b = tick_user(), fn(...), tick_user()
+    local a, _, b = tick_user(), fn(...), tick_user()
     return tick_diff(a, b)
+  end
+
+  -- Benchmark function <fn>, which takes a single number argument N, the
+  -- number of iterations to perform. This works similar to Go benchmarking.
+  -- The return value of <fn> is ignored. Output is printed on the fly.
+  function benchN(fn)
+    -- Closure that times the execution of <fn> for given N (iterations).
+    local it = function(N)
+      local a, _, b = tick_user(), fn(N), tick_user()
+      return tick_diff(a, b)
+    end
+
+    local benchtime = 1 * 1000 * 1000 * 1000 -- 1 second worth of nanoseconds.
+    local N = 1
+    local ns = 0
+
+    -- Run until either N grows too large (perhaps the function is accidentally invariant
+    -- to N) or the function takes more than benchtime to evaluate.
+    while N < 1e10 and ns < benchtime do
+      N = N * 10
+      ns = it(N)  -- How many nanoseconds did the benchmark take?
+      printf("%.0e\t%.2f ns/op\n", N, ns / N)
+    end
+
+    -- After having found a decent number of iterations, time the function
+    -- under benchmark several times and take the minimum.
+    ns = math.min(it(N), it(N), it(N))
+    printf("%.0e\t%.2f ns/op\n", N, ns / N)
   end
 end
 
@@ -327,7 +355,7 @@ if has_graph then
 end
 if has_syscall and has_lj and jit.os == "Linux" then
   examples = examples .. [[
-  bench: bench(function() fun.range(100):map(function(x) return x^2 end):reduce(operator.add, 0) end)]]
+  bench: benchN(function(N) fun.range(N):map(function(x) return x^2 end):reduce(operator.add, 0) end)]]
 end
 
 -- Print the examples if --examples was passed as an argument
