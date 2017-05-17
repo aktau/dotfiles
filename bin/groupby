@@ -29,8 +29,6 @@
 #     10:30 lisa 1
 #     10:50 mike 149
 
-
-
 function sum(acc, val) {
   return acc + val
 }
@@ -41,11 +39,11 @@ function concat(acc, val) {
 
 BEGIN {
   if (ARGC < 3) {
-    print "Usage: groupby [AWK-OPTIONS] <group-col1,group-col2,...> <agg-col>" > "/dev/stderr"
+    print "Usage: groupby [AWK-OPTIONS] <group-col1,group-col2,...> <agg-col> [sum|concat]" > "/dev/stderr"
     exit(1)
   }
   if (ARGC == 4) {
-    aggregator = "sum"
+    aggregator = ARGV[3]
     ARGV[3] = ""
   }
   else {
