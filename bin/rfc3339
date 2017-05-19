@@ -20,8 +20,22 @@
 #     $ rfc3339 5 years ago
 #     2012-02-20 16:22:54+01:00
 
+
 if (( $# != 0 )) ; then
-    date --rfc-3339=seconds -d "$*"
+    # date(1) does _not_ recognize PT for Pacific Time. It does recognize PST
+    # and PDT. Unfortunately, I often forget which one of the two it currently
+    # is, and it would be far safer for me to just specify PT. The following is
+    # a hack. If PT is specified, remove it and set the TZ environment variable
+    # to US/Pacific. The PT needs to be removed because date(1) really doesn't
+    # like setting the TZ variable to the same timezone as the one specified in
+    # the data string (as well as date just not knowing what PT is).
+    input="$*"
+    if [[ "$input" == *PT* ]] ; then
+        export TZ='US/Pacific'
+        # Remove PT from the input string.
+        input=${input/PT/}
+    fi
+    date --rfc-3339=seconds -d "$input"
 else
     date --rfc-3339=seconds
 fi
