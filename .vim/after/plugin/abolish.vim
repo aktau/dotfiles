@@ -31,7 +31,7 @@ Abolish dif{,f}er{,e}nt{,ly,y}                       dif{f}er{e}nt{,ly,ly}
 Abolish suc{,c}esful{,ly,y}                          suc{c}essful{,ly,ly}
 Abolish itnerface{,s}                                interface{}
 Abolish arugment{,s}                                 argument{}
-Abolish {despa,sepe}rat{e,es,ed,ing,ely,ion,ions,or} {despe,sepa}rat{}
+Abolish {despa,sepe,sepa}r{a,e}t{e,es,ed,ing,ely,ion,ions,or} {despe,sepa, sepa}r{a}t{}
 Abolish afterword{,s}                                afterward{}
 Abolish anomol{y,ies}                                anomal{}
 Abolish austrail{a,an,ia,ian}                        austral{ia,ian}
