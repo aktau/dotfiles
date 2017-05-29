@@ -6,12 +6,12 @@ set nocompatible               " be iMproved
 set modelines=0
 
 if has('mac')
-    " fix clipboard on osx, do note that when running from within tmux, you
-    " might need something like
-    " https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard
-    set clipboard+=unnamed
+  " fix clipboard on osx, do note that when running from within tmux, you
+  " might need something like
+  " https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard
+  set clipboard+=unnamed
 else
-    set clipboard=unnamedplus
+  set clipboard=unnamedplus
 endif
 
 if executable('fzf')
@@ -409,68 +409,59 @@ map <F4> :RainbowToggle<CR>
 " filetype detection
 """"""""""""""""""""
 
-if has('autocmd')
-    au WinEnter * setlocal cursorline
-    au WinLeave * setlocal nocursorline
-    au VimResized * wincmd = " Resize splits on window resize.
-    hi ExtraWhitespace ctermbg=red guibg=red
-    au ColorScheme * hi ExtraWhitespace ctermbg=red guibg=red
-    match ExtraWhitespace /\s\+$\| \+\ze\t/
+au WinEnter * setlocal cursorline
+au WinLeave * setlocal nocursorline
+au VimResized * wincmd = " Resize splits on window resize.
+hi ExtraWhitespace ctermbg=red guibg=red
+au ColorScheme * hi ExtraWhitespace ctermbg=red guibg=red
+match ExtraWhitespace /\s\+$\| \+\ze\t/
 
-    " C-language family options.
-    au FileType c,cpp,go set formatoptions+=roj
+" C-language family options.
+au FileType c,cpp,go set formatoptions+=roj
 
-    " This is the same formatlistpat as found in the Markdown filetype. Unlike
-    " the default one, it doesn't just recognize numbered lists, but also
-    " -*+ (unordered) lists.
-    au FileType c,cpp,go,lua setlocal formatlistpat=^\\s*\\d\\+\\.\\s\\+\\\|^[-*+]\\s\\+
+" This is the same formatlistpat as found in the Markdown filetype. Unlike
+" the default one, it doesn't just recognize numbered lists, but also
+" -*+ (unordered) lists.
+au FileType c,cpp,go,lua setlocal formatlistpat=^\\s*\\d\\+\\.\\s\\+\\\|^[-*+]\\s\\+
 
-    " C file specific options
-    au FileType c,cpp set cindent
-    au FileType c,cpp setlocal comments^=:///
+" C file specific options
+au FileType c,cpp set cindent
+au FileType c,cpp setlocal comments^=:///
 
-    au FileType javascript setlocal nocindent
+au FileType javascript setlocal nocindent
 
-    " Only set the filetype of *.sql files to pgsql if it has been set to 'sql'
-    " before. To avoid overwriting earlier autocmds peculiar to a local config.
-    au BufRead,BufNewFile *.sql if !exists("g:filetype_sql") | set ft=pgsql | endif
-    au BufRead,BufNewFile *.svg set ft=svg
-    au BufRead,BufNewFile *.dasc set ft=c
-    au BufRead,BufNewFile mutt{ng,}-*-\w\+ set ft=mail
+" Only set the filetype of *.sql files to pgsql if it has been set to 'sql'
+" before. To avoid overwriting earlier autocmds peculiar to a local config.
+au BufRead,BufNewFile *.sql if !exists("g:filetype_sql") | set ft=pgsql | endif
+au BufRead,BufNewFile *.svg set ft=svg
+au BufRead,BufNewFile *.dasc set ft=c
+au BufRead,BufNewFile mutt{ng,}-*-\w\+ set ft=mail
 
-    " Go file specific options
-    au FileType go setlocal makeprg=go\ build
-    au FileType go setlocal shiftwidth=4 tabstop=4 softtabstop=4 nolist
-    au FileType go let g:SuperTabDefaultCompletionType = "context"
+" Go file specific options
+au FileType go setlocal makeprg=go\ build
+au FileType go setlocal shiftwidth=4 tabstop=4 softtabstop=4 nolist
+au FileType go let g:SuperTabDefaultCompletionType = "context"
 
-    au FileType go unmap <leader>r
-    au FileType go nmap <leader>r <Plug>(go-run)
-    au FileType go nmap <leader>b <Plug>(go-build)
-    au FileType go nmap <leader>t <Plug>(go-test)
-    au FileType go nmap <leader>c :GoCallers<cr>
-    au FileType go nmap <leader>i <Plug>(go-info)
-    au FileType go nmap <leader>d <Plug>(go-doc)
-    au FileType go nmap <leader>n <Plug>(go-rename)
-endif
-
-""""""""""""""""""""""""
-" hacks
-""""""""""""""""""""""""
+au FileType go unmap <leader>r
+au FileType go nmap <leader>r <Plug>(go-run)
+au FileType go nmap <leader>b <Plug>(go-build)
+au FileType go nmap <leader>t <Plug>(go-test)
+au FileType go nmap <leader>c :GoCallers<cr>
+au FileType go nmap <leader>i <Plug>(go-info)
+au FileType go nmap <leader>d <Plug>(go-doc)
+au FileType go nmap <leader>n <Plug>(go-rename)
 
 " tries to get buffer reloading to work correctly in terminals
 augroup checktime
-    au!
-    if !has("gui_running")
-        " silent! necessary otherwise throws errors when using command
-        " line window.
-        autocmd BufEnter        * silent! checktime
-        autocmd CursorHold      * silent! checktime
-        autocmd CursorHoldI     * silent! checktime
-        " these two _may_ slow things down. Remove if they do.
-        " autocmd CursorMoved     * silent! checktime
-        " autocmd CursorMovedI    * silent! checktime
-    endif
+  au!
+  if !has("gui_running")
+    " silent! necessary otherwise throws errors when using command
+    " line window.
+    autocmd BufEnter        * silent! checktime
+    autocmd CursorHold      * silent! checktime
+    autocmd CursorHoldI     * silent! checktime
+    " these two _may_ slow things down. Remove if they do.
+    " autocmd CursorMoved     * silent! checktime
+    " autocmd CursorMovedI    * silent! checktime
+  endif
 augroup END
-
-ab asap as soon as possible
-ab ptal please take another look
