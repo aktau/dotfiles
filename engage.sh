@@ -172,6 +172,3 @@ setup_folders "$dir" "$HOME" <<< "$folders"
 setup_git
 setup_ssh
 setup_neovim
-
-# add patches against upstream, if necessary
-exec "$dir/patchup.sh"
