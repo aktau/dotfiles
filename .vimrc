@@ -34,7 +34,6 @@ call plug#begin('~/.vim/bundle')
 " original repos on github
 Plug 'airblade/vim-gitgutter'
 Plug 'ajh17/VimCompletesMe'
-Plug 'aktau/vim-easytags'
 Plug 'b4winckler/vim-angry'
 Plug 'chrisbra/vim-diff-enhanced'
 Plug 'editorconfig/editorconfig-vim'
@@ -42,6 +41,8 @@ Plug 'godlygeek/tabular'
 Plug 'itchyny/lightline.vim'
 Plug 'ivalkeen/vim-ctrlp-tjump'
 Plug 'kien/ctrlp.vim'
+Plug 'ludovicchabant/vim-gutentags'
+Plug 'luochen1990/rainbow'
 Plug 'rhysd/clever-f.vim'
 Plug 'rking/ag.vim'
 Plug 'scrooloose/syntastic'
@@ -55,7 +56,6 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'xolox/vim-misc'
 Plug 'xuhdev/SingleCompile'
-Plug 'luochen1990/rainbow'
 
 " themes
 Plug 'jnurmine/Zenburn'
@@ -116,6 +116,7 @@ set incsearch                     " Find as you type search
 set hlsearch                      " Highlight search terms
 set ignorecase                    " Case-insensitive searching.
 set smartcase                     " But case-sensitive if expression contains a capital letter.
+set tagcase=match                 " Case sensitive tag matching (most langs are cs).
 set gdefault                      " Set the global flag on substitute commands by default
 set matchpairs+=<:>               " Match < and > as well.
 " set showmatch                     " When a bracket is inserted, briefly jump to the matching one
@@ -310,12 +311,20 @@ let g:syntastic_c_compiler_options = '-std=gnu99 -DINCLUDE_GENERATED_DECLARATION
 
 let g:syntastic_go_checkers=['go', 'govet']
 
-" vim-easytags
-" don't enable this for now... editing a file in $HOME wrecks the HDD
-" let g:easytags_autorecurse = 1
-" set tags=./tags;/,tags;/
-let g:easytags_dynamic_files = 2
-let g:easytags_file = "~/.easytags"
+" vim-gutentags
+let g:gutentags_enabled = 1
+let g:gutentags_generate_on_missing = 1      " Generate a tags file if there is none.
+let g:gutentags_generate_on_new = 0          " Don't regenerate tags file in a new Vim session (I tend to reopen Vim a lot).
+let g:gutentags_generate_on_write = 1        " Do update the tags file on file save.
+let g:gutentags_resolve_symlinks = 1
+" Only index tags in git projects. Store tags files inside of the .git
+" repository so it doesn't make the repo dirty if 'tags' is missing from
+" .gitignore. Downside: this doesn't work for non-git repositories. I would
+" enable it for other VCS's as well but I haven't found how to
+" conditionalize the '.git' in gutentags_ctags_tagfile...
+let g:gutentags_ctags_tagfile = '.git/tags'
+let g:gutentags_project_root = ['.git']
+let g:gutentags_add_default_project_roots = 0
 
 " SingleCompile
 nnoremap <leader>r :SCCompileRun<cr>
