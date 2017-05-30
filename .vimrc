@@ -53,7 +53,6 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
-Plug 'xolox/vim-misc'
 Plug 'xuhdev/SingleCompile'
 
 " themes
