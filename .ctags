@@ -2,7 +2,7 @@
 --exclude=*.xml
 --exclude=*.rst
 --exclude=*.json
---tag-relative
+--tag-relative=yes
 -I FUNC_ATTR_MALLOC
 -I FUNC_ATTR_ALLOC_ALIGN+
 -I FUNC_ATTR_PURE
