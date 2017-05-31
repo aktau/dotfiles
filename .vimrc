@@ -387,13 +387,10 @@ if has('lambda')
     let &magic = magic
   endfunction
 
-  " Mapping table for Vim &filetype to ctags languages. Note that we normalize
-  " cpp to C and not C++ (which is also a ctags language). This is because
-  " ctags recognizes .c files as C, while .h files are always C++. Luckily C
-  " is a prefix of C++, so an unanchored match for language:C finds both
-  " language:C and language:C++.
+  " Mapping table for Vim &filetype to ctags languages. Note that ctags
+  " recognizes .c files as C, while .h files are always C++.
   let s:vim_to_ctags = {
-  \   'cpp': 'C',
+  \   'cpp': '(C|C++)',
   \   'cs': 'C#',
   \ }
 
@@ -428,9 +425,13 @@ if has('lambda')
       " correspond to our filetype/language. This will implicitly filter out
       " ctags headers as well, so we don't need an extra grep(1) invocation
       " for that.
+      "
+      "  TODO: Need to canonicalize the filename before attempting to :edit
+      "  it (if we go through the tag codepaths Vim canonicalizes them for
+      "  us, that's not the case here).
       call fzf#run({
       \ 'source':  'cat '.join(map(tagfiles(), 'fnamemodify(v:val, ":S")')) .
-      \            '| grep "language:' . ctagsft . '"',
+      \            '| grep "language:' . ctagsft . '\t"',
       \ 'options': '+m -d "\t" --with-nth 1,3,2 -n 1,2 --tiebreak=index',
       \ 'down':    '30%',
       \ 'sink':    funcref('s:fzftags_sink')})
