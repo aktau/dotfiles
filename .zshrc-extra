@@ -205,6 +205,12 @@ fdr() {
 
 # fe <file|pattern>... - Open the selected file(s) with the default editor
 fe() {
+  # If stdin is not a TTY, source file(s) from stdin instead of ag(1).
+  if [ ! -t 0 ] ; then
+    fzf -0 -1 -m --query="$*" | vimin
+    return
+  fi
+
   declare -al query
   declare -al paths
 
