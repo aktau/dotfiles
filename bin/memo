@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # memo(1), memoizes the output of your command-line, so you can do:
 #
@@ -176,16 +176,24 @@ memo() {
     # have a cache. Let's create a temporary file.
     local stdinsave
     if (( opt_stdin )) ; then
-      # Create a temporary file, open a file descriptor to it and remove it,
-      # so it gets cleaned up when this process exits.
-      local stdinsave=$(mktemp)
-      exec 3< "$stdinsave"
-      rm "$stdinsave"
+      # Create a temporary file and schedule its cleanup.
+      stdinsave=$(mktemp)
+      cleanup() {
+        rm "$stdinsave"
+      }
 
-      # Get the PID of this subshell, in a portable way, use it to provide a
-      # stable file path to the file descriptor we just opened.
-      local pid=$(sh -c 'echo $PPID')
-      stdinsave="/proc/$pid/fd/3"
+      # Cleanup file after either EXIT (if run as a standalone script) or
+      # RETURN (if run as a sourced bash function). zsh seems to also fire
+      # the EXIT trap when a sourced function returns.
+      #
+      # Check if $ZSH_VERSION is set in an antique way because macOS is
+      # stuck on pre 4.2 bash, so it doesn't know about -v (and we're in set
+      # -u mode, so most other checks will fail).
+      if [[ -z "${ZSH_VERSION-}" ]] ; then
+        trap cleanup EXIT RETURN
+      else
+        trap cleanup EXIT
+      fi
     fi
 
     # In the following block we construct the unique path to save the output of
