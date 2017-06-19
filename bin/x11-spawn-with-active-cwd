@@ -1,0 +1,41 @@
+#!/bin/bash
+#
+# Launch $1 in the current working directory of a process in the hierachy of the
+# active X11 window, in the following order:
+#
+# 1. The SECOND child of the process owning the active X11 window.
+# 2. The FIRST child of the process owning the active X11 window.
+# 3. The process owning the active X11 window.
+#
+# This weird order is to appease urxvt(1), which starts the shell as its second
+# process. This is usually the process who's CWD we want.
+#
+# If, for some reason, the CWD cannot be determined, $1 will be launched without
+# going to the working directory.
+#
+# Requires xdotool(1), xprop(1) and proc(5).
+
+set -euo pipefail
+
+readonly PROG="${1?}"
+readonly ACTIVE_WINDOW=$(xdotool getactivewindow)
+
+# Get PID. If _NET_WM_PID isn't set, execute without changing working directory.
+readonly PID="$(xprop -id "$ACTIVE_WINDOW" _NET_WM_PID | grep -oP '\d+')"
+if [[ "$PID" == "" ]] ; then
+    exec "${PROG}"
+fi
+
+# Get the second (!) child of terminal. In my case, that's usually urxvt. Its
+# first start is another urxvt(1), which is useless.
+CHILD_PID="$(cat /proc/"${PID}"/task/*/children | tr ' ' '\n' | awk 'NR <= 2 { pid = $1 } NR > 2 { print pid ; exit } END { print pid } ')"
+if [[ -z "${CHILD_PID}" ]] ; then
+    CHILD_PID="${PID}"
+fi
+
+readonly CHILD_CWD=$(realpath "/proc/${CHILD_PID}/cwd")
+if [[ "${CHILD_CWD}" ]] ;  then
+    cd "${CHILD_CWD}"
+fi
+
+exec "${PROG}"
