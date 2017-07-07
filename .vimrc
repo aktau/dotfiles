@@ -277,6 +277,13 @@ function! ExecuteMacroOverVisualRange()
   execute ":'<,'>normal @".nr2char(getchar())
 endfunction
 
+" Terminal mode config (Neovim)
+
+if has('nvim')
+  " Map escape to go into terminal mode.
+  tnoremap <Esc> <C-\><C-n>
+endif
+
 """"""""""""""""""""""
 " plugin customization
 """"""""""""""""""""""
