@@ -317,6 +317,9 @@ let g:syntastic_c_compiler_options = '-std=gnu99 -DINCLUDE_GENERATED_DECLARATION
 
 let g:syntastic_go_checkers=['go', 'govet']
 
+" Don't perform syntastic check when we intend to quit (even if we write).
+let g:syntastic_check_on_wq = 0
+
 " vim-gutentags
 let g:gutentags_enabled = 1
 let g:gutentags_generate_on_missing = 1      " Generate a tags file if there is none.
