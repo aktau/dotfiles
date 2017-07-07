@@ -99,8 +99,8 @@ set expandtab                     " use spaces, not tabs (optional)
 set nosmarttab                    " really get rid of tabs
 set backspace=indent,eol,start    " backspace through everything in insert mode"
 set autoindent                    " match indentation of previous line
-set textwidth=76                  " in new gvim windows
-set colorcolumn=80
+set textwidth=80                  " in new gvim windows
+set colorcolumn=+1                " Set colorcolumn = textwidth + 1.
 set pastetoggle=<F2>
 set formatoptions+=n              " format numbered lists properly
 set nojoinspaces                  " Don't add extra spaces after join/fmt.
