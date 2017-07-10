@@ -282,6 +282,12 @@ endfunction
 if has('nvim')
   " Map escape to go into terminal mode.
   tnoremap <Esc> <C-\><C-n>
+
+  " Make navigation into and out of terminal splits nicer.
+  tnoremap <C-h> <C-\><C-N><C-w>h
+  tnoremap <C-j> <C-\><C-N><C-w>j
+  tnoremap <C-k> <C-\><C-N><C-w>k
+  tnoremap <C-l> <C-\><C-N><C-w>l
 endif
 
 """"""""""""""""""""""
