@@ -332,6 +332,7 @@ let g:gutentags_ctags_extra_args = ['--fields=+l']
 nnoremap <leader>r :SCCompileRun<cr>
 
 " vim-go
+let g:go_auto_sameids = 1         " Auto highlight the same variable.
 let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
 let g:go_highlight_structs = 1
@@ -542,7 +543,7 @@ au FileType go nmap <leader>b <Plug>(go-build)
 au FileType go nmap <leader>t <Plug>(go-test)
 au FileType go nmap <leader>c :GoCallers<cr>
 au FileType go nmap <leader>i <Plug>(go-info)
-au FileType go nmap <leader>d <Plug>(go-doc)
+au FileType go nmap <leader>d <Plug>(go-def)
 au FileType go nmap <leader>n <Plug>(go-rename)
 
 " tries to get buffer reloading to work correctly in terminals
