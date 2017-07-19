@@ -533,7 +533,7 @@ au FileType c,cpp,go set formatoptions+=roj
 " This is an extended version of the formatlistpat found in the Markdown filetype. Unlike
 " the default one, it doesn't just recognize numbered lists, but also
 " -*+ (unordered) lists and link reference lists (e.g.: [X]: ... [X+1]: ...).
-au FileType c,cpp,go,java,lua,gitcommit setlocal formatlistpat=^\\s*\\d\\+\\.\\s\\+\\\|^[-*+]\\s\\+\\\|^\\s*\[\\d\\+\\]:\\?\\s*
+au FileType c,cpp,go,java,lua,gitcommit let &l:formatlistpat='^\s*\d\+.\s\+\|^[-*+]\s\+\|^\s*\[\d\+\]:\?\s*'
 
 " C file specific options
 au FileType c,cpp set cindent
