@@ -530,10 +530,15 @@ match ExtraWhitespace /\s\+$\| \+\ze\t/
 " C-language family options.
 au FileType c,cpp,go set formatoptions+=roj
 
-" This is an extended version of the formatlistpat found in the Markdown filetype. Unlike
-" the default one, it doesn't just recognize numbered lists, but also
-" -*+ (unordered) lists and link reference lists (e.g.: [X]: ... [X+1]: ...).
-au FileType c,cpp,go,java,lua,gitcommit let &l:formatlistpat='^\s*\d\+.\s\+\|^[-*+]\s\+\|^\s*\[\d\+\]:\?\s*\|^\s*TODO[(][^)]\+[)]:\s*\|^\s*TODO:\s*'
+" This is an extended version of the formatlistpat found in the Markdown
+" filetype.
+let s:listpatterns =  []
+let s:listpatterns += ['^\s*\d\+.\s\+']            " 1. ...
+let s:listpatterns += ['^[-*+]\s\+']               " - ...
+let s:listpatterns += ['^\s*\[\d\+\]:\?\s*']       " [1]: ...
+let s:listpatterns += ['^\s*TODO[(][^)]\+[)]:\s*'] " TODO(me): ...
+let s:listpatterns += ['^\s*TODO:\s*']             " TODO: ...
+au FileType c,cpp,go,java,lua,gitcommit let &l:formatlistpat=join(s:listpatterns, '\|')
 
 " C file specific options
 au FileType c,cpp set cindent
