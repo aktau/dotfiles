@@ -28,7 +28,7 @@ Abolish wierd{,ed}                                   weird{}
 Abolish mis{,s}pel{,l}ing{,s}                        mis{s}pel{l}ing{}
 Abolish an{e,o}ursym{,s}                             an{e}urysm{}
 Abolish dif{,f}er{,e}nt{,ly,y}                       dif{f}er{e}nt{,ly,ly}
-Abolish suc{,c}esful{,ly,y}                          suc{c}essful{,ly,ly}
+Abolish {un,}suc{,c}esful{,ly,y}                     {un,}suc{c}essful{,ly,ly}
 Abolish itnerface{,s}                                interface{}
 Abolish arugment{,s}                                 argument{}
 Abolish {despa,sepe,sepa}r{a,e}t{e,es,ed,ing,ely,ion,ions,or} {despe,sepa, sepa}r{a}t{}
