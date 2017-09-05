@@ -62,3 +62,4 @@ Abolish segument{,s,ed,ation}                        segment{}
 Abolish o{c,cc}a{s,ss}ion{,al,ally}                  o{cc}a{s}ion{}
 Abolish a{c,cc}ro{s,ss}                              a{c}ro{ss}
 Abolish plagueing                                    plaguing
+Abolish ap{p,}rop{r,}iate                            ap{p}rop{r}iate
