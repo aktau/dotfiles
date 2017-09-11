@@ -22,6 +22,7 @@ dir=~/dotfiles                                      # dotfiles directory
 olddir=~/dotfiles_old                               # old dotfiles backup directory
 olddir_current=$olddir/"$(date +%d-%m-%Y)"
 files=".lua .vimrc .vim .psqlrc .newsbeuter .zshrc-extra .ctags .tmux.conf"
+linux_files=".Xdefaults"
 folders="etc"
 
 ##########
@@ -71,6 +72,11 @@ function setup_dotfiles {
     for file in $files; do
         setup_link "$file" "$file"
     done
+    if [[ "$OSTYPE" == 'linux-gnu' ]] ; then
+        for file in $linux_files; do
+            setup_link "$file" "$file"
+        done
+    fi
 }
 
 # This function creates the hierarchies to the passed in folders in the

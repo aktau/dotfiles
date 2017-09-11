@@ -1,0 +1,115 @@
+! To find out which resources an app would be using, such as f.ex. XTerm,
+! use:
+!
+!   $ appres XTerm xterm
+
+!-------------------------------------------------------------------------------
+!
+!
+!      C O M M O N
+!
+!
+
+! Terminal
+*saveLines:              32767
+*loginShell:             true
+
+!-------------------------------------------------------------------------------
+!
+!
+!      U R X V T
+!
+!
+
+!URxvt*font:              -*-terminus-medium-r-*-*-12-120-*-*-*-*-*-*
+!URxvt*boldFont:          -*-terminus-medium-r-*-*-12-120-*-*-*-*-*-*
+!URxvt*italicFont:        -*-terminus-medium-r-*-*-12-120-*-*-*-*-*-*
+!URxvt*boldItalicFont:    -*-terminus-medium-r-*-*-12-120-*-*-*-*-*-*
+
+URxvt*font:               xft:Ubuntu Mono:regular:size=12
+URxvt*boldFont:           xft:Ubuntu Mono:bold:size=12
+
+!URxvt*font:             -misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*
+!URxvt*boldFont:         -misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*
+
+!URxvt*font:             xft:DejaVu Sans Mono:bold:size=10
+!URxvt*boldFont:         xft:DejaVu Sans Mono:bold:size=10
+!URxvt*font:             xft:Envy Code R:pixelsize=11
+
+!URxvt*font:             xft:Monaco:size=8.6
+!URxvt*font:             xft:Monaco:size=7.5
+
+URxvt*scrollBar:          false
+URxvt*scrollBar_right:    true
+URxvt*shading:            30
+URxvt*termName:           rxvt-unicode
+URxvt*secondaryScroll:    true
+URxvt*perl-lib:           /usr/lib/urxvt/perl/
+URxvt*perl-ext-common:    default,matcher,searchable-scrollback
+URxvt*urlLauncher:        firefox
+URxvt*matcher.button:     1
+URxvt.cutchars:           "()*,<>[]{}|''"
+URxvt*visualBell:         true
+URxvt*keysym.C-u:         perl:matcher
+URxvt*urgentOnBell:       true
+
+!-------------------------------------------------------------------------------
+!
+!
+!      X T E R M
+!
+!
+
+XTerm*internalBorder:     0
+XTerm*loginShell:         true
+XTerm*scrollBar:          false
+XTerm*cursorBlink:        false
+XTerm*dynamicColors:      on
+XTerm*highlightSelection: true
+! Catch URLs
+XTerm*charClass:          33:48,35-38:48,39:43,42-47:48,58-59:48,61:48,63-64:48,126:48
+! Appearance
+XTerm*utf8:               2
+XTerm*eightBitInput:      true
+! XTerm*faceName:         terminus:pixelsize=12
+XTerm*faceName:           Ubuntu Mono:size=12
+
+!-------------------------------------------------------------------------------
+!
+!
+!     T H E M E S
+!
+!
+
+! Zenburn is the default theme. See below for an override.
+
+! Zenburn
+*.cursorColor: #b092a4
+*.background:  #2F2F2F
+*.foreground:  #DCDCCC
+! black + red
+*.color0:      #1E2320
+*.color1:      #705050
+! green + yellow
+*.color2:      #60b48a
+*.color3:      #dfaf8f
+! blue + purple
+*.color4:      #506070
+*.color5:      #dc8cc3
+! cyan + white
+*.color6:      #8cd0d3
+*.color7:      #dcdccc
+! bright-black + bright-red
+*.color8:      #709080
+*.color9:      #dca3a3
+! bright-green + bright-yellow
+*.color10:     #c3bf9f
+*.color11:     #f0dfaf
+! bright-blue + bright-purple
+*.color12:     #94bff3
+*.color13:     #ec93d3
+! bright-cyan + bright-white
+*.color14:     #93e0e3
+*.color15:     #ffffff
+
+! #include "./dotfiles/term/themes/xresources/nord"
