@@ -1,7 +1,11 @@
 --exclude=*.html
---exclude=*.xml
---exclude=*.rst
 --exclude=*.json
+--exclude=*.rst
+--exclude=*.xml
+--exclude=.git
+--exclude=.hg
+--exclude=.svn
+--exclude=build
 --tag-relative=yes
 -I FUNC_ATTR_MALLOC
 -I FUNC_ATTR_ALLOC_ALIGN+
