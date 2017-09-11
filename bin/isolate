@@ -1,0 +1,51 @@
+#!/bin/bash
+#
+# Isolate a process on Linux systems.
+#
+# USAGE
+#
+#   isolate <cpuset> <cmd...>
+#
+# cpuset must be a full pathname to wherever you mounted the cpuset pseudofs.
+# E.g.: /cpuset/<cpuset-name>
+#
+# You need to have already created a suitable cpuset (and if you want true
+# isolation, you must move all existing tasks into a different cpuset, like sys
+# created below, and change the default affinity of the OS). An example:
+#
+#   mkdir /cpuset
+#   mount -t cpuset none /cpuset/
+#   cd /cpuset
+#   mkdir sys
+#   echo 0-2 > sys/cpus
+#   echo 1 > sys/cpu_exclusive
+#   echo 0 > sys/mems
+#   mkdir rt
+#   echo 3 > rt/cpus
+#   echo 1 >  rt/cpu_exclusive
+#   echo 0 > rt/mems
+#   echo 0 > rt/sched_load_balance
+#   echo 1 > rt/mem_hardwall
+#   for T in `cat tasks`; do echo "Moving " $T; echo $T > sys/tasks; done
+#
+# NOTE: From the docs, a more canonical place for the cpuset mount is (though
+# strangely this has another type):
+#
+#   mount -t cgroup -o cpuset cpuset /sys/fs/cgroup/cpuset
+#
+# And there's also:
+#
+#   mount -t cpuset X /sys/fs/cgroup/cpuset
+#
+# See the docs: https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt.
+
+set -euo pipefail
+
+readonly CPUSET="${1?}"
+shift
+
+# Isolate the current task on the cpuset.
+sudo tee "${CPUSET}/tasks" <<< $$
+
+# Execute the real command.
+exec "$@"
