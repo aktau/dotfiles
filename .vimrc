@@ -461,7 +461,7 @@ if has('lambda')
       call feedkeys(":silent! tag " . word . "\r", 'nt')
     else
       " Filter out tags in the taglist that don't match the current filetype.
-      let langtaglist = filter(taglist, {key, val -> get(val, 'language') =~ '^'.ctagsft})
+      let langtaglist = filter(taglist, {key, val -> get(val, 'language') =~# escape('^'.ctagsft, '|()')})
       if empty(langtaglist)
         echo("No tags found for: " . word)
         return
