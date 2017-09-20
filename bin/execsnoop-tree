@@ -1,0 +1,108 @@
+#!/usr/bin/awk -f
+#
+# USAGE
+#
+#   execsnoop-tree < <execsnoop-output>
+#
+# DESCRIPTION
+#
+#   Turn execsnoop(1) [1] output into a tree based on parent-child
+#   relationships. Inside of parent-child sections, the order is chronological.
+#
+#   execsnoop output looks like this:
+#
+#     PID    PPID ARGS
+#     3184   3167 as --64 -o trivial.o /tmp/ccjUPNUv.s
+#     3185   3174 as --64 -o trivial.o /tmp/ccMBEmWv.s
+#     3187   3164 as --64 -o trivial.o /tmp/cc2OOURv.s
+#     3188   3181 as --64 -o trivial.o /tmp/cc3Y1lGu.s
+#
+#   Unfortunately, this can't be used in a live pipe like so:
+#
+#     execsnoop | execsnoop-tree
+#
+#   Because awk(1) quits when it reads the ctrl-c without printing anything. For
+#   the reasons and workarounds, see https://unix.stackexchange.com/a/260972. I
+#   consider the workaround too ugly, for now.
+#
+# EXAMPLES
+#
+#   $ execsnoop > execsnoop.out
+#   <ctrl-c>
+#   $ execsnoop-tree < execsnoop.out
+#
+# [1]: https://github.com/brendangregg/perf-tools/blob/master/execsnoop
+
+# Print the tree recursively, which should be adjacency list representation,
+# as follows:
+#
+#   tree[""]  = ["A": 1, "B": 1, "C": 1]
+#   tree["A"] = ["A_child1": 1, "A_child2": 1]
+#   ^^^^  ^     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   tree node         lchildarr
+function walktree(tree, node, indentchar, indent) {
+  for (child in tree[node]) {
+    if (child in seen) {
+      printf("ERROR: already saw %d\n", child)
+      exit 3
+    }
+    printf("%s%s\t%s\n", indent, child, tree[node][child])
+    seen[child] = 1
+    if (child in tree) {
+      walktree(tree, child, indentchar, indent indentchar)
+    }
+  }
+}
+
+function add(parent, child, title) {
+  proc[parent][child] = title
+  parents[child] = parent
+}
+
+BEGIN {
+  if (ARGC != 1) {
+    print "Usage:  execsnoop-tree < <execsnoop-output>" > "/dev/stderr"
+    exit(1)
+  }
+  ARGV[1] = "-"
+}
+
+# $1 == child, $2 == parent.
+$1 ~ /^[0-9]+$/ &&
+$2 ~ /^[0-9]+$/ {
+  child_ = $1
+  parent_ = $2
+  $1 = ""
+  $2 = ""
+  # Check if we've seen this PID before. If we did, it may be an exec(2). In
+  # that case PPID = 0.
+  if (child_ in parents) {
+    if (parent_ != 0) {
+      print "ASSERT: saw a process again being spawned by a different parent", $0 > "/dev/stderr"
+      exit 2
+    }
+    # We could either ignore it or issue a resolved process name fixup. We leave
+    # the original parent intact.
+    proc[parents[child_]][child_] = $0
+    next
+  }
+  add(parent_, child_, $0)
+  # Edge cases for processes which we didn't observe the spawning of. Pretend
+  # they're children of init (0).
+  if (parent_ != 0 && parent_ in parents == 0) {
+    # Make a weak attempt to read the command-line for these processes. This
+    # gets increasingly less likely or more confusing the longer it's been since
+    # the trace was captured.
+    procpath_ = "/proc/"parent_"/cmdline"
+    if ((getline cmdline < procpath_) > 0) {
+      add(0, parent_, cmdline)
+    }
+    else {
+      add(0, parent_, "N/A")
+    }
+  }
+}
+
+END {
+  walktree(proc, 0, "\t")
+}

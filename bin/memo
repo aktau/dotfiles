@@ -83,9 +83,9 @@ memo() {
   # create it with the right permissions.
   ensuredir() {
     local dir="${TMPDIR:-/tmp}/memo"
-    [ -d "$dir" ] || mkdir -p -m 0777 "$dir"
+    [[ -d "$dir" ]] || mkdir -p -m 0777 "$dir"
     dir="$dir/$USER"
-    [ -d "$dir" ] || mkdir -m 0700 "$dir"
+    [[ -d "$dir" ]] || mkdir -m 0700 "$dir"
     echo -n "$dir"
   }
 
