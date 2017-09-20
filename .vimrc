@@ -445,7 +445,7 @@ if has('lambda')
       "  us, that's not the case here).
       call fzf#run({
       \ 'source':  'cat '.join(map(tagfiles(), 'fnamemodify(v:val, ":S")')) .
-      \            '| grep "language:' . ctagsft . '\t"',
+      \            '| grep -P "language:' . ctagsft . '\t"',
       \ 'options': '+m -d "\t" --with-nth 1,3,2 -n 1,2 --tiebreak=index',
       \ 'down':    '30%',
       \ 'sink':    funcref('s:fzftags_sink')})
