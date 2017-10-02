@@ -357,8 +357,8 @@ le() {
     *) expr="print($expr)" ;;
   esac
 
-  eval "$(luarocks path)" &&
-    LUA_INIT="@$HOME/.lua/init.lua" luajit -e "$expr"
+  ( eval "$(luarocks path)" &&
+    LUA_INIT="@$HOME/.lua/init.lua" luajit -e "$expr" )
 }
 
 # Use Lua as a UNIX filter. By default, if no "print" or "write" substrings
@@ -389,9 +389,8 @@ lef() {
     *) expr="${expr}:each(print)" ;;
   esac
 
-  eval "$(luarocks path)" &&
-    LUA_INIT="@$HOME/.lua/init.lua" luajit -e \
-    "fun.wrap(stiter(io.lines())):$expr"
+  ( eval "$(luarocks path)" && LUA_INIT="@$HOME/.lua/init.lua" luajit -e \
+    "fun.wrap(stiter(io.lines())):$expr" )
 }
 
 # Simpler invocation of lef(1) when only one operation is necessary.
@@ -404,17 +403,15 @@ lef() {
 #
 # TODO(aktau): Implement string splitting.
 lefs() {
-  eval "$(luarocks path)" &&
-    LUA_INIT="@$HOME/.lua/init.lua" luajit -e \
-    "fun.wrap(stiter(io.lines())):map(function(line) local x = split(line) ; return $@ end):each(print)"
+  ( eval "$(luarocks path)" && LUA_INIT="@$HOME/.lua/init.lua" luajit -e \
+    "fun.wrap(stiter(io.lines())):map(function(line) local x = split(line) ; return $@ end):each(print)" )
 }
 
 # Start a luajit interpreter with some libraries preloaded.
 lj() {
   # Add local and global rocks to the lua search path, then preload those
   # libraries and some other helper code from init.lua.
-  eval "$(luarocks path)" &&
-    luajit -i $HOME/.lua/init.lua --examples
+  ( eval "$(luarocks path)" && luajit -i $HOME/.lua/init.lua --examples )
 }
 
 # Run git-diff on files outside of a repository, to be able to make use of
