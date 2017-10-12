@@ -345,7 +345,7 @@ if has_ml then
 end
 if has_fun then
   examples = examples .. [[
-  fun:   fun.range(100):map(function(x) return x^2 end):reduce(operator.add, 0)
+  fun:   fun.range(100):map(function(x) return x^2 end):reduce(fun.operator.add, 0)
 ]]
 end
 if has_graph then
@@ -355,7 +355,7 @@ if has_graph then
 end
 if has_syscall and has_lj and jit.os == "Linux" then
   examples = examples .. [[
-  bench: benchN(function(N) fun.range(N):map(function(x) return x^2 end):reduce(operator.add, 0) end)]]
+  bench: benchN(function(N) fun.range(N):map(function(x) return x^2 end):reduce(fun.operator.add, 0) end)]]
 end
 
 -- Print the examples if --examples was passed as an argument
