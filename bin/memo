@@ -198,12 +198,15 @@ memo() {
 
     # In the following block we construct the unique path to save the output of
     # the command in.
-    local file=$({
+    local file
+    file=$({
       # The command and its arguments are always part of the hash.
       echo -n "$@"
 
       # Save the input while compressing it and pass it through with tee(1).
-      (( opt_stdin )) && tee >(compressor > "$stdinsave")
+      if (( opt_stdin )) ; then
+        tee >(compressor > "$stdinsave")
+      fi
     } | path)
 
     # Remove all versions of this hash if -c was passed.
