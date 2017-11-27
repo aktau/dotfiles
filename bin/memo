@@ -209,19 +209,20 @@ memo() {
       fi
     } | path)
 
-    # Remove all versions of this hash if -c was passed.
-    (( opt_clear )) &&
+    if (( opt_clear )) ; then
+      # Remove the saved content(s) of this hash if -c was passed.
       find "$(dirname "$file")" -type f -name "$(basename "$file")*" -delete
-
-    # Output the cached file or generate a new one.
-    catfile "$file" || {
-      if (( opt_stdin )) ; then
-        # It appears we don't have a cached file, but we already absorbed stdin,
-        # so we need to produce it again.
-        exec < <(decompressor < "$stdinsave")
-      fi
-      "$@" | tee >(compressfile "$file")
-    }
+    else
+      # Output the cached file or generate a new one.
+      catfile "$file" || {
+        if (( opt_stdin )) ; then
+          # It appears we don't have a cached file, but we already absorbed
+          # stdin, so we need to produce it again.
+          exec < <(decompressor < "$stdinsave")
+        fi
+        "$@" | tee >(compressfile "$file")
+      }
+    fi
   fi
   )
 }
