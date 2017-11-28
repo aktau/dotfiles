@@ -2,7 +2,7 @@
 #
 # memo(1), memoizes the output of your command-line, so you can do:
 #
-#   $ memo <some long running command> | ...
+#  $ memo <some long running command> | ...
 #
 # Instead of
 #
@@ -64,6 +64,7 @@ memo() {
       echo "  -s  Take stdin as an input to the command. Note, that this"
       echo "      requires buffering up all the input before memo is able to"
       echo "      decide whether to replay the cached version or not."
+      return $1
   }
 
   # Process options.
@@ -72,12 +73,14 @@ memo() {
   while getopts :chs opt ; do
     case $opt in
       c) opt_clear=1 ;;
-      h) usage ; return 1 ;;
+      h) usage 0 ;;
       s) opt_stdin=1 ;;
       ?) (( --OPTIND )) ; break ;;
     esac
   done
   shift $(( OPTIND - 1 ))
+
+  (( $# > 0 )) || usage 1
 
   # Ensures that the memodir for $USER exists. If it doesn't exist, tries to
   # create it with the right permissions.
