@@ -58,6 +58,8 @@ memo() {
       echo "DESCRIPTION"
       echo "  Memoizes the output of <command> and outputs it."
       echo ""
+      echo "  NOTE: If an interrupt happens while memoizing, it is cleared."
+      echo ""
       echo "OPTIONS"
       echo "  -c  Clean the cache, if no command is specified, clean everything."
       echo "  -h  Usage message."
@@ -183,6 +185,7 @@ memo() {
       stdinsave=$(mktemp)
       cleanup() {
         rm "$stdinsave"
+        trap - EXIT # Clean EXIT trap.
       }
 
       # Cleanup file after either EXIT (if run as a standalone script) or
@@ -218,6 +221,27 @@ memo() {
     else
       # Output the cached file or generate a new one.
       catfile "$file" || {
+        # Clear the cache and forward the return/signal code.
+        nocache() {
+          # $? represents the signal on all handlers except for ERR, where it
+          # represents the process error code. Note to self: find a clever way
+          # to deal with this.
+          declare -ri ret=$?
+          trap - INT # Clear traps.
+          rm "$file"* 2>/dev/null || true
+          exit $ret
+        }
+
+        # WARNING: if you're ever thinking of adding more signals to clear the
+        # cache on, read the following:
+        #
+        # When adding the 'ERR' signal to the set, any 'INT' signal received
+        # will trigger the specified function twice (from the same process, see
+        # the commit comments). I cannot explain why this is the case, but it's
+        # so. To try it out: trap nocache INT ERR, then make the process
+        # interrupt by pressing ctrl-c.
+        trap nocache INT
+
         if (( opt_stdin )) ; then
           # It appears we don't have a cached file, but we already absorbed
           # stdin, so we need to produce it again.
