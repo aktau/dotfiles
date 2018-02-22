@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# Attempt to set linux console colors (i.e.: without X11 or Wayland running)
+# from Xresources/Xdefaults. Does nothing if $TERM is not set to 'linux' or
+# Xdefaults is not found in the current users' homedir.
+#
+# Should probably be run from ~/.profile. See
+# https://blog.flowblok.id.au/2013-02/shell-startup-scripts.html.
+
+if [[ "$TERM" = "linux" ]] && [[ -r "$HOME/.Xdefaults" ]] ; then
+    # Check if we have a C preprocessor installed. Yes... Xresources/Xdefaults
+    # can use C defines.
+    if hash cpp 2>/dev/null ; then
+        cpp -P "$HOME/.Xdefaults"
+    else
+        cat "$HOME/.Xdefaults"
+    fi |
+        sed -n 's/.*\*\.\?color\([0-9]\{1,\}\).*#\([0-9a-fA-F]\{6\}\).*/\1 \2/p' |
+        awk '$1 < 16 {printf "\033]P%X%s", $1, $2}'
+    clear
+fi
