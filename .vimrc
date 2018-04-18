@@ -124,10 +124,7 @@ set matchpairs+=<:>               " Match < and > as well.
 " set showmatch                     " When a bracket is inserted, briefly jump to the matching one
 
 " undo
-set undofile                      " Save undo's after file closes
-set undodir=$HOME/.vim/undo       " where to save undo histories
-set undolevels=1000               " How many undos
-set undoreload=10000              " number of lines to save for undo
+set noundofile                    " Don't save undo's after file closes.
 
 set hidden                        " Handle multiple buffers better.
 set title                         " Set the terminal's title
