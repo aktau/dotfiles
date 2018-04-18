@@ -48,11 +48,17 @@ pass quick on { $wifi $ether } proto udp from any port 67:68
 # redirect you to another DNS server.
 pass out quick proto udp to { 8.8.8.8, 8.8.4.4, 1.2.3.4, 192.168.179.1, 192.168.1.1 } port 53
 
-# Allow VPN.
-# The destination address specification is a bit loose, but I couldn't get a
-# complete list of hosts. Only allowing UDP 1194 should be enough to keep
-# possible risks to a minimum.
-pass quick proto udp to { 162.253.128.82, 184.75.214.114, 184.75.214.42, 184.75.215.122, 184.75.220.162, 185.94.192.26, 188.120.238.110, 192.121.82.54, 192.121.82.58, 192.121.82.67, 213.183.54.64, 46.246.93.16, 85.17.136.249, 85.17.136.250, 85.17.136.251, 87.236.215.160, 91.231.84.93, 91.231.84.94, 94.242.255.193 } port { 1194, 443, 53, 80 }
+# Allow VPN. The destination address specification is a bit loose, but I
+# couldn't get a complete list of hosts. Only allowing UDP 1194 (and 1196 as
+# used by my provider) should be enough to keep possible risks to a minimum.
+#
+# Example:
+#   pass quick proto udp to { 162.253.128.82, 184.75.214.114, 184.75.214.42, 184.75.215.122, 184.75.220.162, 185.94.192.26, 188.120.238.110, 192.121.82.54, 192.121.82.58, 192.121.82.67, 213.183.54.64, 46.246.93.16, 85.17.136.249, 85.17.136.250, 85.17.136.251, 87.236.215.160, 91.231.84.93, 91.231.84.94, 94.242.255.193 } port { 1194, 1196, 443, 53, 80 }
+#
+# Generated with:
+#   rg --no-filename 'remote \d.*' | awk '{print $2}' | sort -u | paste -sd',' - | sed 's@,@, @g'
+#
+pass quick proto udp to { 103.16.26.137, 162.253.128.82, 184.75.214.114, 184.75.214.42, 184.75.215.122, 184.75.220.162, 185.61.148.113, 185.61.149.95, 185.86.148.139, 185.86.148.167, 185.86.148.67, 185.86.149.132, 185.86.150.17, 185.86.150.21, 185.86.151.146, 185.9.18.110, 185.94.192.26, 188.120.231.5, 188.120.233.37, 188.120.238.110, 198.144.159.110, 198.144.159.113, 198.144.159.116, 198.144.159.144, 198.144.159.147, 213.183.54.64, 85.17.136.249, 85.17.136.250, 85.17.136.251, 85.17.72.113, 87.236.215.160, 91.231.84.93, 91.231.84.94, 93.158.216.215, 94.242.255.193 } port { 1194, 1196, 443, 53, 80 }
 
 # Allow traffic on the local network
 pass quick to 192.168.0.0/16
