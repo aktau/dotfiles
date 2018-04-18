@@ -319,7 +319,9 @@ fnamere() {
     # Pass '*' glob to find(1) so it matches dotfiles like .bashrc as well
     # but doesn't print nor regex match the leading './'. This makes it
     # easier to do an anchoring match like '^[0-9]+'.
-    find * -regextype posix-extended -regex "$@"
+    local find=find
+    (( $+commands[gfind] )) && find=gfind
+    $find * -regextype posix-extended -regex "$@"
   )
 }
 
