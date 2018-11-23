@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# Processes paths on a line-by-line basis, leaves out paths that don't represent
+# files. Could be useful when you're using locate(1), which doesn't take a -type
+# flag like find(1).
+
+set -euo pipefail
+
+while read path ; do
+    if [ -d "$path" ] ; then
+        echo "$path"
+    fi
+done
