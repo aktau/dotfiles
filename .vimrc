@@ -32,7 +32,6 @@ endif
 call plug#begin('~/.vim/bundle')
 
 " original repos on github
-Plug 'ajh17/VimCompletesMe'
 Plug 'b4winckler/vim-angry'
 Plug 'chrisbra/vim-diff-enhanced'
 Plug 'sgur/vim-editorconfig'
