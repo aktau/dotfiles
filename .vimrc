@@ -33,7 +33,6 @@ call plug#begin('~/.vim/bundle')
 
 " original repos on github
 Plug 'b4winckler/vim-angry'
-Plug 'chrisbra/vim-diff-enhanced'
 Plug 'godlygeek/tabular'
 Plug 'itchyny/lightline.vim'
 Plug 'ludovicchabant/vim-gutentags'
@@ -174,6 +173,14 @@ set directory=/tmp                " Keep swap files in one location
 set noswapfile
 set timeoutlen=500
 
+" Vim 8 and Neovim have libxdiff built-in, and can be told to use the patience
+" algorithm, which I like better.
+"
+" Sadly, the patch-level check doesn't wor for Neovim because it remains at
+" minor patchlevel 0 (meaning it doesn't consider any Vim 8.1 patches to be
+" integrated).
+set diffopt+=algorithm:patience
+
 set laststatus=2                  " Show the status line all the time
 
 " Set a colorscheme. This is really stupid though, static_tomorrownight changes
@@ -294,9 +301,6 @@ endif
 " vim-gitgutter
 highlight clear SignColumn
 "let g:gitgutter_sign_column_always = 1
-
-" vim-diff-enhanced
-let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
 
 " gist-vim
 let g:gist_detect_filetype = 1
