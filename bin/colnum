@@ -1,0 +1,29 @@
+#!/usr/bin/awk -f
+#
+# Prepend an extra header line to the stream that gives column numbers for
+# every column. Similar to `cat -n`, but for columns. Takes AWK flags.
+
+# Parse arguments.
+BEGIN {
+  if (ARGC != 1) {
+    print "Usage: colnum" > "/dev/stderr"
+    exit(1)
+  }
+  col = ARGV[1]
+  ARGV[1] = "-"
+}
+
+# Enforce that the input separator is the output separator, to not mess with the
+# stream.
+# BEGIN {
+#   OFS = FS
+# }
+
+NR == 1 {
+  for (i = 0 ; i < NF ; i++) {
+    printf("%d" FS, i+1)
+  }
+  print ""
+}
+
+{ print }
