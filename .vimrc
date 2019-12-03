@@ -29,6 +29,22 @@ if empty(glob('~/.vim/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall | source $MYVIMRC
 endif
 
+" PlugActivated is a cut-down version of PlugLoaded
+" (https://vi.stackexchange.com/a/14143), which only checks for whether a plugin
+" will be loaded. So it can be used at load-time itself to decide whether or not
+" to load an extra plugin based on other plugins being activated.
+function! PlugActivated(name)
+  return (
+    \ has_key(g:plugs, a:name) &&
+    \ isdirectory(g:plugs[a:name].dir))
+endfunction
+
+" Conditional activation of plugins by predicates.
+function! PlugCond(cond, ...)
+  let opts = get(a:000, 0, {})
+  return a:cond ? opts : extend(opts, { 'on': [], 'for': [] })
+endfunction
+
 call plug#begin('~/.vim/bundle')
 
 " original repos on github
@@ -71,9 +87,7 @@ if filereadable($HOME . '/.local_config/local.vim')
 endif
 
 " If the local overrides didn't load vim-signify, load gitgutter.
-if !exists('g:loaded_signify')
-  Plug 'airblade/vim-gitgutter'
-endif
+Plug 'airblade/vim-gitgutter', PlugCond(!PlugActivated('vim-signify'))
 
 call plug#end()
 
