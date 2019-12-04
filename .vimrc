@@ -160,6 +160,7 @@ set ttyfast                       " indicate a fast terminal connection
 set tf                            " improve redrawing for newer computers
 set nolazyredraw                  " turn off lazy redraw
 set shell=/bin/zsh
+set diffopt+=vertical             " Vertical diff windows on :diffsplit.
 
 set visualbell
 set noerrorbells
