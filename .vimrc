@@ -37,7 +37,18 @@ function! PlugCond(cond, ...)
   return a:cond ? opts : extend(opts, { 'on': [], 'for': [] })
 endfunction
 
+" A list of known paths on remote filesystems. It would be more futureproof to
+" interpret the output of df(1), but I'm lazy and it sounds error-prone.
+let g:fs_remote_folders = []
+
 call plug#begin('~/.vim/bundle')
+
+let mapleader = ","
+
+" Enable any local modifications
+if filereadable($HOME . '/.local_config/local.vim')
+  source ~/.local_config/local.vim
+endif
 
 " original repos on github
 Plug 'b4winckler/vim-angry'
@@ -54,7 +65,7 @@ Plug 'sgur/vim-editorconfig'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-eunuch'
-Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-fugitive', PlugCond(empty(filter(copy(g:fs_remote_folders), {_, dir -> getcwd() =~ '^' . dir})))
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-surround'
@@ -72,12 +83,6 @@ Plug 'fatih/vim-go'
 Plug 'nfnty/vim-nftables'
 Plug 'rodjek/vim-puppet'
 Plug 'rust-lang/rust.vim'
-
-let mapleader = ","
-" Enable any local modifications
-if filereadable($HOME . '/.local_config/local.vim')
-  source ~/.local_config/local.vim
-endif
 
 " If the local overrides didn't load vim-signify, load gitgutter.
 Plug 'airblade/vim-gitgutter', PlugCond(!PlugActivated('vim-signify'))
