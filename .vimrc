@@ -14,14 +14,6 @@ else
   set clipboard=unnamedplus
 endif
 
-if executable('fzf')
-  if isdirectory($GOPATH . '/src/github.com/junegunn/fzf')
-    exe 'set rtp+=' . $GOPATH . '/src/github.com/junegunn/fzf'
-  else
-    exe 'set rtp+=' . fnamemodify(resolve(systemlist('which fzf')[0]), ':h:h')
-  endif
-endif
-
 " Install vim-plug if it's missing. Need curl(1) though.
 if empty(glob('~/.vim/autoload/plug.vim'))
   silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
@@ -51,6 +43,7 @@ call plug#begin('~/.vim/bundle')
 Plug 'b4winckler/vim-angry'
 Plug 'godlygeek/tabular'
 Plug 'itchyny/lightline.vim'
+Plug 'junegunn/fzf'  " This downloads the whole FZF repo even if we only want fzf.vim, so bet it.
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'luochen1990/rainbow'
 Plug 'rhysd/clever-f.vim'
