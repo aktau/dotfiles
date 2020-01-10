@@ -93,7 +93,6 @@ filetype plugin indent on         " load file type plugins + indentation
 syntax enable
 
 set encoding=utf-8
-set termencoding=utf-8
 scriptencoding utf-8
 
 set showcmd                       " display incomplete commands.
