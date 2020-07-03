@@ -78,6 +78,7 @@ Plug 'robertmeta/nofrils'
 " language support
 Plug 'exu/pgsql.vim'
 Plug 'fatih/vim-go'
+Plug 'mmarchini/bpftrace.vim'
 Plug 'nfnty/vim-nftables'
 Plug 'rodjek/vim-puppet'
 Plug 'rust-lang/rust.vim'
