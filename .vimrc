@@ -73,8 +73,6 @@ Plug 'tpope/vim-unimpaired'
 Plug 'xuhdev/SingleCompile'
 
 " themes
-Plug 'jnurmine/Zenburn'
-Plug 'https://bitbucket.org/kisom/eink.vim.git'
 Plug 'robertmeta/nofrils'
 
 " language support
