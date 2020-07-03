@@ -283,6 +283,10 @@ map <Right> :echo "no!"<cr>
 map <Up> :echo "no!"<cr>
 map <Down> :echo "no!"<cr>
 
+" Use <TAB> to select the popup menu.
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
 " visual-at. Allow running macro's over a visual selection, just type @<reg>
 " while in visual mode.
 xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
