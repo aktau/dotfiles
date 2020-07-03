@@ -19,7 +19,7 @@ Abolish embar{,r}as{,s}ing                           embarrassing
 Abolish existant                                     existent
 Abolish garbace                                      garbage
 Abolish worksapce                                    workspace
-Abolish oc{,c}ur{,s,red,ed}                          oc{c}ur{,s,red,red}
+Abolish oc{,c}ur{,s,red,ed,ring,ing}                 oc{c}ur{,s,red,red,ring,ring}
 Abolish exmaple{,s}                                  example{}
 Abolish mil{,l}isecond{,s}                           mil{l}isecond{}
 Abolish com{,m}it{,t}{ed,ing}                        com{m}it{t}{}
