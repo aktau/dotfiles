@@ -65,7 +65,6 @@ Plug 'scrooloose/syntastic'
 Plug 'sgur/vim-editorconfig'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-fugitive', PlugCond(empty(filter(copy(g:fs_remote_folders), {_, dir -> getcwd() =~ '^' . dir})))
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-sleuth'
