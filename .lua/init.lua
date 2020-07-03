@@ -299,7 +299,13 @@ function isin(val, ...)
 end
 
 if math.round == nil then
-  function math.round(n) return math.floor(n + 0.5) end
+  function math.round(n, precision)
+    if not precision then
+      return math.floor(n + 0.5)
+    end
+    local mult = 10^(precision or 0)
+    return math.floor(n * mult + 0.5) / mult
+  end
 end
 
 if math.log2 == nil then
