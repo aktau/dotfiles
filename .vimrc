@@ -51,6 +51,7 @@ if filereadable($HOME . '/.local_config/local.vim')
 endif
 
 " original repos on github
+Plug 'ZeroKnight/vim-signjump'  " Allow jumping between (any) signs.
 Plug 'b4winckler/vim-angry'
 Plug 'godlygeek/tabular'
 Plug 'itchyny/lightline.vim'
@@ -356,6 +357,9 @@ let g:gutentags_add_default_project_roots = 0
 " Make ctags add the language of the tag, so that we can postprocess the
 " tags file for fuzzy tag finding.
 let g:gutentags_ctags_extra_args = ['--fields=+l']
+
+" vim-signjump
+let g:signjump = { 'use_jumplist': 1, 'debug': 1 }
 
 " SingleCompile
 nnoremap <leader>r :SCCompileRun<cr>
