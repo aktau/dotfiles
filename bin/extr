@@ -1,0 +1,5 @@
+#!/bin/bash
+#
+# Extracts text betwen delimiters
+
+exec grep -oP "${1}\K[^${1}\s]+"
