@@ -216,17 +216,6 @@ vmap <s-tab> <gv
 " open the definition in a new split
 nnoremap <c-\> <c-w>g<c-]>
 
-" fix trailing spaces
-nnoremap <leader>w :%s/\s\+$//<cr>:let @/=''<CR>
-
-" map sort function to a key
-vnoremap <leader>s :sort<CR>
-
-" save on ctrl-s in every mode, does not work under tmux
-noremap <C-S> :update<CR>
-vnoremap <C-S> <C-C>:update<CR>
-inoremap <C-S> <C-O>:update<CR>
-
 " Rewrap the current paragraph.
 nnoremap <leader>q gqip
 " Rewrap the current comment block. Necessary because paragraphs don't work
@@ -252,12 +241,6 @@ nnoremap <C-l> <C-w>l
 
 " re-select text you just pasted
 nnoremap <leader>v V`]
-
-" open .vimrc in a split panel and edit it
-nnoremap <leader>ev <C-w><C-v><C-l>:e $MYVIMRC<cr>
-
-" clear search results
-nnoremap <leader><space> :noh<cr>
 
 " select last matched item
 nnoremap <leader>/ //e<Enter>v??<Enter>
@@ -316,12 +299,6 @@ endif
 " vim-gitgutter
 highlight clear SignColumn
 "let g:gitgutter_sign_column_always = 1
-
-" gist-vim
-let g:gist_detect_filetype = 1
-
-" vim-sneak
-let g:sneak#streak = 1
 
 " syntastic
 set statusline+=%#warningmsg#
