@@ -73,6 +73,10 @@ Plug 'tpope/vim-unimpaired'
 Plug 'xuhdev/SingleCompile'
 
 " themes
+Plug 'arcticicestudio/nord-vim'
+Plug 'gruvbox-community/gruvbox'
+Plug 'lifepillar/vim-solarized8'
+Plug 'mhartington/oceanic-next'
 Plug 'robertmeta/nofrils'
 
 " language support
