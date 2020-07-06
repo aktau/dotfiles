@@ -300,6 +300,11 @@ endif
 " plugin customization
 """"""""""""""""""""""
 
+" rking/ag.vim
+if executable('rg')
+  let g:ag_prg="rg --no-heading --vimgrep"
+endif
+
 " vim-gitgutter
 highlight clear SignColumn
 "let g:gitgutter_sign_column_always = 1
