@@ -126,9 +126,9 @@ if command -v nvim >/dev/null 2>&1 ; then
 fi
 
 # Use ag to supply fzf with filenames instead of find, it's faster.
-if hash rg ; then
+if hash rg &>/dev/null ; then
   export FZF_DEFAULT_COMMAND='rg --files'
-elif hash ag ; then
+elif hash ag &>/dev/null ; then
   export FZF_DEFAULT_COMMAND="ag -i --nocolor --nogroup --hidden \
     --ignore .git \
     --ignore .svn \
