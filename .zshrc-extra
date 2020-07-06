@@ -126,12 +126,16 @@ if command -v nvim >/dev/null 2>&1 ; then
 fi
 
 # Use ag to supply fzf with filenames instead of find, it's faster.
-export FZF_DEFAULT_COMMAND="ag -i --nocolor --nogroup --hidden \
-  --ignore .git \
-  --ignore .svn \
-  --ignore .hg \
-  --ignore .DS_Store \
-  -g ''"
+if hash rg ; then
+  export FZF_DEFAULT_COMMAND='rg --files'
+elif hash ag ; then
+  export FZF_DEFAULT_COMMAND="ag -i --nocolor --nogroup --hidden \
+    --ignore .git \
+    --ignore .svn \
+    --ignore .hg \
+    --ignore .DS_Store \
+    -g ''"
+fi
 
 # runargs is basically the same as xargs(1) but implemented as a shell
 # function so you don't have ugly long-running xargs processes all over the
