@@ -23,7 +23,7 @@ olddir=~/dotfiles_old                               # old dotfiles backup direct
 olddir_current=$olddir/"$(date +%d-%m-%Y)"
 files=".lua .vimrc .vim .psqlrc .newsbeuter .zshrc-extra .ctags .tmux.conf"
 linux_files=".Xdefaults"
-folders="etc"
+folders=('etc' '.config')
 
 ##########
 
@@ -86,23 +86,26 @@ function setup_dotfiles {
 function setup_folders {
     local src="$1"
     local dst="$2"
+    shift 2
 
-    pushd "$src" >/dev/null
-    while read folder ; do
-        printf '%b' "${SRCCOLOR}"
+    (
+      cd "$src"
+      # Implicit loop over the rest of the arguments.
+      for folder ; do
+          printf '%b' "${SRCCOLOR}"
 
-        # mirror the directory structure, if necessary
-        find "$folder" -type d \
-            -exec echo DIR "${src}"/{} -\> "${dst}/"{} \; \
-            -exec mkdir -p "${dst}/"{} \;
+          # mirror the directory structure, if necessary
+          find "$folder" -type d \
+              -exec echo DIR "${src}"/{} -\> "${dst}/"{} \; \
+              -exec mkdir -p "${dst}/"{} \;
 
-        printf '%b' "${ENDCOLOR}"
+          printf '%b' "${ENDCOLOR}"
 
-        # symlink the files (leafs)
-        find "$folder" -not -type d \
-            -exec "$scriptdir/safelink.sh" "${src}/"{} "${dst}/"{} "$olddir_current" \;
-    done
-    popd >/dev/null
+          # symlink the files (leafs)
+          find "$folder" -not -type d \
+              -exec "$scriptdir/safelink.sh" "${src}/"{} "${dst}/"{} "$olddir_current" \;
+      done
+    )
 }
 
 function setup_git {
@@ -174,7 +177,7 @@ function config_zsh {
 #install_zsh
 config_zsh
 setup_dotfiles "$files"
-setup_folders "$dir" "$HOME" <<< "$folders"
+setup_folders "$dir" "$HOME" "${folders[@]}"
 setup_git
 setup_ssh
 setup_neovim
