@@ -63,7 +63,10 @@ tools:
       - '%f:%l %m'
 
   sh-shellcheck: &sh-shellcheck
-    lint-command: 'shellcheck -f gcc -x'
+    lint-command: 'shellcheck -f gcc -x -'
+    # It's important to use lint-stding: true, see
+    # https://github.com/mattn/efm-langserver/issues/59.
+    lint-stdin: true
     lint-formats:
       - '%f:%l:%c: %trror: %m'
       - '%f:%l:%c: %tarning: %m'
