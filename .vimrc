@@ -50,6 +50,17 @@ if filereadable($HOME . '/.local_config/local.vim')
   source ~/.local_config/local.vim
 endif
 
+" LSP setup. Based on the following posts/articles, in order of influence:
+"  - www.reddit.com/r/neovim/comments/gxcbui/in_built_lsp_is_amazing/
+"  - github.com/nvim-lua/completion-nvim
+"  - www.reddit.com/r/neovim/comments/h0ndj0/to_those_who_have_integrated_lsp_functionality
+"  - www.reddit.com/r/neovim/comments/gy8ko7/question_how_to_get_more_readable_error_messages
+"  - www.reddit.com/r/neovim/comments/hba6yb/coc_neovim_lua_completion_source
+if has('nvim')
+  Plug 'neovim/nvim-lsp'          " Ready-made LSP server configurations.
+  Plug 'nvim-lua/completion-nvim' " Async autocomplete using nvim builtin LSP.
+endif
+
 " original repos on github
 Plug 'ZeroKnight/vim-signjump'  " Allow jumping between (any) signs.
 Plug 'b4winckler/vim-angry'
@@ -61,7 +72,6 @@ Plug 'luochen1990/rainbow'
 Plug 'rhysd/clever-f.vim'
 Plug 'rking/ag.vim'
 Plug 'roman/golden-ratio'
-Plug 'scrooloose/syntastic'
 Plug 'sgur/vim-editorconfig'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-commentary'
@@ -81,7 +91,6 @@ Plug 'robertmeta/nofrils'
 
 " language support
 Plug 'exu/pgsql.vim'
-Plug 'fatih/vim-go'
 Plug 'mmarchini/bpftrace.vim'
 Plug 'nfnty/vim-nftables'
 Plug 'rodjek/vim-puppet'
@@ -187,6 +196,7 @@ set nowritebackup                 " And again.
 set directory=/tmp                " Keep swap files in one location
 set noswapfile
 set timeoutlen=500
+set updatetime=100                " Trigger CursorHold after 100ms (default is 4000ms).
 
 " Vim 8 and Neovim have libxdiff built-in, and can be told to use the patience
 " algorithm, which I like better.
@@ -270,9 +280,15 @@ map <Right> :echo "no!"<cr>
 map <Up> :echo "no!"<cr>
 map <Down> :echo "no!"<cr>
 
-" Use <TAB> to select the popup menu.
-inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+" Use <Tab> and <S-Tab> to navigate through popup menu
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
+" Set completeopt to have a better completion experience
+set completeopt=menuone,noinsert,noselect
+
+" Avoid showing message extra message when using completion
+set shortmess+=c
 
 " visual-at. Allow running macro's over a visual selection, just type @<reg>
 " while in visual mode.
@@ -300,6 +316,11 @@ endif
 " plugin customization
 """"""""""""""""""""""
 
+" nvim-lsp
+if has('nvim')
+  lua require('lsp')
+endif
+
 " rking/ag.vim
 if executable('rg')
   let g:ag_prg="rg --no-heading --vimgrep"
@@ -308,25 +329,6 @@ endif
 " vim-gitgutter
 highlight clear SignColumn
 "let g:gitgutter_sign_column_always = 1
-
-" syntastic
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-" let g:syntastic_auto_loc_list=1
-" let g:syntastic_loc_list_height=5
-let g:syntastic_c_include_dirs = [
-            \ '../build/include',
-            \ 'build/include',
-            \ '../build/src/nvim/auto',
-            \ 'build/src/nvim/auto',
-            \ ]
-let g:syntastic_c_compiler_options = '-std=gnu99 -DINCLUDE_GENERATED_DECLARATIONS'
-
-let g:syntastic_go_checkers=['go', 'govet']
-
-" Don't perform syntastic check when we intend to quit (even if we write).
-let g:syntastic_check_on_wq = 0
 
 " vim-gutentags
 let g:gutentags_enabled = 1
@@ -352,19 +354,11 @@ let g:signjump = { 'use_jumplist': 1, 'debug': 1 }
 " SingleCompile
 nnoremap <leader>r :SCCompileRun<cr>
 
-" vim-go
-let g:go_auto_sameids = 1         " Auto highlight the same variable.
-let g:go_highlight_functions = 1
-let g:go_highlight_methods = 1
-let g:go_highlight_structs = 1
-let g:go_fmt_command = "goimports"
-
 " rust.vim
 let g:rustfmt_autosave = 1
 " Rust uses textwidth=99, to disable this, use let g:rust_recommended_style = 0.
 " Otherwise adjust colorcolumn to match.
 au FileType rust setlocal colorcolumn=100
-au FileType rust let g:syntastic_rust_checkers = ['rustc']
 
 " tabularize
 " some keybinds taken from the excellent vimcasts episode on Tabularize
@@ -564,15 +558,6 @@ au BufRead,BufNewFile mutt{ng,}-*-\w\+ set ft=mail
 au FileType go setlocal makeprg=go\ build
 au FileType go setlocal shiftwidth=4 tabstop=4 softtabstop=4 nolist
 au FileType go let g:SuperTabDefaultCompletionType = "context"
-
-au FileType go unmap <leader>r
-au FileType go nmap <leader>r <Plug>(go-run)
-au FileType go nmap <leader>b <Plug>(go-build)
-au FileType go nmap <leader>t <Plug>(go-test)
-au FileType go nmap <leader>c :GoCallers<cr>
-au FileType go nmap <leader>i <Plug>(go-info)
-au FileType go nmap <leader>d <Plug>(go-def)
-au FileType go nmap <leader>n <Plug>(go-rename)
 
 " tries to get buffer reloading to work correctly in terminals
 augroup checktime
