@@ -519,6 +519,14 @@ map <F4> :RainbowToggle<CR>
 " filetype detection
 """"""""""""""""""""
 
+if has('nvim')
+  "`Highlight text on (non-visual mode) yanking.
+  augroup highlightyank
+    au!
+    au TextYankPost * lua return (not vim.v.event.visual) and require('vim.highlight').on_yank("IncSearch", 500)
+  augroup END
+endif
+
 au WinEnter * setlocal cursorline
 au WinLeave * setlocal nocursorline
 au VimResized * wincmd = " Resize splits on window resize.
