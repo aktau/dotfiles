@@ -523,7 +523,7 @@ if has('nvim')
   "`Highlight text on (non-visual mode) yanking.
   augroup highlightyank
     au!
-    au TextYankPost * lua return (not vim.v.event.visual) and require('vim.highlight').on_yank("IncSearch", 500)
+    au TextYankPost * lua require('vim.highlight').on_yank{timeout=500, on_visual=false}
   augroup END
 endif
 
