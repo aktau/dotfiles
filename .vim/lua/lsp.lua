@@ -163,6 +163,13 @@ local servers = {
   ['clangd'] = {},
   ['gopls'] = {},
   ['rust_analyzer'] = {},
+  ['sumneko_lua'] = {
+    settings = {
+      Lua = {
+        runtime = { version = "LuaJIT" }
+      }
+    }
+  },
 
   -- A generic langserver that can be used to pull regular linters into the LSP
   -- ecosystem (like shellcheck).
