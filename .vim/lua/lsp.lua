@@ -1,8 +1,29 @@
+-- for debugging
+-- :lua require('vim.lsp.log').set_level("debug")
+-- :lua print(vim.inspect(vim.lsp.buf_get_clients()))
+-- :lua print(vim.lsp.get_log_path())
+-- :lua print(vim.inspect(vim.tbl_keys(vim.lsp.callbacks)))
+
 -- This setup was inspired by:
 --
 --  * https://gitlab.com/SanchayanMaity/dotfiles/-/blob/master/nvim/.config/nvim/lua/lsp.lua
 --  * https://github.com/ahmedelgabri/dotfiles/blob/master/roles/vim/files/.vim/lua/lsp.lua
-local nvim_lsp = require('nvim_lsp')
+local has_nvim_lsp, nvim_lsp = pcall(require, 'nvim_lsp')
+if not has_nvim_lsp then
+  print("install the 'github.com/neovim/nvim-lspconfig' plugin to get LSP support")
+  return
+end
+
+-- TODO: extract to a utility library when I get more lua things.
+--
+-- Stolen from
+-- https://github.com/ahmedelgabri/dotfiles/blob/94373b988275b415e24ef7757349fb02b809c3df/roles/vim/files/.vim/lua/_/utils.lua.
+local function augroup(group, fn)
+  vim.api.nvim_command("augroup " .. group)
+  vim.api.nvim_command("autocmd!")
+  fn()
+  vim.api.nvim_command("augroup END")
+end
 
 -- For debugging:
 --
@@ -104,59 +125,50 @@ local function on_attach(client, bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "gt", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "pd", "<cmd>lua lsp_peek_definition()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'ga', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-
-  -- TODO: make a local copy of Prev/NextDiagnostic if I decide to not use
-  --       diagnostic anymore.
-  local has_diagnostic, diagnostic = pcall(require, 'diagnostic')
-  if has_diagnostic then
-    diagnostic.on_attach()
-
-    vim.api.nvim_buf_set_keymap(bufnr, "n", "[d", ":PrevDiagnostic<CR>", opts)
-    vim.api.nvim_buf_set_keymap(bufnr, "n", "]d", ":NextDiagnostic<CR>", opts)
-    vim.api.nvim_buf_set_keymap(bufnr, "n", "[D", ":PrevDiagnosticCycle<CR>", opts)
-    vim.api.nvim_buf_set_keymap(bufnr, "n", "]D", ":NextDiagnosticCycle<CR>", opts)
-  end
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "ga", '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "[d", "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", opts)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "]d", "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", opts)
 
   local has_completion, completion = pcall(require, 'completion')
   if has_completion then
     completion.on_attach()
   end
 
-  -- Enable format-on-save when available (see :help lsp-config). A discussion
-  -- on how to do this with nvim-lsp:
-  -- https://github.com/neovim/nvim-lsp/issues/115.
-  --
-  -- TODO: When gopls implements willSaveWaitUntil (no issue yet), use it
-  --       instead as it saves a roundtrip:
-  --       https://github.com/Microsoft/language-server-protocol/issues/726.
-  if client.resolved_capabilities.document_formatting then
-    -- With gopls, textDocument/formatting only runs gofmt. If we also want
-    -- goimports, we need to run "all" code actions. See
-    -- https://github.com/Microsoft/language-server-protocol/issues/726.
-    if vim.api.nvim_buf_get_option(bufnr, "filetype") == "go" then
-      vim.api.nvim_command("autocmd BufWritePre <buffer> lua go_organize_imports_sync(1000)")
+  augroup(
+    "LSP",
+    function()
+      -- Enable format-on-save when available (see :help lsp-config). A discussion
+      -- on how to do this with nvim-lsp:
+      -- https://github.com/neovim/nvim-lsp/issues/115.
+      --
+      -- TODO: When gopls implements willSaveWaitUntil (no issue yet), use it
+      --       instead as it saves a roundtrip:
+      --       https://github.com/Microsoft/language-server-protocol/issues/726.
+      if client.resolved_capabilities.document_formatting then
+        -- With gopls, textDocument/formatting only runs gofmt. If we also want
+        -- goimports, we need to run "all" code actions. See
+        -- https://github.com/Microsoft/language-server-protocol/issues/726.
+        if vim.api.nvim_buf_get_option(bufnr, "filetype") == "go" then
+          vim.api.nvim_command("autocmd BufWritePre <buffer> lua go_organize_imports_sync(1000)")
+        end
+        vim.api.nvim_command("autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync(nil, 1000)")
+      end
+
+      if client.resolved_capabilities.document_highlight then
+        vim.api.nvim_command("autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()")
+        vim.api.nvim_command("autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()")
+        vim.api.nvim_command("autocmd CursorMoved <buffer> lua vim.lsp.util.buf_clear_references()")
+      end
+
+
+      -- `show_line_diagnostics` draws a nice popup window. I like it when this
+      -- appears when I hover over a line with a diagnostic. This hack
+      -- accomplishes that.
+      --
+      -- Source: https://github.com/nvim-lua/diagnostic-nvim/issues/29
+      vim.api.nvim_command('autocmd CursorHold <buffer> lua vim.lsp.diagnostic.show_line_diagnostics({show_header=false})')
     end
-    vim.api.nvim_command("autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync(nil, 1000)")
-  end
-
-  if client.resolved_capabilities.document_highlight then
-    vim.api.nvim_command("autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()")
-    vim.api.nvim_command("autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()")
-    vim.api.nvim_command("autocmd CursorMoved <buffer> lua vim.lsp.util.buf_clear_references()")
-  end
-
-  -- Diagnostics are automatically shown as virtual text by nvim-lsp (and also
-  -- the nvim-diagnostic extension, which makes it more configurable). But this
-  -- doesn't handle multiline diagnostics well.
-  --
-  -- Instead, `show_line_diagnostics` draws a nice popup window. This is
-  -- activated by Prev/NextDiagnostic (if using nvim-diagnostic), but I also
-  -- like it when it automatically appears when going over a line with a
-  -- diagnostic. This hack accomplishes that.
-  --
-  -- Source: https://github.com/nvim-lua/diagnostic-nvim/issues/29
-  vim.api.nvim_command('autocmd CursorHold <buffer> lua vim.lsp.util.show_line_diagnostics()')
+  )
 end
 
 local servers = {
@@ -194,3 +206,16 @@ for lsp, config in pairs(servers) do
     config
   ))
 end
+
+
+-- Configure nvim-lsp with handlers. More specifically: diagnostics.
+-- https://github.com/nvim-lua/diagnostic-nvim/issues/73
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+  vim.lsp.diagnostic.on_publish_diagnostics,
+  {
+    virtual_text = true,  -- Apply virtual text to line endings.
+    underline = true,  -- Apply underlines to diagnostics.
+    signs = true,  -- Apply signs for diagnostics.
+    update_in_insert = false,  -- Do not update diagnostics while still inserting.
+  }
+)
