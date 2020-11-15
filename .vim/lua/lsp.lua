@@ -8,8 +8,8 @@
 --
 --  * https://gitlab.com/SanchayanMaity/dotfiles/-/blob/master/nvim/.config/nvim/lua/lsp.lua
 --  * https://github.com/ahmedelgabri/dotfiles/blob/master/roles/vim/files/.vim/lua/lsp.lua
-local has_nvim_lsp, nvim_lsp = pcall(require, 'nvim_lsp')
-if not has_nvim_lsp then
+local has_lspconfig, lspconfig = pcall(require, 'lspconfig')
+if not has_lspconfig then
   print("install the 'github.com/neovim/nvim-lspconfig' plugin to get LSP support")
   return
 end
@@ -200,7 +200,7 @@ local servers = {
 }
 
 for lsp, config in pairs(servers) do
-  nvim_lsp[lsp].setup(vim.tbl_extend(
+  lspconfig[lsp].setup(vim.tbl_extend(
     'force',
     { on_attach = on_attach },
     config
