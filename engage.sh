@@ -24,6 +24,7 @@ relscriptdir=$( realpath --relative-to="$HOME" "$scriptdir" )
 
 
 dir=~/dotfiles                                      # dotfiles directory
+bindir=~/bin                                        # Local binaries directory.
 olddir=~/dotfiles_old                               # old dotfiles backup directory
 olddir_current=$olddir/"$(date +%d-%m-%Y)"
 files=".lua .vimrc .vim .psqlrc .newsbeuter .zshrc-extra .ctags .tmux.conf"
@@ -41,6 +42,9 @@ echo "done"
 printf '%b %b %b%b' ${MAKECOLOR}"Changing"${ENDCOLOR} "working directory to" ${BINCOLOR}${dir}${ENDCOLOR} "..."
 cd $dir
 echo "done"
+
+# Ensure bindir exists
+[[ -d "$bindir" ]] || mkdir "$bindir"
 
 function setup_link {
     local orig="$1"
@@ -198,7 +202,7 @@ function config_zsh {
 # Debian installs fd(1) under /usr/bin/fdfind. Fix that.
 if ! command -v fd >/dev/null 2>&1 ; then
   if command -v fdfind >/dev/null 2>&1 ; then
-    "$scriptdir/safelink.sh" "$(which fdfind)" "$HOME/bin/fd" "$olddir_current"
+    "$scriptdir/safelink.sh" "$(which fdfind)" "$bindir/fd" "$olddir_current"
   fi
 fi
 
