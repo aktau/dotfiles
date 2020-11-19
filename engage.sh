@@ -18,6 +18,11 @@ ENDCOLOR="\033[0m"
 
 scriptdir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
+# Like $scriptdir, but relative to $HOME, so that it can remain stable when
+# moving $HOME.
+relscriptdir=$( realpath --relative-to="$HOME" "$scriptdir" )
+
+
 dir=~/dotfiles                                      # dotfiles directory
 olddir=~/dotfiles_old                               # old dotfiles backup directory
 olddir_current=$olddir/"$(date +%d-%m-%Y)"
@@ -165,13 +170,29 @@ else
 fi
 }
 
+function add_line {
+    local file="$1"
+    local line="$2"
+
+    if ! grep -q "$line" "$file" ; then
+      echo "$line" >> "$file"
+    fi
+}
+
 function config_zsh {
     printf "%b %b\n" ${MAKECOLOR}"Configuring"${ENDCOLOR} "zsh"
 
     local zshrc="$HOME/.zshrc"
-    local line="source ~/.zshrc-extra"
 
-    grep -q "$line" "$zshrc" || printf "\n%b\n%b" "# include some extra helpers" "$line" >> "$zshrc"
+    local base
+    if [[ -n "$relscriptdir" ]] ; then
+      base="~/$relscriptdir"
+    else
+      base="$scriptdir"
+    fi
+
+    add_line "$zshrc" "source $base/zgen.zsh"
+    add_line "$zshrc" "source $base/.zshrc-extra"
 }
 
 #install_zsh
