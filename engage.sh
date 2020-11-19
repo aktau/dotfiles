@@ -195,6 +195,13 @@ function config_zsh {
     add_line "$zshrc" "source $base/.zshrc-extra"
 }
 
+# Debian installs fd(1) under /usr/bin/fdfind. Fix that.
+if ! command -v fd >/dev/null 2>&1 ; then
+  if command -v fdfind >/dev/null 2>&1 ; then
+    "$scriptdir/safelink.sh" "$(which fdfind)" "$HOME/bin/fd" "$olddir_current"
+  fi
+fi
+
 #install_zsh
 config_zsh
 setup_dotfiles "$files"
