@@ -178,7 +178,7 @@ function add_line {
     local file="$1"
     local line="$2"
 
-    if ! grep -q "$line" "$file" ; then
+    if ! grep -qxF "$line" "$file" ; then
       echo "$line" >> "$file"
     fi
 }
