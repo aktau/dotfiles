@@ -178,7 +178,15 @@ local servers = {
   ['sumneko_lua'] = {
     settings = {
       Lua = {
-        runtime = { version = "LuaJIT" }
+        diagnostics = {
+          globals = { 'vim' },
+        },
+        runtime = { version = 'LuaJIT' },
+        workspace = {
+          library = {
+            [vim.fn.expand('$VIMRUNTIME/lua')] = true,
+          }
+        }
       }
     }
   },
