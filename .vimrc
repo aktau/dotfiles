@@ -22,7 +22,7 @@ if empty(glob('~/.vim/autoload/plug.vim'))
 endif
 
 " Say no to Python. On Neovim it spawns an extra process and is generally slow.
-if !has('nvim')
+if has('nvim')
   let g:loaded_python_provider = 0
   let g:loaded_python3_provider = 0
 endif
