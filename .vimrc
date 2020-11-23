@@ -21,6 +21,12 @@ if empty(glob('~/.vim/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall | source $MYVIMRC
 endif
 
+" Say no to Python. On Neovim it spawns an extra process and is generally slow.
+if !has('nvim')
+  let g:loaded_python_provider = 0
+  let g:loaded_python3_provider = 0
+endif
+
 " PlugActivated is a cut-down version of PlugLoaded
 " (https://vi.stackexchange.com/a/14143), which only checks for whether a plugin
 " will be loaded. So it can be used at load-time itself to decide whether or not
