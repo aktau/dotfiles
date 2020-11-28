@@ -125,6 +125,8 @@ local function on_attach(client, bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "gt", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "pd", "<cmd>lua lsp_peek_definition()<CR>", opts)
+  -- TODO: Try out github.com/RishabhRD/nvim-lsputils for more stylish code
+  -- actions. Example: https://github.com/ahmedelgabri/dotfiles/commit/546dfc37cd9ef110664286eb50ece4713108a511.
   vim.api.nvim_buf_set_keymap(bufnr, "n", "ga", '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "[d", "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", opts)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "]d", "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", opts)
@@ -137,9 +139,13 @@ local function on_attach(client, bufnr)
   augroup(
     "LSP",
     function()
-      -- Enable format-on-save when available (see :help lsp-config). A discussion
-      -- on how to do this with nvim-lsp:
+      -- Enable format-on-save when available (see :help lsp-config). A
+      -- discussion on how to do this with nvim-lsp:
       -- https://github.com/neovim/nvim-lsp/issues/115.
+      --
+      -- A discussion on how to do this better (more asynchronously) for slow
+      -- LSPs:
+      -- https://www.reddit.com/r/neovim/comments/jvisg5/lets_talk_formatting_again
       --
       -- TODO: When gopls implements willSaveWaitUntil (no issue yet), use it
       --       instead as it saves a roundtrip:
@@ -160,7 +166,6 @@ local function on_attach(client, bufnr)
         vim.api.nvim_command("autocmd CursorMoved <buffer> lua vim.lsp.util.buf_clear_references()")
       end
 
-
       -- `show_line_diagnostics` draws a nice popup window. I like it when this
       -- appears when I hover over a line with a diagnostic. This hack
       -- accomplishes that.
@@ -169,6 +174,52 @@ local function on_attach(client, bufnr)
       vim.api.nvim_command('autocmd CursorHold <buffer> lua vim.lsp.diagnostic.show_line_diagnostics({show_header=false})')
     end
   )
+end
+
+-- Add custom LSP for certain environments. The tricky thing is to make it the
+-- preferential LSP whenever it is applicable (correct filetype and root),
+-- excluding other LSPs.
+
+-- override_lsp_root returns the first matching root from
+-- `g:aktau_override_lsp.roots` that `fname` is a child of, returns nil if none
+-- match.
+local override_lsp_root = function() return nil end
+local override_lsp = vim.g.aktau_override_lsp
+if override_lsp ~= nil then
+  override_lsp_root = function(fname)
+    -- Early out shortcuts, if either `fname` or `g:aktau_override_lsp.roots`
+    -- are empty.
+    if fname == nil or fname == '' then
+      return nil
+    end
+    if override_lsp.roots == nil or #override_lsp.roots == 0 then
+      return nil
+    end
+
+    for _, root_for_override_lsp in ipairs(override_lsp.roots) do
+      if vim.startswith(fname, root_for_override_lsp) then
+        return root_for_override_lsp
+      end
+    end
+    return nil
+  end
+
+  local configs = require('lspconfig/configs')
+  configs[override_lsp.name] = {
+    default_config = {
+      cmd = override_lsp.cmd,
+      filetypes = override_lsp.filetypes,
+      -- Only run instances of the remote fs LSP for files that are actually on
+      -- the remote fs.
+      root_dir = override_lsp_root,
+      settings = {},
+    },
+  }
+
+  -- Setup the override LSP separately. All other LSPs need a `root_dir`
+  -- override so as to not start int he overridden roots (see
+  -- `override_lsp_root`).
+  lspconfig[override_lsp.name].setup({ on_attach = on_attach })
 end
 
 local servers = {
@@ -208,13 +259,29 @@ local servers = {
 }
 
 for lsp, config in pairs(servers) do
-  lspconfig[lsp].setup(vim.tbl_extend(
+  -- Try to get the original `root_dir` function
+  local root_dir_fn = config.root_dir
+  if config.root_dir == nil then
+    root_dir_fn = lspconfig[lsp].document_config.default_config.root_dir
+  end
+
+  lspconfig[lsp].setup(vim.tbl_deep_extend(
     'force',
-    { on_attach = on_attach },
-    config
+    { on_attach = on_attach, },
+    config,
+    -- Ensure the regular LSPs do not run in the overridden roots.
+    {
+      root_dir = function(fname)
+        -- TODO: don't install the override if the filetypes don't match (so
+        --       that efm-langserver can work in all scenarios).
+        if override_lsp_root(fname) ~= nil then
+          return nil
+        end
+        return root_dir_fn(fname)
+      end,
+    }
   ))
 end
-
 
 -- Configure nvim-lsp with handlers. More specifically: diagnostics.
 -- https://github.com/nvim-lua/diagnostic-nvim/issues/73
