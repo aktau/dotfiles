@@ -68,7 +68,6 @@ if has('nvim')
 endif
 
 " original repos on github
-Plug 'ZeroKnight/vim-signjump'  " Allow jumping between (any) signs.
 Plug 'b4winckler/vim-angry'
 Plug 'godlygeek/tabular'
 Plug 'itchyny/lightline.vim'
