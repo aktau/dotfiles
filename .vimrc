@@ -89,6 +89,7 @@ Plug 'xuhdev/SingleCompile'
 
 " themes
 Plug 'arcticicestudio/nord-vim'
+Plug 'drewtempelmeyer/palenight.vim'
 Plug 'gruvbox-community/gruvbox'
 Plug 'lifepillar/vim-solarized8'
 Plug 'mhartington/oceanic-next'
