@@ -72,7 +72,6 @@ Plug 'b4winckler/vim-angry'
 Plug 'godlygeek/tabular'
 Plug 'itchyny/lightline.vim'
 Plug 'junegunn/fzf'  " This downloads the whole FZF repo even if we only want fzf.vim, so bet it.
-Plug 'ludovicchabant/vim-gutentags'
 Plug 'luochen1990/rainbow'
 Plug 'mhinz/vim-signify'
 Plug 'rhysd/clever-f.vim'
@@ -351,24 +350,6 @@ endif
 " vim-signify
 let g:signify_sign_change = '~'              " The default is '!', but I prefer vim-gitgutter's '~'
 
-" vim-gutentags
-let g:gutentags_enabled = 1
-let g:gutentags_generate_on_missing = 1      " Generate a tags file if there is none.
-let g:gutentags_generate_on_new = 0          " Don't regenerate tags file in a new Vim session (I tend to reopen Vim a lot).
-let g:gutentags_generate_on_write = 1        " Do update the tags file on file save.
-let g:gutentags_resolve_symlinks = 1
-" Only index tags in git projects. Store tags files inside of the .git
-" repository so it doesn't make the repo dirty if 'tags' is missing from
-" .gitignore. Downside: this doesn't work for non-git repositories. I would
-" enable it for other VCS's as well but I haven't found how to
-" conditionalize the '.git' in gutentags_ctags_tagfile...
-let g:gutentags_ctags_tagfile = '.git/tags'
-let g:gutentags_project_root = ['.git']
-let g:gutentags_add_default_project_roots = 0
-" Make ctags add the language of the tag, so that we can postprocess the
-" tags file for fuzzy tag finding.
-let g:gutentags_ctags_extra_args = ['--fields=+l']
-
 " vim-signjump
 let g:signjump = { 'use_jumplist': 1, 'debug': 1 }
 
@@ -404,103 +385,6 @@ nmap <silent> ]G :tablast<CR>
 
 " fzf
 nnoremap <silent> <c-p> :FZF<CR>
-
-if has('lambda')
-  " Fuzzy tag searching with FZF. Credit goes to junegunn, slightly modified
-  " by me to also take input from concatenated taglist() output.
-  function! s:fzftags_sink(line)
-    let parts = split(a:line, '\t\zs')
-    let excmd = matchstr(parts[2:], '^.*\ze;"\t')
-    " If the last match didn't work, that probably means the ex command was
-    " already preprocessed (i.e.: it came from taglist()).
-    if empty(excmd)
-      let excmd = parts[2]
-    endif
-    " Open the file we want to jumpt to.
-    execute 'silent e' parts[1][:-2]
-    let [magic, &magic] = [&magic, 0]
-    " Jump inside of the file.
-    execute excmd
-    let &magic = magic
-  endfunction
-
-  " Mapping table for Vim &filetype to ctags languages. Note that ctags
-  " recognizes .c files as C, while .h files are always C++.
-  let s:vim_to_ctags = {
-  \   'cpp': '(C|C++)',
-  \   'cs': 'C#',
-  \ }
-
-  " Fuzzy tag matching. If passed a word as an argument, it will look for a
-  " prefix match and present an fzf selector if there are multiple. If no
-  " arguments are passed, it will pipe all tags for the current &filetype to
-  " fzf. Taken from ivalkeen/vim-ctrlp-tjump and modified. Thanks!
-  "
-  " Requires Vim 8 or Neovim, as it uses lambdas.
-  function! s:fzftags(...)
-    if empty(tagfiles())
-      echohl WarningMsg
-      echom 'No tags file(s) present'
-      echohl None
-      return
-    endif
-
-    " Take the first argument of the function as the (partial) tag to search
-    " for if it was given. Otherwise (attempt to) expand the word under the
-    " cursor
-    let word = exists('a:1') ? a:1 : expand('<cword>')
-
-    " Get the ctags name for the language from &filetype. If we don't have a
-    " match in our match, make a good guess by capitalizing the first
-    " character of the &filetype.
-    let ctagsft = get(s:vim_to_ctags, &filetype, substitute(&filetype, '^.', '\u\0', ''))
-
-    " If was no word was passed as an argument (or was under the cursor), use
-    " the entire tags file for fuzzy matching (filtered by filetype).
-    if empty(word)
-      " Concatenate all existing tagfiles, filtering out lines that don't
-      " correspond to our filetype/language. This will implicitly filter out
-      " ctags headers as well, so we don't need an extra grep(1) invocation
-      " for that.
-      "
-      "  TODO: Need to canonicalize the filename before attempting to :edit
-      "  it (if we go through the tag codepaths Vim canonicalizes them for
-      "  us, that's not the case here).
-      call fzf#run({
-      \ 'source':  'cat '.join(map(tagfiles(), 'fnamemodify(v:val, ":S")')) .
-      \            '| grep -P "language:' . ctagsft . '\t"',
-      \ 'options': '+m -d "\t" --with-nth 1,3,2 -n 1,2 --tiebreak=index',
-      \ 'down':    '30%',
-      \ 'sink':    funcref('s:fzftags_sink')})
-      return
-    endif
-
-    " For fast tag lookup, we ask for a prefix match. This should enable
-    " binary search (help :tagbsearch).
-    let taglist = taglist('^' . word)
-    if len(taglist) == 0
-      echo("No tags found for: " . word)
-    elseif len(taglist) == 1
-      call feedkeys(":silent! tag " . word . "\r", 'nt')
-    else
-      " Filter out tags in the taglist that don't match the current filetype.
-      let langtaglist = filter(taglist, {key, val -> get(val, 'language') =~# escape('^'.ctagsft, '|()')})
-      if empty(langtaglist)
-        echo("No tags found for: " . word)
-        return
-      endif
-      " ...and pass them to fzf(1).
-      call fzf#run({
-      \ 'source':  map(langtaglist, {key, val -> get(val, 'name') . "\t" . get(val, 'filename') . "\t" . get(val, 'cmd')}),
-      \ 'options': '+m -d "\t" -n 1,2 --tiebreak=index',
-      \ 'down':    '30%',
-      \ 'sink':    funcref('s:fzftags_sink')})
-    endif
-  endfunction
-
-  command! -nargs=? FZFTags call s:fzftags(<f-args>)
-  nnoremap <c-]> :FZFTags<cr>
-endif
 
 " lightline
 if !exists('g:lightline')
