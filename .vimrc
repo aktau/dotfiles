@@ -350,9 +350,6 @@ endif
 " vim-signify
 let g:signify_sign_change = '~'              " The default is '!', but I prefer vim-gitgutter's '~'
 
-" vim-signjump
-let g:signjump = { 'use_jumplist': 1, 'debug': 1 }
-
 " SingleCompile
 nnoremap <leader>r :SCCompileRun<cr>
 
