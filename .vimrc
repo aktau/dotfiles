@@ -74,6 +74,7 @@ Plug 'itchyny/lightline.vim'
 Plug 'junegunn/fzf'  " This downloads the whole FZF repo even if we only want fzf.vim, so bet it.
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'luochen1990/rainbow'
+Plug 'mhinz/vim-signify'
 Plug 'rhysd/clever-f.vim'
 Plug 'rking/ag.vim'
 Plug 'roman/golden-ratio'
@@ -101,9 +102,6 @@ Plug 'mmarchini/bpftrace.vim'
 Plug 'nfnty/vim-nftables'
 Plug 'rodjek/vim-puppet'
 Plug 'rust-lang/rust.vim'
-
-" If the local overrides didn't load vim-signify, load gitgutter.
-Plug 'airblade/vim-gitgutter', PlugCond(!PlugActivated('vim-signify'))
 
 call plug#end()
 
@@ -202,7 +200,12 @@ set nowritebackup                 " And again.
 set directory=/tmp                " Keep swap files in one location
 set noswapfile
 set timeoutlen=500
-set updatetime=100                " Trigger CursorHold after 100ms (default is 4000ms).
+" Trigger CursorHold after 500ms (default is 4000ms). This used to be 100ms, but
+" e.g. vim-signify checks whether files on disk have changed based on this
+" interval (plus cursor move). Alternatively we could go back to 100ms and
+" disable vim-signify auto-update. This would allow the snappy experience of the
+" nvim-lsp diagnostic popup again.
+set updatetime=500
 
 " Vim 8 and Neovim have libxdiff built-in, and can be told to use the patience
 " algorithm, which I like better.
@@ -345,9 +348,8 @@ if executable('rg')
   let g:ag_prg="rg --no-heading --vimgrep"
 endif
 
-" vim-gitgutter
-highlight clear SignColumn
-"let g:gitgutter_sign_column_always = 1
+" vim-signify
+let g:signify_sign_change = '~'              " The default is '!', but I prefer vim-gitgutter's '~'
 
 " vim-gutentags
 let g:gutentags_enabled = 1
