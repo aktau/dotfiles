@@ -20,9 +20,9 @@
 _MVMN_HOST=""
 ((${+SSH_CONNECTION})) && _MVMN_HOST=" %B%F{yellow}@%m%f%b"
 
-# To prepend an ISO 8601 date, use %D{%F %T}, %* is shorthand for %D{%T}.
-# See `man zshall`, go to "SIMPLE PROMPT ESCAPES".
-PROMPT='%F{green}%*%f${_MVMN_HOST} %B%F{blue}%2~%f%b ${_MVMN_GIT_CACHE}%B»%b '
+# To prepend an ISO 8601 date, use %D{%F %T}. See `man zshall`, go to "SIMPLE
+# PROMPT ESCAPES".
+PROMPT='%F{green}%D{%T}%f${_MVMN_HOST} %B%F{blue}%2~%f%b ${_MVMN_GIT_CACHE}%B»%b '
 
 # For some reason, when not loading all of oh-my-zsh, I need to autoload
 # colors right before these statements... I have to figure out what that's
