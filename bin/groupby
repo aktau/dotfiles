@@ -56,18 +56,45 @@ BEGIN {
   if (groupcol ~ /,/) {
     ngroupcols = split(groupcol, groupcols, ",")
   }
+  if (aggcol ~ /,/) {
+    naggcols = split(aggcol, aggcols, ",")
+  }
   ARGV[1] = "-"
   ARGV[2] = ""
   ARGV[3] = ""
 }
 
-# Grouping on multiple columns.
+# Grouping on multiple columns, aggregating on multiple columns (slowest).
+ngroupcols && naggcols {
+  key = $groupcols[1]
+  for (i = 2 ; i <= ngroupcols ; i++) {
+    key = key OFS $groupcols[i]
+  }
+  agg = $aggcols[1]
+  for (i = 2 ; i <= naggcols ; i++) {
+    agg = agg OFS $aggcols[i]
+  }
+  arr[key] = @aggregator(arr[key], agg)
+  next
+}
+
+# Grouping on multiple columns, aggregating on a single column.
 ngroupcols {
   key = $groupcols[1]
   for (i = 2 ; i <= ngroupcols ; i++) {
     key = key OFS $groupcols[i]
   }
   arr[key] = @aggregator(arr[key], $aggcol)
+  next
+}
+
+# Grouping on a single column, aggregating on multiple columns.
+ngroupcols && naggcols {
+  agg = $aggcols[1]
+  for (i = 2 ; i <= naggcols ; i++) {
+    agg = agg OFS $aggcols[i]
+  }
+  arr[$groupcol] = @aggregator(arr[$groupcol], agg)
   next
 }
 
