@@ -122,7 +122,7 @@ export LESS="-R -S"
 
 # Set manpager to nvim if possible. Highlighted linkable manpages!
 if command -v nvim >/dev/null 2>&1 ; then
-  export MANPAGER="nvim '+set ft=man' -"
+  export MANPAGER='nvim +Man!'
 fi
 
 # Use ag to supply fzf with filenames instead of find, it's faster.
