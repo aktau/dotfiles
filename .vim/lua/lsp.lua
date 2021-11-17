@@ -129,6 +129,10 @@ local function on_attach(client, bufnr)
   -- Source omnicompletion from LSP.
   vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
 
+  -- Enable range formatting with the LSP
+  -- (https://github.com/nvim-lua/completion-nvim/issues/399).
+  vim.api.nvim_buf_set_option(bufnr, 'formatexpr', 'v:lua.vim.lsp.formatexpr')
+
   -- (Potentially) override some keybindings to use LSP functionality.
   local opts = { noremap = true, silent = true }
   vim.api.nvim_buf_set_keymap(bufnr, "n", "<Leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
