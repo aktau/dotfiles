@@ -259,25 +259,18 @@ local servers = {
 }
 
 for lsp, config in pairs(servers) do
-  -- Try to get the original `root_dir` function
-  local root_dir_fn = config.root_dir
-  if config.root_dir == nil then
-    root_dir_fn = lspconfig[lsp].document_config.default_config.root_dir
-  end
-
   lspconfig[lsp].setup(vim.tbl_deep_extend(
     'force',
     { on_attach = on_attach, },
     config,
     -- Ensure the regular LSPs do not run in the overridden roots.
     {
-      root_dir = function(fname)
+      on_new_config = function(config, root_dir)
         -- TODO: don't install the override if the filetypes don't match (so
         --       that efm-langserver can work in all scenarios).
-        if override_lsp_root(fname) ~= nil then
-          return nil
+        if override_lsp_root(root_dir) ~= nil then
+          config.enabled = false
         end
-        return root_dir_fn(fname)
       end,
     }
   ))
