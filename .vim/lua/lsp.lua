@@ -281,9 +281,10 @@ end
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
   vim.lsp.diagnostic.on_publish_diagnostics,
   {
-    virtual_text = true,  -- Apply virtual text to line endings.
-    underline = true,  -- Apply underlines to diagnostics.
+    severity_sort = true,
     signs = true,  -- Apply signs for diagnostics.
+    underline = true,  -- Apply underlines to diagnostics.
     update_in_insert = false,  -- Do not update diagnostics while still inserting.
+    virtual_text = true,  -- Apply virtual text to line endings.
   }
 )
