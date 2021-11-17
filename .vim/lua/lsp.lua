@@ -174,6 +174,42 @@ local function on_attach(client, bufnr)
   )
 end
 
+local servers = {
+  ['clangd'] = {},
+  ['gopls'] = {},
+  ['rust_analyzer'] = {},
+  ['sumneko_lua'] = {
+    settings = {
+      Lua = {
+        diagnostics = {
+          globals = { 'vim' },
+        },
+        runtime = { version = 'LuaJIT' },
+        workspace = {
+          library = {
+            [vim.fn.expand('$VIMRUNTIME/lua')] = true,
+          }
+        }
+      }
+    }
+  },
+
+  -- A generic langserver that can be used to pull regular linters into the LSP
+  -- ecosystem (like shellcheck).
+  ['efm'] = {
+    -- TODO: Figure out how to avoid:
+    --   efm doesn't implement a number of capabilities:
+    --     Error executing vim.schedule lua callback: ...geer/neovim/share/nvim/runtime/lua/vim/lsp/callbacks.lua:259: RPC[Error] code_name = MethodNotFound, message = "method not supported: textDocument/documentHighlight"
+    --     data = vim.NIL
+    filetypes = { 'bash', 'sh', 'zsh' },
+    -- Normally root_dir is set to util.root_pattern(".git"). But this means
+    -- shellcheck is not enabled for any shell file not in a git repository,
+    -- which is not desirable. `root_dir` is required, it servers as an LSP
+    -- deduplication point. We only want one EFM so just set it to /.
+    root_dir = function() return '/' end,
+  },
+}
+
 -- Add custom LSP for certain environments. The tricky thing is to make it the
 -- preferential LSP whenever it is applicable (correct filetype and root),
 -- excluding other LSPs.
@@ -213,64 +249,27 @@ if override_lsp ~= nil then
       settings = {},
     },
   }
-
-  -- Setup the override LSP separately. All other LSPs need a `root_dir`
-  -- override so as to not start int he overridden roots (see
-  -- `override_lsp_root`).
-  lspconfig[override_lsp.name].setup({ on_attach = on_attach })
+  servers[override_lsp.name] = {}
 end
 
-local servers = {
-  ['clangd'] = {},
-  ['gopls'] = {},
-  ['rust_analyzer'] = {},
-  ['sumneko_lua'] = {
-    settings = {
-      Lua = {
-        diagnostics = {
-          globals = { 'vim' },
-        },
-        runtime = { version = 'LuaJIT' },
-        workspace = {
-          library = {
-            [vim.fn.expand('$VIMRUNTIME/lua')] = true,
-          }
-        }
-      }
-    }
-  },
-
-  -- A generic langserver that can be used to pull regular linters into the LSP
-  -- ecosystem (like shellcheck).
-  ['efm'] = {
-    -- TODO: Figure out how to avoid:
-    --   efm doesn't implement a number of capabilities:
-    --     Error executing vim.schedule lua callback: ...geer/neovim/share/nvim/runtime/lua/vim/lsp/callbacks.lua:259: RPC[Error] code_name = MethodNotFound, message = "method not supported: textDocument/documentHighlight"
-    --     data = vim.NIL
-    filetypes = { 'bash', 'sh', 'zsh' },
-    -- Normally root_dir is set to util.root_pattern(".git"). But this means
-    -- shellcheck is not enabled for any shell file not in a git repository,
-    -- which is not desirable. `root_dir` is required, it servers as an LSP
-    -- deduplication point. We only want one EFM so just set it to /.
-    root_dir = function() return '/' end,
-  },
-}
-
 for lsp, config in pairs(servers) do
+  -- The `override_lsp`, if set, inhibits all other LSPs that would activate for
+  -- the same root.
+  local overrides = {}
+  if override_lsp ~= nil and lsp ~= override_lsp.name then
+    -- Ensure the regular LSPs do not run in the overridden roots.
+    overrides.on_new_config = function(config, root_dir)
+      -- TODO: don't install the override if the filetypes don't match (so
+      --       that efm-langserver can work in all scenarios).
+      config.enabled = (override_lsp_root(root_dir) == nil)
+    end
+  end
+
   lspconfig[lsp].setup(vim.tbl_deep_extend(
     'force',
     { on_attach = on_attach, },
     config,
-    -- Ensure the regular LSPs do not run in the overridden roots.
-    {
-      on_new_config = function(config, root_dir)
-        -- TODO: don't install the override if the filetypes don't match (so
-        --       that efm-langserver can work in all scenarios).
-        if override_lsp_root(root_dir) ~= nil then
-          config.enabled = false
-        end
-      end,
-    }
+    overrides
   ))
 end
 
