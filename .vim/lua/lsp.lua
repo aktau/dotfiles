@@ -128,8 +128,8 @@ local function on_attach(client, bufnr)
   -- TODO: Try out github.com/RishabhRD/nvim-lsputils for more stylish code
   -- actions. Example: https://github.com/ahmedelgabri/dotfiles/commit/546dfc37cd9ef110664286eb50ece4713108a511.
   vim.api.nvim_buf_set_keymap(bufnr, "n", "ga", '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "[d", "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "]d", "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", opts)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", opts)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", opts)
 
   local has_completion, completion = pcall(require, 'completion')
   if has_completion then
@@ -166,12 +166,10 @@ local function on_attach(client, bufnr)
         vim.api.nvim_command("autocmd CursorMoved <buffer> lua vim.lsp.util.buf_clear_references()")
       end
 
-      -- `show_line_diagnostics` draws a nice popup window. I like it when this
-      -- appears when I hover over a line with a diagnostic. This hack
-      -- accomplishes that.
+      -- Draw a popup window showing all diagnostic.
       --
       -- Source: https://github.com/nvim-lua/diagnostic-nvim/issues/29
-      vim.api.nvim_command('autocmd CursorHold <buffer> lua vim.lsp.diagnostic.show_line_diagnostics({show_header=false})')
+      vim.api.nvim_command('autocmd CursorHold <buffer> lua vim.diagnostic.open_float(0, {show_header=false, scope="line", border="single", source="always"})')
     end
   )
 end
