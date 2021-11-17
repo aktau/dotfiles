@@ -14,6 +14,22 @@ if not has_lspconfig then
   return
 end
 
+local has_cmp, cmp = pcall(require, 'cmp')
+local has_cmp_nvim_lsp, cmp_nvim_lsp = pcall(require, 'cmp_nvim_lsp')
+if has_cmp and has_cmp_nvim_lsp then
+  cmp.setup({
+    mapping = {
+      ['<C-Space>'] = cmp.mapping.complete(),
+      ['<C-e>'] = cmp.mapping.close(),
+      ['<CR>'] = cmp.mapping.confirm({ select = true }),
+    },
+    sources = {
+      { name = 'nvim_lsp' },
+      { name = 'buffer' },
+    }
+  })
+end
+
 -- TODO: extract to a utility library when I get more lua things.
 --
 -- Stolen from
@@ -130,11 +146,6 @@ local function on_attach(client, bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "ga", '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", opts)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", opts)
-
-  local has_completion, completion = pcall(require, 'completion')
-  if has_completion then
-    completion.on_attach()
-  end
 
   augroup(
     "LSP",
@@ -253,6 +264,14 @@ if override_lsp ~= nil then
 end
 
 for lsp, config in pairs(servers) do
+  local defaults = {
+    on_attach = on_attach,
+  }
+
+  if has_cmp and has_cmp_nvim_lsp then
+    defaults.capabilities = cmp_nvim_lsp.update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  end
+
   -- The `override_lsp`, if set, inhibits all other LSPs that would activate for
   -- the same root.
   local overrides = {}
@@ -267,7 +286,7 @@ for lsp, config in pairs(servers) do
 
   lspconfig[lsp].setup(vim.tbl_deep_extend(
     'force',
-    { on_attach = on_attach, },
+    defaults,
     config,
     overrides
   ))
