@@ -126,12 +126,19 @@ function go_organize_imports_sync(timeout_ms)
 end
 
 local function on_attach(client, bufnr)
-  -- Source omnicompletion from LSP.
-  vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
-
-  -- Enable range formatting with the LSP
-  -- (https://github.com/nvim-lua/completion-nvim/issues/399).
-  vim.api.nvim_buf_set_option(bufnr, 'formatexpr', 'v:lua.vim.lsp.formatexpr')
+  -- Integrate with builtin functionality.
+  --
+  -- In case of `omnifunc`, we also use a special completion plugin to trigger
+  -- automatically, but it's nice to have a fallback to determin whether the
+  -- plugin or the LSP is failing to trigger/complete.
+  --
+  -- In case of `tagfunc`, we also create our own `gd` mapping (see below) which
+  -- does something similar. See https://github.com/neovim/neovim/issues/15309
+  -- for a discussion. E.g., perform <c-w><c-]> to go to a definition in a new
+  -- split.
+  vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc") -- <C-x><C-o> in insert mode.
+  vim.api.nvim_buf_set_option(bufnr, "formatexpr", "v:lua.vim.lsp.formatexpr")
+  vim.api.nvim_buf_set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
 
   -- (Potentially) override some keybindings to use LSP functionality.
   local opts = { noremap = true, silent = true }
