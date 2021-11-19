@@ -456,6 +456,8 @@ au FileType * let &formatlistpat=join(s:listpatterns, '\|')
 " C file specific options
 au FileType c,cpp set cindent
 au FileType c,cpp setlocal comments^=:///
+" No C++ codebase I work on uses old-style /* */ comments.
+au FileType cpp   setlocal commentstring=//\ %s
 
 au FileType javascript setlocal nocindent
 
