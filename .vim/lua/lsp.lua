@@ -274,7 +274,7 @@ if override_lsp ~= nil then
   servers[override_lsp.name] = {}
 end
 
-for lsp, config in pairs(servers) do
+do
   local defaults = {
     on_attach = on_attach,
   }
@@ -283,24 +283,26 @@ for lsp, config in pairs(servers) do
     defaults.capabilities = cmp_nvim_lsp.update_capabilities(vim.lsp.protocol.make_client_capabilities())
   end
 
-  -- The `override_lsp`, if set, inhibits all other LSPs that would activate for
-  -- the same root.
-  local overrides = {}
-  if override_lsp ~= nil and lsp ~= override_lsp.name then
-    -- Ensure the regular LSPs do not run in the overridden roots.
-    overrides.on_new_config = function(config, root_dir)
-      -- TODO: don't install the override if the filetypes don't match (so
-      --       that efm-langserver can work in all scenarios).
-      config.enabled = (override_lsp_root(root_dir) == nil)
+  for lsp, config in pairs(servers) do
+    -- The `override_lsp`, if set, inhibits all other LSPs that would activate
+    -- for the same root.
+    local overrides = {}
+    if override_lsp ~= nil and lsp ~= override_lsp.name then
+      -- Ensure the regular LSPs do not run in the overridden roots.
+      overrides.on_new_config = function(config, root_dir)
+        -- TODO: don't install the override if the filetypes don't match (so
+        --       that efm-langserver can work in all scenarios).
+        config.enabled = (override_lsp_root(root_dir) == nil)
+      end
     end
-  end
 
-  lspconfig[lsp].setup(vim.tbl_deep_extend(
-    'force',
-    defaults,
-    config,
-    overrides
-  ))
+    lspconfig[lsp].setup(vim.tbl_deep_extend(
+      'force',
+      defaults,
+      config,
+      overrides
+    ))
+  end
 end
 
 -- Configure nvim-lsp with handlers. More specifically: diagnostics.
