@@ -100,34 +100,46 @@ function lsp_peek_definition()
   end
 end
 
--- Synchronously organise (Go) imports. Taken from
+-- Synchronously organise (Go) imports.
+--
+-- Taken from
 -- https://github.com/neovim/nvim-lsp/issues/115#issuecomment-654427197.
-function go_organize_imports_sync(timeout_ms)
-  local context = { source = { organizeImports = true } }
-  vim.validate { context = { context, 't', true } }
+--
+-- Spurious note: there is an "official" recommendation in the golang/tools
+-- repo: https://github.com/golang/tools/blob/master/gopls/doc/vim. It appears
+-- to be based on the comments in that thread, and specifically upon a version I
+-- submitted to my dotfiles (but did not mention in the comments), compare:
+--
+--  - 2020-06-10: https://github.com/aktau/dotfiles/commit/bd848ca8b9b7a3f116c9438875f6f4b37b035a4f#diff-86f5da41be84a0e774e1cc85d8c02440b0a92d3550517ed3331e795b74c43c88
+--  - 2021-02-23: https://go-review.googlesource.com/c/tools/+/294529
+--
+-- Later another fix was made, which also came from the github thread: following
+-- the LSP spec and using "only" in the context to limit the LSP to organizing
+-- imports instead of executing all available actions:
+-- https://github.com/golang/tools/commit/6e9046bfcd34178dc116189817430a2ad1ee7b43.
+--
+-- A later comment by alexaandru@ made another robustness improvement: avoiding
+-- the hardcoded "1" indexing. I combined this with a look at more recent
+-- versions (0.6.0-git) of the Neovim LSP implementation to arrive at the
+-- current version.
+function goimports(timeout_ms)
   local params = vim.lsp.util.make_range_params()
-  params.context = context
+  params.context = { only = { "source.organizeImports" } }
 
-  -- See the implementation of the textDocument/codeAction callback
-  -- (lua/vim/lsp/callbacks.lua) for how to do this properly.
-  local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, timeout_ms)
-  if not result then return end
-  local actions = result[1].result
-  if not actions then return end
-  local action = actions[1]
-
-  -- textDocument/codeAction can return either Command[] or CodeAction[]. If it
-  -- is a CodeAction, it can have either an edit, a command or both. Edits
-  -- should be executed first.
-  if action.edit or type(action.command) == "table" then
-    if action.edit then
-      vim.lsp.util.apply_workspace_edit(action.edit)
+  local response = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, timeout_ms)
+  for _, r in pairs(response or {}) do
+    for _, action in pairs(r.result or {}) do
+      -- textDocument/codeAction can return either Command[] or CodeAction[]. If
+      -- it is a CodeAction, it can have either an edit, a command or both.
+      -- Edits should be executed first.
+      if action.edit then
+        vim.lsp.util.apply_workspace_edit(action.edit)
+      end
+      if action.command then
+        local command = type(action.command) == "table" and action.command or action
+        vim.lsp.buf.execute_command(action.command)
+      end
     end
-    if type(action.command) == "table" then
-      vim.lsp.buf.execute_command(action.command)
-    end
-  else
-    vim.lsp.buf.execute_command(action)
   end
 end
 
@@ -183,7 +195,7 @@ local function on_attach(client, bufnr)
         -- goimports, we need to run "all" code actions. See
         -- https://github.com/Microsoft/language-server-protocol/issues/726.
         if vim.api.nvim_buf_get_option(bufnr, "filetype") == "go" then
-          vim.api.nvim_command("autocmd BufWritePre <buffer> lua go_organize_imports_sync(1000)")
+          vim.api.nvim_command("autocmd BufWritePre <buffer> lua goimports(1000)")
         end
         vim.api.nvim_command("autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync(nil, 1000)")
       end
