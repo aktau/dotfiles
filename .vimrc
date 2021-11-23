@@ -67,6 +67,7 @@ if has('nvim')
   Plug 'hrsh7th/cmp-buffer'
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/nvim-cmp' " Async autocomplete using nvim builtin LSP.
+  Plug 'hrsh7th/vim-vsnip' " A snippet plugin is required for hrsh7th/nvim-cmp.
 endif
 
 " original repos on github

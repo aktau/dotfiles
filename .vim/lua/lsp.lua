@@ -18,6 +18,12 @@ local has_cmp, cmp = pcall(require, 'cmp')
 local has_cmp_nvim_lsp, cmp_nvim_lsp = pcall(require, 'cmp_nvim_lsp')
 if has_cmp and has_cmp_nvim_lsp then
   cmp.setup({
+    snippet = {
+      -- cmp-nvim requires a snippet engine.
+      expand = function(args)
+        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+      end,
+    },
     mapping = {
       ['<C-Space>'] = cmp.mapping.complete(),
       ['<C-e>'] = cmp.mapping.close(),
