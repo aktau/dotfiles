@@ -122,6 +122,9 @@ end
 -- the hardcoded "1" indexing. I combined this with a look at more recent
 -- versions (0.6.0-git) of the Neovim LSP implementation to arrive at the
 -- current version.
+--
+-- Some LSPs (like pyright) instead perform this function as a command, see the
+-- example in https://github.com/neovim/nvim-lspconfig/issues/1221.
 function goimports(timeout_ms)
   local params = vim.lsp.util.make_range_params()
   params.context = { only = { "source.organizeImports" } }
