@@ -285,7 +285,7 @@ if override_lsp ~= nil then
     return nil
   end
 
-  local configs = require('lspconfig/configs')
+  local configs = require('lspconfig.configs')
   configs[override_lsp.name] = {
     default_config = {
       cmd = override_lsp.cmd,
