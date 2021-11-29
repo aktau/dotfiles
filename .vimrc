@@ -73,7 +73,12 @@ endif
 " original repos on github
 Plug 'b4winckler/vim-angry'
 Plug 'godlygeek/tabular'
-Plug 'itchyny/lightline.vim'
+if has('nvim')
+  Plug 'nvim-lualine/lualine.nvim'
+  Plug 'arkav/lualine-lsp-progress'
+else
+  Plug 'itchyny/lightline.vim'
+endif
 Plug 'junegunn/fzf'  " This downloads the whole FZF repo even if we only want fzf.vim, so bet it.
 Plug 'luochen1990/rainbow'
 Plug 'mhinz/vim-signify'
@@ -340,9 +345,51 @@ endif
 " plugin customization
 """"""""""""""""""""""
 
-" nvim-lsp
 if has('nvim')
+  " nvim-lsp
   lua require('lsp')
+
+  " lualine.nvim
+  lua << END
+  -- Remove when https://github.com/arkav/lualine-lsp-progress/issues/10 is
+  -- fixed.
+  local function lsp_client_names()
+    local clients = {}
+    for idx, client in pairs(vim.lsp.buf_get_clients()) do
+      clients[idx] = client.name
+    end
+    if next(clients) == nil then
+      return ""
+    end
+    return "LSP(" .. table.concat(clients, "/") .. ")"
+  end
+  require("lualine").setup({
+    options = {
+      icons_enabled = false,
+      component_separators = { left = '|', right = '|'},
+      section_separators = { left = '', right = ''},
+    },
+    sections = {
+      lualine_a = {"mode"},
+      lualine_b = {"branch", "diff", {"diagnostics", sources = { "nvim" }}},
+      lualine_c = { { "filename", path = 1 }, lsp_client_names, "lsp_progress" },
+      lualine_x = {"encoding", "fileformat", "filetype"},
+      lualine_y = {"progress"},
+      lualine_z = {"location"}
+    },
+  })
+END
+else
+  " lightline
+  let g:lightline = {
+    \   'active': {
+    \     'left': [ [ 'mode', 'paste' ],
+    \               [ 'fugitive', 'readonly', 'relativepath', 'modified' ] ]
+    \   },
+    \   'component_function': {
+    \     'fugitive': 'fugitive#statusline',
+    \   }
+    \ }
 endif
 
 " rking/ag.vim
@@ -385,17 +432,6 @@ nmap <silent> ]G :tablast<CR>
 
 " fzf
 nnoremap <silent> <c-p> :FZF<CR>
-
-" lightline
-let g:lightline = {
-  \   'active': {
-  \     'left': [ [ 'mode', 'paste' ],
-  \               [ 'fugitive', 'readonly', 'relativepath', 'modified' ] ]
-  \   },
-  \   'component_function': {
-  \     'fugitive': 'fugitive#statusline',
-  \   }
-  \ }
 
 " rainbow
 let g:rainbow_active = 0 " Disabled by default, toggle with :RainbowToggle.
