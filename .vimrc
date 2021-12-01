@@ -256,8 +256,27 @@ autocmd BufWritePre * kz|:%s/\s\+$//e|'z
 vmap <tab> >gv
 vmap <s-tab> <gv
 
-" open the definition in a new split
-nnoremap <c-\> <c-w>g<c-]>
+" Prefer :tjump over :tag, see https://stackoverflow.com/q/7640663/558819.
+nnoremap <c-]> g<c-]>
+vnoremap <c-]> g<c-]>
+" Open the definition (using :tjump, due to 'g') in a vertical split (<c-w>g).
+"
+" This is the vertical version of <c-w>g<c-]>, except that this has the downside
+" of opening a split even if the tag can't be found. To fix this, we might
+" formulate it in Ex-commands instead:
+"
+"   nnoremap <C-\> :vertical stjump <C-r><C-w><CR>
+"                                   ^^^^^^^^^^
+"                                        `--- Word under cursor :h c_<C-R>_<C-W>
+"
+" The problem is that this formulation pases flags '' instead of flags 'c' to
+" `:h tag-function`. This means (e.g.) for the Neovim LSP tagfunc, that it
+" doesn't actually use go-to-definition. For now I'll live with the downside.
+"
+" Maybe I'll give the approaches in https://www.reddit.com/r/vim/comments/8vsdmt
+" and https://stackoverflow.com/a/563992/558819 a try next.
+nnoremap <c-\> <c-w>vg<c-]>
+vnoremap <c-\> <c-w>vg<c-]>
 
 " Rewrap the current paragraph.
 nnoremap <leader>q gqip
