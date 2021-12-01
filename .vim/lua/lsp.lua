@@ -176,8 +176,9 @@ local function on_attach(client, bufnr)
   -- TODO: Try out github.com/RishabhRD/nvim-lsputils for more stylish code
   -- actions. Example: https://github.com/ahmedelgabri/dotfiles/commit/546dfc37cd9ef110664286eb50ece4713108a511.
   vim.api.nvim_buf_set_keymap(bufnr, "n", "ga", '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", opts)
+  -- Pass float = false to avoid conflict with open_float() on CursorHold.
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "[d", "<cmd>lua vim.diagnostic.goto_prev({float = false})<CR>", opts)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "]d", "<cmd>lua vim.diagnostic.goto_next({float = false})<CR>", opts)
 
   augroup(
     "LSP",
@@ -209,10 +210,10 @@ local function on_attach(client, bufnr)
         vim.api.nvim_command("autocmd CursorMoved <buffer> lua vim.lsp.util.buf_clear_references()")
       end
 
-      -- Draw a popup window showing all diagnostic.
+      -- Draw a popup window showing all diagnostics.
       --
       -- Source: https://github.com/nvim-lua/diagnostic-nvim/issues/29
-      vim.api.nvim_command('autocmd CursorHold <buffer> lua vim.diagnostic.open_float(0, {show_header=false, scope="line", border="single", source="always"})')
+      vim.api.nvim_command('autocmd CursorHold <buffer> lua vim.diagnostic.open_float(0)')
     end
   )
 end
@@ -330,15 +331,20 @@ do
   end
 end
 
--- Configure nvim-lsp with handlers. More specifically: diagnostics.
--- https://github.com/nvim-lua/diagnostic-nvim/issues/73
-vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-  vim.lsp.diagnostic.on_publish_diagnostics,
-  {
-    severity_sort = true,
-    signs = true,  -- Apply signs for diagnostics.
-    underline = true,  -- Apply underlines to diagnostics.
-    update_in_insert = false,  -- Do not update diagnostics while still inserting.
-    virtual_text = true,  -- Apply virtual text to line endings.
+-- Configure diagnostics globally, which also applies to LSP diagnostics via
+-- vim.lsp.diagnostic.on_publish_diagnostics. The old way of configuring using
+-- `handler = vim.lsp.with(..., {...})` still works, but is more expensive and
+-- cumbersome.
+vim.diagnostic.config({
+  severity_sort = true,
+  signs = true,  -- Apply signs for diagnostics.
+  underline = true,  -- Apply underlines to diagnostics.
+  update_in_insert = false,  -- Do not update diagnostics while still inserting.
+  virtual_text = true,  -- Apply virtual text to line endings.
+  float = {
+    border = "single",
+    header = false,
+    scope = "line",
+    source = "always",
   }
-)
+})
