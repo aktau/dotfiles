@@ -49,12 +49,12 @@ folders=(
 ##########
 
 # create dotfiles_old in homedir
-printf '%b %b %b' ${MAKECOLOR}"Creating"${ENDCOLOR} ${BINCOLOR}${olddir_current}${ENDCOLOR} "for backup of any existing dotfiles in ~ ..."
-mkdir -p $olddir_current
+printf '%b %b %b' "${MAKECOLOR}Creating${ENDCOLOR}" "${BINCOLOR}${olddir_current}${ENDCOLOR}" 'for backup of any existing dotfiles in ~ ...'
+mkdir -p "$olddir_current"
 echo "done"
 
 # change to the dotfiles directory
-printf '%b %b %b%b' ${MAKECOLOR}"Changing"${ENDCOLOR} "working directory to" ${BINCOLOR}${dir}${ENDCOLOR} "..."
+printf '%b %b %b%b' "${MAKECOLOR}Changing${ENDCOLOR}" "working directory to" "${BINCOLOR}${dir}${ENDCOLOR}" "..."
 cd $dir
 echo "done"
 
@@ -73,7 +73,7 @@ function setup_link {
 }
 
 function setup_neovim {
-    printf "%b %b\n" ${MAKECOLOR}"Creating"${ENDCOLOR} "neovim aliases..."
+    printf "%b %b\n" "${MAKECOLOR}Creating${ENDCOLOR}" 'neovim aliases...'
 
     # neovim uses the same config as vanilla
     : "${XDG_CONFIG_HOME:=$HOME/.config}"
@@ -86,11 +86,11 @@ function setup_dotfiles {
     # move any existing dotfiles in homedir to dotfiles_old directory, then create
     # symlinks from the homedir to any files in the ~/dotfiles directory specified in
     # $files
-    printf '%b %b %b %b %b\n' ${MAKECOLOR}"Moving"${ENDCOLOR} \
+    printf '%b %b %b %b %b\n' "${MAKECOLOR}Moving${ENDCOLOR}" \
         "any existing dotfiles from" \
-        ${BINCOLOR}"~"${ENDCOLOR} \
+        "${BINCOLOR}~${ENDCOLOR}" \
         "to" \
-        ${BINCOLOR}${olddir_current}${ENDCOLOR}
+        "${BINCOLOR}${olddir_current}${ENDCOLOR}"
     for file ; do
         setup_link "$file" "$file"
     done
@@ -158,7 +158,7 @@ function setup_ssh {
     mkdir -p ~/.ssh
     chmod 700 ~/.ssh
     [ -f ~/.ssh/authorized_keys ] && chmod -f 600 ~/.ssh/authorized_keys
-    chown -R $USER ~/.ssh
+    chown -R "$USER" ~/.ssh
 }
 
 function add_line {
@@ -171,7 +171,7 @@ function add_line {
 }
 
 function config_zsh {
-    printf "%b %b\n" ${MAKECOLOR}"Configuring"${ENDCOLOR} "zsh"
+    printf "%b %b\n" "${MAKECOLOR}Configuring${ENDCOLOR}" "zsh"
 
     local zshrc="$HOME/.zshrc"
 
