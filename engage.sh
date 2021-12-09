@@ -27,9 +27,23 @@ dir=~/dotfiles                                      # dotfiles directory
 bindir=~/bin                                        # Local binaries directory.
 olddir=~/dotfiles_old                               # old dotfiles backup directory
 olddir_current=$olddir/"$(date +%d-%m-%Y)"
-files=".lua .vimrc .vim .psqlrc .newsbeuter .zshrc-extra .ctags .tmux.conf"
-linux_files=".Xdefaults"
-folders=('etc' '.config')
+files=(
+  .ctags
+  .lua
+  .newsbeuter
+  .psqlrc
+  .tmux.conf
+  .vim
+  .vimrc
+  .zshrc-extra
+)
+linux_files=(
+  .Xdefaults
+)
+folders=(
+  .config
+  etc
+)
 
 ##########
 
@@ -68,8 +82,6 @@ function setup_neovim {
 }
 
 function setup_dotfiles {
-    files="$1"
-
     # move any existing dotfiles in homedir to dotfiles_old directory, then create
     # symlinks from the homedir to any files in the ~/dotfiles directory specified in
     # $files
@@ -78,11 +90,11 @@ function setup_dotfiles {
         ${BINCOLOR}"~"${ENDCOLOR} \
         "to" \
         ${BINCOLOR}${olddir_current}${ENDCOLOR}
-    for file in $files; do
+    for file ; do
         setup_link "$file" "$file"
     done
     if [[ "$OSTYPE" == 'linux-gnu' ]] ; then
-        for file in $linux_files; do
+        for file in "${linux_files[@]}"; do
             setup_link "$file" "$file"
         done
     fi
@@ -208,7 +220,7 @@ fi
 
 #install_zsh
 config_zsh
-setup_dotfiles "$files"
+setup_dotfiles "${files[@]}"
 setup_folders "$dir" "$HOME" "${folders[@]}"
 setup_git
 setup_ssh
