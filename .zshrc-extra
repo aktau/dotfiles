@@ -125,9 +125,11 @@ if command -v nvim >/dev/null 2>&1 ; then
   export MANPAGER='nvim +Man!'
 fi
 
-# Use ag to supply fzf with filenames instead of find, it's faster.
-if hash rg &>/dev/null ; then
-  export FZF_DEFAULT_COMMAND='rg --files'
+# Use the fastest way available to supply fzf(1) with filenames instead of find.
+if hash fd &>/dev/null ; then
+  export FZF_DEFAULT_COMMAND='fd --type file --follow --hidden --exclude .git'
+elif hash rg &>/dev/null ; then
+  export FZF_DEFAULT_COMMAND="rg --files --hidden -g '!.git/'"
 elif hash ag &>/dev/null ; then
   export FZF_DEFAULT_COMMAND="ag -i --nocolor --nogroup --hidden \
     --ignore .git \
