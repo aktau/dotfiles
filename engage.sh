@@ -161,32 +161,6 @@ function setup_ssh {
     chown -R $USER ~/.ssh
 }
 
-function install_zsh {
-# Test to see if zshell is installed.  If it is:
-if [ -f /bin/zsh -o -f /usr/bin/zsh ]; then
-    # Clone my oh-my-zsh repository from GitHub only if it isn't already present
-    if [[ ! -d $dir/oh-my-zsh/ ]]; then
-        git clone http://github.com/michaeljsmalley/oh-my-zsh.git
-    fi
-    # Set the default shell to zsh if it isn't currently set to zsh
-    if [[ ! $(echo $SHELL) == $(which zsh) ]]; then
-        chsh -s $(which zsh)
-    fi
-else
-    # If zsh isn't installed, get the platform of the current machine
-    platform=$(uname);
-    # If the platform is Linux, try an apt-get to install zsh and then recurse
-    if [[ $platform == 'Linux' ]]; then
-        sudo apt-get install zsh
-        install_zsh
-    # If the platform is OS X, tell the user to install zsh :)
-    elif [[ $platform == 'Darwin' ]]; then
-        echo "Please install zsh, then re-run this script!"
-        exit
-    fi
-fi
-}
-
 function add_line {
     local file="$1"
     local line="$2"
@@ -212,6 +186,18 @@ function config_zsh {
     add_line "$zshrc" "source $base/.zshrc-extra"
 }
 
+function check_zsh {
+  # Using $SHELL is not a portable way to get the users' default shell, but it's
+  # good enough for me.
+  if [[ "${SHELL##*/}" = 'zsh' ]] ; then
+    return
+  fi
+  echo 'Your shell is not zsh. Please install/use zsh, then re-run this script'
+  echo 'You may want to make zsh the default after installing, run:'
+  echo "  chsh -s \"\$(which zsh)\""
+  exit
+}
+
 # Debian installs fd(1) under /usr/bin/fdfind. Fix that.
 if ! command -v fd >/dev/null 2>&1 ; then
   if command -v fdfind >/dev/null 2>&1 ; then
@@ -219,10 +205,10 @@ if ! command -v fd >/dev/null 2>&1 ; then
   fi
 fi
 
-#install_zsh
-config_zsh
 setup_dotfiles "${files[@]}"
 setup_folders "$dir" "$HOME" "${folders[@]}"
 setup_git
 setup_ssh
 setup_neovim
+config_zsh
+check_zsh
