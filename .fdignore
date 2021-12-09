@@ -1,0 +1,5 @@
+# This allows passing --hidden to see files/folders in git repositories without
+# printing the contents of .git which is often large. You can still search .git
+# folders by passing the -I/--no-ignore flag. See
+# https://github.com/sharkdp/fd/issues/204.
+.git

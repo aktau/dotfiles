@@ -29,6 +29,7 @@ olddir=~/dotfiles_old                               # old dotfiles backup direct
 olddir_current=$olddir/"$(date +%d-%m-%Y)"
 files=(
   .ctags
+  .fdignore
   .lua
   .newsbeuter
   .psqlrc
