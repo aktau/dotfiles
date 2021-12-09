@@ -164,7 +164,7 @@ local function on_attach(client, bufnr)
       -- Draw a popup window showing all diagnostics.
       --
       -- Source: https://github.com/nvim-lua/diagnostic-nvim/issues/29
-      vim.api.nvim_command('autocmd CursorHold <buffer> lua vim.diagnostic.open_float(0)')
+      vim.api.nvim_command('autocmd CursorHold <buffer> lua vim.diagnostic.open_float()')
     end
   )
 end
