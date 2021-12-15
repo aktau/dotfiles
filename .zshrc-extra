@@ -228,7 +228,11 @@ fe() {
     fi
   done
 
-  ag -g '' "${paths[@]}" | fzf -0 -1 -m --query="${query[@]}" | vimin
+  if command -v fd >/dev/null 2>&1 ; then
+    fd --type f --no-ignore
+  else
+    find -type f
+  fi | fzf -0 -1 -m --query="${query[@]}" | vimin
 }
 
 # vimp opens the argument if it can be found your $PATH.
