@@ -390,7 +390,7 @@ if has('nvim')
     },
     sections = {
       lualine_a = {"mode"},
-      lualine_b = {"branch", "diff", {"diagnostics", sources = { "nvim" }}},
+      lualine_b = {"branch", "diff", {"diagnostics", sources = { "nvim_diagnostic" }}},
       lualine_c = { { "filename", path = 1 }, lsp_client_names, "lsp_progress" },
       lualine_x = {"encoding", "fileformat", "filetype"},
       lualine_y = {"progress"},
