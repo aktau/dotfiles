@@ -126,10 +126,7 @@ set autoread                      " reload files automagically
 
 " text preferences
 set nowrap                        " don't wrap lines
-set tabstop=4 shiftwidth=4        " a tab is two spaces (or set this to 4)
-set softtabstop=4
-set expandtab                     " use spaces, not tabs (optional)
-set nosmarttab                    " really get rid of tabs
+set tabstop=2 shiftwidth=2 softtabstop=2 nosmarttab expandtab
 set backspace=indent,eol,start    " backspace through everything in insert mode"
 set autoindent                    " match indentation of previous line
 set textwidth=80                  " in new gvim windows
@@ -140,8 +137,8 @@ set nojoinspaces                  " Don't add extra spaces after join/fmt.
 
 " show invisible characters
 set list
-" som alternatives: tab:▸\,eol:¬
-set listchars=tab:\|\ ,trail:…
+" some alternatives: tab:▸\,eol:¬
+set listchars=tab:▸\ ,trail:…
 
 " searching
 nnoremap <CR> :noh<CR><CR>
@@ -506,7 +503,10 @@ au BufRead,BufNewFile *.dasc set ft=c
 au BufRead,BufNewFile mutt{ng,}-*-\w\+ set ft=mail
 
 " Go file specific options
-au FileType go setlocal shiftwidth=4 tabstop=4 softtabstop=4 nolist
+" Hide tab characters (normally they're highlighted using listchars). Note that
+" removing the `tab:...` part from listchars just makes it highlighted using the
+" default (^I), which is even more ugly.
+au FileType go setlocal listchars=tab:\ \ ,trail:…
 
 " tries to get buffer reloading to work correctly in terminals
 augroup checktime
