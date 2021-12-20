@@ -506,7 +506,6 @@ au BufRead,BufNewFile *.dasc set ft=c
 au BufRead,BufNewFile mutt{ng,}-*-\w\+ set ft=mail
 
 " Go file specific options
-au FileType go setlocal makeprg=go\ build
 au FileType go setlocal shiftwidth=4 tabstop=4 softtabstop=4 nolist
 au FileType go let g:SuperTabDefaultCompletionType = "context"
 
