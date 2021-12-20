@@ -3,7 +3,7 @@ filetype off
 filetype plugin indent off
 
 set nocompatible               " be iMproved
-set modelines=0
+set nomodeline
 
 if has('mac')
   " fix clipboard on osx, do note that when running from within tmux, you
