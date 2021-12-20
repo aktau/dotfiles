@@ -507,7 +507,6 @@ au BufRead,BufNewFile mutt{ng,}-*-\w\+ set ft=mail
 
 " Go file specific options
 au FileType go setlocal shiftwidth=4 tabstop=4 softtabstop=4 nolist
-au FileType go let g:SuperTabDefaultCompletionType = "context"
 
 " tries to get buffer reloading to work correctly in terminals
 augroup checktime
