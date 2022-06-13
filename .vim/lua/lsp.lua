@@ -145,7 +145,7 @@ local function on_attach(client, bufnr)
       -- TODO: When gopls implements willSaveWaitUntil (no issue yet), use it
       --       instead as it saves a roundtrip:
       --       https://github.com/Microsoft/language-server-protocol/issues/726.
-      if client.resolved_capabilities.document_formatting then
+      if client.server_capabilities.documentFormattingProvider then
         -- With gopls, textDocument/formatting only runs gofmt. If we also want
         -- goimports, we need to run "all" code actions. See
         -- https://github.com/Microsoft/language-server-protocol/issues/726.
@@ -155,7 +155,7 @@ local function on_attach(client, bufnr)
         vim.api.nvim_command("autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync(nil, 1000)")
       end
 
-      if client.resolved_capabilities.document_highlight then
+      if client.server_capabilities.documentHighlightProvider then
         vim.api.nvim_command("autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()")
         vim.api.nvim_command("autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()")
         vim.api.nvim_command("autocmd CursorMoved <buffer> lua vim.lsp.util.buf_clear_references()")
