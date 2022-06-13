@@ -157,7 +157,6 @@ local function on_attach(client, bufnr)
 
       if client.server_capabilities.documentHighlightProvider then
         vim.api.nvim_command("autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()")
-        vim.api.nvim_command("autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()")
         vim.api.nvim_command("autocmd CursorMoved <buffer> lua vim.lsp.util.buf_clear_references()")
       end
 
