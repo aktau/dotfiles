@@ -152,7 +152,7 @@ local function on_attach(client, bufnr)
         if vim.api.nvim_buf_get_option(bufnr, "filetype") == "go" then
           vim.api.nvim_command("autocmd BufWritePre <buffer> lua goimports(1000)")
         end
-        vim.api.nvim_command("autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync(nil, 1000)")
+        vim.api.nvim_command("autocmd BufWritePre <buffer> lua vim.lsp.buf.format({timeout_ms=1000})")
       end
 
       if client.server_capabilities.documentHighlightProvider then
