@@ -1,22 +1,143 @@
 -- for debugging
--- :lua require('vim.lsp.log').set_level("debug")
--- :lua print(vim.inspect(vim.lsp.buf_get_clients()))
--- :lua print(vim.lsp.get_log_path())
--- :lua print(vim.inspect(vim.tbl_keys(vim.lsp.callbacks)))
+--  :lua require('vim.lsp.log').set_level("debug")
+--  :lua print(vim.inspect(vim.lsp.buf_get_clients()))
+--  :lua print(vim.lsp.get_log_path())
+--  :lua print(vim.inspect(vim.tbl_keys(vim.lsp.callbacks)))
 
--- This setup was inspired by:
---
---  * https://gitlab.com/SanchayanMaity/dotfiles/-/blob/master/nvim/.config/nvim/lua/lsp.lua
---  * https://github.com/ahmedelgabri/dotfiles/blob/master/roles/vim/files/.vim/lua/lsp.lua
-local has_lspconfig, lspconfig = pcall(require, 'lspconfig')
-if not has_lspconfig then
-  print("install the 'github.com/neovim/nvim-lspconfig' plugin to get LSP support")
-  return
+-- Configure diagnostics globally, which also applies to LSP diagnostics via
+-- vim.lsp.diagnostic.on_publish_diagnostics.
+vim.diagnostic.config({
+  severity_sort = true,
+  signs = true,              -- Apply signs for diagnostics.
+  underline = true,          -- Apply underlines to diagnostics.
+  update_in_insert = false,  -- Do not update diagnostics while still inserting.
+  virtual_text = true,       -- Apply virtual text to line endings.
+  float = {
+    border = "single",
+    header = false,
+    scope = "line",
+    source = "always",
+  }
+})
+
+-- Find the nearest parent directory (of `start`) that contains a file in
+-- `basenames`.
+local function find_first_parent(start, basenames)
+  return vim.fs.dirname(vim.fs.find(basenames, { path = vim.fs.dirname(fname), upward = true })[1])
 end
+
+local configs = {
+  ["clangd"] = {
+    cmd = { "clangd" },
+    filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
+    root_dir = function(fname)
+      local wd = vim.fs.dirname(fname)
+      return find_first_parent(wd, {
+        ".clangd",
+        ".clang-tidy",
+        ".clang-format",
+        "compile_commands.json",
+        "compile_flags.txt",
+        "configure.ac", -- AutoTools
+      }) or find_first_parent(wd, {
+        ".git",
+      })
+    end,
+  },
+  ["gopls"] = {
+    cmd = { "gopls" },
+    filetypes = { "go", "gomod", "gotmpl" },
+    root_dir = function(fname)
+      local wd = vim.fs.dirname(fname)
+      return find_first_parent(wd, {
+        "go.work",
+      }) or find_first_parent(wd, {
+        "go.mod",
+        ".git",
+      })
+    end,
+  },
+  ["efm"] = {
+    cmd = { "efm-langserver" },
+    filetypes = { "bash", "sh", "zsh" },
+    -- Normally root_dir is set to util.root_pattern(".git"). But this means
+    -- shellcheck is not enabled for any shell file not in a git repository,
+    -- which is not desirable. `root_dir` is required, it servers as an LSP
+    -- deduplication point. We only want one EFM so just set it to /.
+    root_dir = function() return "/" end,
+  },
+}
+
+-- Lookup table of LSP servers by filetype.
+local servers_by_filetype = {}
+
+-- Will make `server_name` the _first_ server started for every item in
+-- `filetypes`.
+local function register_server_for_filetypes(server_name, filetypes)
+  -- Prepend `item` to the list (`tbl`), or create the list.
+  local function tbl_prepend(tbl, item)
+    if tbl == nil then
+      return {item}
+    end
+    table.insert(tbl, 1, item)
+    return tbl
+  end
+
+  for _, ft in ipairs(filetypes) do
+    servers_by_filetype[ft] = tbl_prepend(servers_by_filetype[ft], server_name)
+  end
+end
+
+for name, config in pairs(configs) do
+  register_server_for_filetypes(name, config.filetypes)
+end
+
+local override_lsp = vim.g.aktau_override_lsp
+if override_lsp ~= nil then
+  configs[override_lsp.name] = {
+    cmd = override_lsp.cmd,
+    filetypes = override_lsp.filetypes,
+    -- Only run instances of the remote fs LSP for files that are actually on
+    -- the remote fs.
+    --
+    -- override_lsp_root returns the first matching root from
+    -- `g:aktau_override_lsp.roots` that `fname` is a child of, returns nil if
+    -- none match.
+    root_dir = function(fname)
+      -- Early out shortcuts, if either `fname` or `g:aktau_override_lsp.roots`
+      -- are empty.
+      if fname == nil or fname == '' then
+        return nil
+      end
+      if override_lsp.roots == nil or #override_lsp.roots == 0 then
+        return nil
+      end
+
+      -- Make path name absolute.
+      if string.sub(fname, 1, 1) ~= "/" then
+        fname = vim.loop.fs_realpath(fname)
+      end
+
+      for _, root_for_override_lsp in ipairs(override_lsp.roots) do
+        if vim.startswith(fname, root_for_override_lsp) then
+          return root_for_override_lsp
+        end
+      end
+
+      return nil
+    end,
+  }
+
+  register_server_for_filetypes(override_lsp.name, override_lsp.filetypes)
+end
+
+local capabilities = {}
 
 local has_cmp, cmp = pcall(require, 'cmp')
 local has_cmp_nvim_lsp, cmp_nvim_lsp = pcall(require, 'cmp_nvim_lsp')
 if has_cmp and has_cmp_nvim_lsp then
+  capabilities = cmp_nvim_lsp.update_capabilities(vim.lsp.protocol.make_client_capabilities())
+
   cmp.setup({
     snippet = {
       -- cmp-nvim requires a snippet engine.
@@ -47,21 +168,34 @@ if has_cmp and has_cmp_nvim_lsp then
   })
 end
 
--- TODO: extract to a utility library when I get more lua things.
---
--- Stolen from
--- https://github.com/ahmedelgabri/dotfiles/blob/94373b988275b415e24ef7757349fb02b809c3df/roles/vim/files/.vim/lua/_/utils.lua.
-local function augroup(group, fn)
-  vim.api.nvim_command("augroup " .. group)
-  vim.api.nvim_command("autocmd!")
-  fn()
-  vim.api.nvim_command("augroup END")
-end
+local lsp_augroup = vim.api.nvim_create_augroup("lsp", { clear = true })
 
--- For debugging:
---
--- vim.lsp.set_log_level("trace") -- "trace", "debug", "info", "warn", "error"
--- print('LSP logging to:', vim.lsp.get_log_path())
+-- Start a matching LSP client for any of the filetypes owned by the servers in
+-- `configs`.
+vim.api.nvim_create_autocmd("FileType", {
+  group = lsp_augroup,
+  pattern = vim.tbl_keys(servers_by_filetype), -- Union of all recognized filetypes.
+  callback = function(args)
+    local ft = args.match
+    local servers = servers_by_filetype[ft]
+    for _, server_name in ipairs(servers) do
+      -- Start the first LSP in servers_by_filetype[ft] that returns a matching
+      -- root_dir.
+      local config = configs[server_name]
+      local root_dir = config.root_dir(args.file)
+      if root_dir ~= nil then
+        vim.lsp.start({
+          name = server_name,
+          cmd = config.cmd,
+          root_dir = root_dir,
+          capabilities = capabilities,
+        })
+        return
+      end
+    end
+    print("WARNING: the filetype", ft, "is claimed by at least one LSP server config, but none were executable or had a non-nil root_dir, available:", vim.inspect(servers))
+  end,
+})
 
 -- Synchronously organise (Go) imports.
 --
@@ -85,14 +219,11 @@ end
 -- the hardcoded "1" indexing. I combined this with a look at more recent
 -- versions (0.6.0-git) of the Neovim LSP implementation to arrive at the
 -- current version.
---
--- Some LSPs (like pyright) instead perform this function as a command, see the
--- example in https://github.com/neovim/nvim-lspconfig/issues/1221.
-function goimports(timeout_ms)
+local function goimports()
   local params = vim.lsp.util.make_range_params()
   params.context = { only = { "source.organizeImports" } }
 
-  local response = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, timeout_ms)
+  local response = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
   for _, r in pairs(response or {}) do
     for _, action in pairs(r.result or {}) do
       -- textDocument/codeAction can return either Command[] or CodeAction[]. If
@@ -109,203 +240,72 @@ function goimports(timeout_ms)
   end
 end
 
-local function on_attach(client, bufnr)
-  -- Integrate with builtin functionality.
-  --
-  -- In case of `omnifunc`, we also use a special completion plugin to trigger
-  -- automatically, but it's nice to have a fallback to determin whether the
-  -- plugin or the LSP is failing to trigger/complete.
-  --
-  -- In case of `tagfunc`, we also create our own `gd` mapping (see below) which
-  -- does something similar. See https://github.com/neovim/neovim/issues/15309
-  -- for a discussion. E.g., perform <c-w><c-]> to go to a definition in a new
-  -- split.
-  vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc") -- <C-x><C-o> in insert mode.
-  vim.api.nvim_buf_set_option(bufnr, "formatexpr", "v:lua.vim.lsp.formatexpr")
-  vim.api.nvim_buf_set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
+-- Setup keybindings once an LSP client is attached.
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = lsp_augroup,
+  callback = function(args)
+    local bufnr = args.buf
 
-  -- (Potentially) override some keybindings to use LSP functionality.
-  local opts = { noremap = true, silent = true }
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "<Leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "K",  "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "g0", "<cmd>lua vim.lsp.buf.document_symbol()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gW", "<cmd>lua vim.lsp.buf.workspace_symbol()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gt", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
-  -- TODO: Try out github.com/RishabhRD/nvim-lsputils for more stylish code
-  -- actions. Example: https://github.com/ahmedelgabri/dotfiles/commit/546dfc37cd9ef110664286eb50ece4713108a511.
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "ga", '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  -- Pass float = false to avoid conflict with open_float() on CursorHold.
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "[d", "<cmd>lua vim.diagnostic.goto_prev({float = false})<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "]d", "<cmd>lua vim.diagnostic.goto_next({float = false})<CR>", opts)
+    -- Integrate with builtin functionality.
+    --
+    -- In case of `omnifunc`, we also use a special completion plugin to trigger
+    -- automatically, but it's nice to have a fallback to determin whether the
+    -- plugin or the LSP is failing to trigger/complete.
+    --
+    -- In case of `tagfunc`, we also create our own `gd` mapping (see below) which
+    -- does something similar. See https://github.com/neovim/neovim/issues/15309
+    -- for a discussion. E.g., perform <c-w><c-]> to go to a definition in a new
+    -- split.
+    vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"-- <C-x><C-o> in insert mode.
+    vim.bo[bufnr].formatexpr = "v:lua.vim.lsp.formatexpr"
+    vim.bo[bufnr].tagfunc = "v:lua.vim.lsp.tagfunc"
 
-  augroup(
-    "LSP",
-    function()
-      -- Enable format-on-save when available (see :help lsp-config). A
-      -- discussion on how to do this with nvim-lsp:
-      -- https://github.com/neovim/nvim-lsp/issues/115.
-      --
-      -- A discussion on how to do this better (more asynchronously) for slow
-      -- LSPs:
-      -- https://www.reddit.com/r/neovim/comments/jvisg5/lets_talk_formatting_again
-      --
-      -- TODO: When gopls implements willSaveWaitUntil (no issue yet), use it
-      --       instead as it saves a roundtrip:
-      --       https://github.com/Microsoft/language-server-protocol/issues/726.
-      if client.server_capabilities.documentFormattingProvider then
-        -- With gopls, textDocument/formatting only runs gofmt. If we also want
-        -- goimports, we need to run "all" code actions. See
-        -- https://github.com/Microsoft/language-server-protocol/issues/726.
-        if vim.api.nvim_buf_get_option(bufnr, "filetype") == "go" then
-          vim.api.nvim_command("autocmd BufWritePre <buffer> lua goimports(1000)")
-        end
-        vim.api.nvim_command("autocmd BufWritePre <buffer> lua vim.lsp.buf.format({timeout_ms=1000})")
+    -- (Potentially) override some keybindings to use LSP functionality.
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    local opts = { silent = true, buffer = bufnr }
+    if client.server_capabilities.hoverProvider then
+      vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+    end
+    vim.keymap.set("n", "<Leader>rn", vim.lsp.buf.rename, opts)
+    vim.keymap.set("n", "g0", vim.lsp.buf.document_symbol, opts)
+    vim.keymap.set("n", "gW", vim.lsp.buf.workspace_symbol, opts)
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+    vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+    vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+    vim.keymap.set("n", "gs", vim.lsp.buf.signature_help, opts)
+    vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, opts)
+    vim.keymap.set("n", "ga", vim.lsp.buf.code_action, opts)
+    vim.keymap.set("n", "[d", function() vim.diagnostic.goto_prev({float = false}) end, opts)
+    vim.keymap.set("n", "]d", function() vim.diagnostic.goto_next({float = false}) end, opts)
+
+    local lsp_buffer_augroup = vim.api.nvim_create_augroup("lsp-buffer", {})
+    local function aucmd(event, callback)
+      vim.api.nvim_create_autocmd(event, { group = lsp_buffer_augroup, buffer = bufnr, callback = callback })
+    end
+
+    -- Enable format-on-save when available (see :help lsp-config). A
+    -- discussion on how to do this with nvim-lsp:
+    -- https://github.com/neovim/nvim-lsp/issues/115.
+    --
+    -- TODO: When gopls implements willSaveWaitUntil (no issue yet), use it
+    --       instead as it saves a roundtrip:
+    --       https://github.com/Microsoft/language-server-protocol/issues/726.
+    if client.server_capabilities.documentFormattingProvider then
+      -- With gopls, textDocument/formatting only runs gofmt. If we also want
+      -- goimports a specific code action. See
+      -- https://github.com/Microsoft/language-server-protocol/issues/726.
+      if vim.bo[bufnr].filetype == "go" then
+        aucmd("BufWritePre", function() goimports() end)
       end
-
-      if client.server_capabilities.documentHighlightProvider then
-        vim.api.nvim_command("autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()")
-        vim.api.nvim_command("autocmd CursorMoved <buffer> lua vim.lsp.util.buf_clear_references()")
-      end
-
-      -- Draw a popup window showing all diagnostics.
-      --
-      -- Source: https://github.com/nvim-lua/diagnostic-nvim/issues/29
-      vim.api.nvim_command('autocmd CursorHold <buffer> lua vim.diagnostic.open_float()')
-    end
-  )
-end
-
-local servers = {
-  ['clangd'] = {},
-  ['gopls'] = {},
-  ['rust_analyzer'] = {},
-  ['sumneko_lua'] = {
-    settings = {
-      Lua = {
-        runtime = {
-          version = 'LuaJIT',
-          path = vim.split(package.path, ';'),
-        },
-        diagnostics = {
-          globals = { 'vim' },
-        },
-        workspace = {
-          library = {
-            [vim.fn.expand('$VIMRUNTIME/lua')] = true,
-            [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
-          }
-        }
-      }
-    }
-  },
-
-  -- A generic langserver that can be used to pull regular linters into the LSP
-  -- ecosystem (like shellcheck).
-  ['efm'] = {
-    -- TODO: Figure out how to avoid:
-    --   efm doesn't implement a number of capabilities:
-    --     Error executing vim.schedule lua callback: ...geer/neovim/share/nvim/runtime/lua/vim/lsp/callbacks.lua:259: RPC[Error] code_name = MethodNotFound, message = "method not supported: textDocument/documentHighlight"
-    --     data = vim.NIL
-    filetypes = { 'bash', 'sh', 'zsh' },
-    -- Normally root_dir is set to util.root_pattern(".git"). But this means
-    -- shellcheck is not enabled for any shell file not in a git repository,
-    -- which is not desirable. `root_dir` is required, it servers as an LSP
-    -- deduplication point. We only want one EFM so just set it to /.
-    root_dir = function() return '/' end,
-  },
-}
-
--- Add custom LSP for certain environments. The tricky thing is to make it the
--- preferential LSP whenever it is applicable (correct filetype and root),
--- excluding other LSPs.
-
--- override_lsp_root returns the first matching root from
--- `g:aktau_override_lsp.roots` that `fname` is a child of, returns nil if none
--- match.
-local override_lsp_root = function() return nil end
-local override_lsp = vim.g.aktau_override_lsp
-if override_lsp ~= nil then
-  override_lsp_root = function(fname)
-    -- Early out shortcuts, if either `fname` or `g:aktau_override_lsp.roots`
-    -- are empty.
-    if fname == nil or fname == '' then
-      return nil
-    end
-    if override_lsp.roots == nil or #override_lsp.roots == 0 then
-      return nil
+      aucmd("BufWritePre", function() vim.lsp.buf.format({timeout_ms=1000}) end)
     end
 
-    for _, root_for_override_lsp in ipairs(override_lsp.roots) do
-      if vim.startswith(fname, root_for_override_lsp) then
-        return root_for_override_lsp
-      end
-    end
-    return nil
-  end
-
-  local configs = require('lspconfig.configs')
-  configs[override_lsp.name] = {
-    default_config = {
-      cmd = override_lsp.cmd,
-      filetypes = override_lsp.filetypes,
-      -- Only run instances of the remote fs LSP for files that are actually on
-      -- the remote fs.
-      root_dir = override_lsp_root,
-      settings = {},
-    },
-  }
-  servers[override_lsp.name] = {}
-end
-
-do
-  local defaults = {
-    on_attach = on_attach,
-  }
-
-  if has_cmp and has_cmp_nvim_lsp then
-    defaults.capabilities = cmp_nvim_lsp.update_capabilities(vim.lsp.protocol.make_client_capabilities())
-  end
-
-  for lsp, config in pairs(servers) do
-    -- The `override_lsp`, if set, inhibits all other LSPs that would activate
-    -- for the same root.
-    local overrides = {}
-    if override_lsp ~= nil and lsp ~= override_lsp.name then
-      -- Ensure the regular LSPs do not run in the overridden roots.
-      overrides.on_new_config = function(config, root_dir)
-        -- TODO: don't install the override if the filetypes don't match (so
-        --       that efm-langserver can work in all scenarios).
-        config.enabled = (override_lsp_root(root_dir) == nil)
-      end
+    if client.server_capabilities.documentHighlightProvider then
+      aucmd("CursorHold", function() vim.lsp.buf.document_highlight() end)
+      aucmd("CursorMoved", function() vim.lsp.util.buf_clear_references() end)
     end
 
-    lspconfig[lsp].setup(vim.tbl_deep_extend(
-      'force',
-      defaults,
-      config,
-      overrides
-    ))
-  end
-end
-
--- Configure diagnostics globally, which also applies to LSP diagnostics via
--- vim.lsp.diagnostic.on_publish_diagnostics. The old way of configuring using
--- `handler = vim.lsp.with(..., {...})` still works, but is more expensive and
--- cumbersome.
-vim.diagnostic.config({
-  severity_sort = true,
-  signs = true,  -- Apply signs for diagnostics.
-  underline = true,  -- Apply underlines to diagnostics.
-  update_in_insert = false,  -- Do not update diagnostics while still inserting.
-  virtual_text = true,  -- Apply virtual text to line endings.
-  float = {
-    border = "single",
-    header = false,
-    scope = "line",
-    source = "always",
-  }
+    -- Draw a popup window showing all diagnostics.
+    aucmd("CursorHold", function() vim.diagnostic.open_float() end)
+  end,
 })

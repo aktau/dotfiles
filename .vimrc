@@ -63,7 +63,6 @@ endif
 "  - www.reddit.com/r/neovim/comments/gy8ko7/question_how_to_get_more_readable_error_messages
 "  - www.reddit.com/r/neovim/comments/hba6yb/coc_neovim_lua_completion_source
 if has('nvim')
-  Plug 'neovim/nvim-lspconfig'    " Ready-made LSP server configurations.
   Plug 'hrsh7th/cmp-buffer'
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/nvim-cmp' " Async autocomplete using nvim builtin LSP.
