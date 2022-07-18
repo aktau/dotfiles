@@ -188,12 +188,9 @@ set sidescrolloff=7
 set splitbelow
 set splitright
 
-set sidescroll=1
-set mouse-=a
+set sidescroll=1                  " Number of columns to scroll horizontally.
+set mouse=                        " Disable mouse (allows copying from cmdline).
 set mousehide
-if !has("nvim")
-  set ttymouse=xterm2
-endif
 if exists("+inccommand")
   set inccommand=nosplit
 endif
