@@ -156,7 +156,7 @@ set matchpairs+=<:>               " Match < and > as well.
 set noundofile                    " Don't save undo's after file closes.
 
 set hidden                        " Handle multiple buffers better.
-set title                         " Set the terminal's title
+set title                         " Set the terminal's title, see https://github.com/neovim/neovim/issues/19040
 set number                        " Show line numbers.
 set ruler                         " Show cursor position.
 set cursorline                    " Highlight current line
