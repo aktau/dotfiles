@@ -56,13 +56,9 @@ if filereadable($HOME . '/.local_config/local.vim')
   source ~/.local_config/local.vim
 endif
 
-" LSP setup. Based on the following posts/articles, in order of influence:
-"  - www.reddit.com/r/neovim/comments/gxcbui/in_built_lsp_is_amazing/
-"  - github.com/nvim-lua/completion-nvim
-"  - www.reddit.com/r/neovim/comments/h0ndj0/to_those_who_have_integrated_lsp_functionality
-"  - www.reddit.com/r/neovim/comments/gy8ko7/question_how_to_get_more_readable_error_messages
-"  - www.reddit.com/r/neovim/comments/hba6yb/coc_neovim_lua_completion_source
 if has('nvim')
+  " LSP extras. The actual setup is just based on native nvim functions, see
+  " .vim/lua/lsp.lua.
   Plug 'hrsh7th/cmp-buffer'
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/nvim-cmp' " Async autocomplete using nvim builtin LSP.
@@ -130,7 +126,6 @@ set backspace=indent,eol,start    " backspace through everything in insert mode"
 set autoindent                    " match indentation of previous line
 set textwidth=80                  " in new gvim windows
 set colorcolumn=+1                " Set colorcolumn = textwidth + 1.
-set pastetoggle=<F2>
 set formatoptions+=n              " format numbered lists properly
 set nojoinspaces                  " Don't add extra spaces after join/fmt.
 
@@ -150,7 +145,6 @@ set smartcase                     " But case-sensitive if expression contains a 
 set tagcase=match                 " Case sensitive tag matching (most langs are cs).
 set gdefault                      " Set the global flag on substitute commands by default
 set matchpairs+=<:>               " Match < and > as well.
-" set showmatch                     " When a bracket is inserted, briefly jump to the matching one
 
 " undo
 set noundofile                    " Don't save undo's after file closes.
@@ -172,9 +166,6 @@ set wildignore+=*.swp,*.zip
 set magic                         " magic matching
 
 " small tweaks
-set ttyfast                       " indicate a fast terminal connection
-set tf                            " improve redrawing for newer computers
-set nolazyredraw                  " turn off lazy redraw
 set shell=/bin/zsh
 set diffopt+=vertical             " Vertical diff windows on :diffsplit.
 
@@ -182,12 +173,11 @@ set visualbell
 set noerrorbells
 set history=1000                  " Store lots of :cmdline history
 
-set scrolloff=3
-set sidescrolloff=7
-
 set splitbelow
 set splitright
 
+set scrolloff=3
+set sidescrolloff=7
 set sidescroll=1                  " Number of columns to scroll horizontally.
 set mouse=                        " Disable mouse (allows copying from cmdline).
 set mousehide
@@ -240,10 +230,10 @@ else
   set background=dark
 endif
 
-autocmd FileType python setlocal tabstop=8 expandtab shiftwidth=4 softtabstop=4
-
 " clear trailing spaces on save
 autocmd BufWritePre * kz|:%s/\s\+$//e|'z
+
+autocmd FileType python setlocal tabstop=8 expandtab shiftwidth=4 softtabstop=4
 
 " indent/unindent visual mode selection with tab/shift+tab
 vmap <tab> >gv
@@ -302,10 +292,6 @@ nnoremap <leader>/ //e<Enter>v??<Enter>
 
 " see what unsaved changes you have
 nnoremap <leader>u :w !diff - %<CR>
-
-" % is hard to type
-" nnoremap <tab> %
-" vnoremap <tab> %
 
 " go to the end of the copied/yank text
 vnoremap <silent> y y`]
@@ -468,9 +454,6 @@ hi ExtraWhitespace ctermbg=red guibg=red
 au ColorScheme * hi ExtraWhitespace ctermbg=red guibg=red
 match ExtraWhitespace /\s\+$\| \+\ze\t/
 
-" C-language family options.
-au FileType c,cpp,go set formatoptions+=roj
-
 " This is a modified version of the formatlistpat found in the Markdown
 " filetype, and the default formatlistpat. The goal is to be able to gq all text
 " without messing things up.
@@ -482,6 +465,9 @@ let s:listpatterns += ['^\s*TODO[(][^)]\+[)]:\s*'] " TODO(me): ...
 let s:listpatterns += ['^\s*TODO:\s*']             " TODO: ...
 let &l:formatlistpat = join(s:listpatterns, '\|')
 au FileType * let &formatlistpat=join(s:listpatterns, '\|')
+
+" C-language family options.
+au FileType c,cpp,go set formatoptions+=roj
 
 " C file specific options
 au FileType c,cpp set cindent
