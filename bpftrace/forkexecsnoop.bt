@@ -1,0 +1,114 @@
+#!/usr/bin/env bpftrace
+
+#include <linux/sched.h>
+
+BEGIN {
+  printf("%-7s ", "TIME(μs)");
+  printf("%-5s %-8s %-8s %-13s %-7s %-15s\n",
+          "TYPE", "PID", "TID", "PTID/RETV", "LAT(μs)", "COMM");
+}
+
+tracepoint:syscalls:sys_enter_clone /(args->clone_flags & CLONE_THREAD) == 0/ {
+  if ($1 >= 1) {
+    printf("%-7u ", elapsed / 1000);
+    printf("CLONE %-8d %-8d %-13s %-7s %-15s",
+      pid,
+      tid,
+      "N/A",
+      "N/A",
+      comm
+    );
+
+    $flags = args->clone_flags;
+    printf(" flags=(");
+    // https://github.com/iovisor/bpftrace/issues/2304.
+    //
+    // if ($flags & CLONE_CHILD_CLEARTID) { printf("CLONE_CHILD_CLEARTID|"); }
+    // if ($flags & CLONE_CHILD_SETTID)   { printf("CLONE_CHILD_SETTID|");   }
+    // if ($flags & CLONE_FILES)          { printf("CLONE_FILES|");          }
+    // if ($flags & CLONE_FS)             { printf("CLONE_FS|");             }
+    // if ($flags & CLONE_IO)             { printf("CLONE_IO|");             }
+    // if ($flags & CLONE_NEWCGROUP)      { printf("CLONE_NEWCGROUP|");      }
+    // if ($flags & CLONE_NEWIPC)         { printf("CLONE_NEWIPC|");         }
+    // if ($flags & CLONE_NEWNET)         { printf("CLONE_NEWNET|");         }
+    // if ($flags & CLONE_NEWNS)          { printf("CLONE_NEWNS|");          }
+    // if ($flags & CLONE_NEWPID)         { printf("CLONE_NEWPID|");         }
+    // if ($flags & CLONE_NEWUSER)        { printf("CLONE_NEWUSER|");        }
+    // if ($flags & CLONE_NEWUTS)         { printf("CLONE_NEWUTS|");         }
+    // if ($flags & CLONE_PARENT)         { printf("CLONE_PARENT|");         }
+    // if ($flags & CLONE_PARENT_SETTID)  { printf("CLONE_PARENT_SETTID|");  }
+    // if ($flags & CLONE_PTRACE)         { printf("CLONE_PTRACE|");         }
+    // if ($flags & CLONE_SETTLS)         { printf("CLONE_SETTLS|");         }
+    // if ($flags & CLONE_SIGHAND)        { printf("CLONE_SIGHAND|");        }
+    // if ($flags & CLONE_SYSVSEM)        { printf("CLONE_SYSVSEM|");        }
+    // if ($flags & CLONE_THREAD)         { printf("CLONE_THREAD|");         }
+    // if ($flags & CLONE_UNTRACED)       { printf("CLONE_UNTRACED|");       }
+    // if ($flags & CLONE_VFORK)          { printf("CLONE_VFORK|");          }
+    // if ($flags & CLONE_VM)             { printf("CLONE_VM|");             }
+    printf(")\n");
+  }
+  @startforkparent[tid] = nsecs;
+  @startforkchild[tid] = nsecs;
+}
+
+// Child exit (ret == 0 and not a thread).
+tracepoint:syscalls:sys_exit_clone /args->ret == 0 && @startforkchild[curtask->parent->pid]/ {
+  $ptid = curtask->parent->pid; // curtask->parent->pid is the parents tid.
+
+  printf("%-7u ", elapsed / 1000);
+  printf("CHILD %-8d %-8d ptid=%-8d %-7d %-15s\n",
+    pid,
+    tid,
+    $ptid,
+    (nsecs - @startforkchild[$ptid]) / 1000, // ELAPSED
+    comm
+  );
+
+  delete(@startforkchild[$ptid]);
+}
+
+// Parent exit (ret > 1 and not a thread clone return).
+tracepoint:syscalls:sys_exit_clone /args->ret > 0 && @startforkparent[tid]/ {
+  printf("%-7u ", elapsed / 1000);
+  printf("PARNT %-8d %-8d retv=%-8d %-7d %-15s\n",
+    pid,
+    tid,
+    args->ret,
+    (nsecs - @startforkparent[tid]) / 1000, // ELAPSED
+    comm
+  );
+
+  delete(@startforkparent[tid]);
+}
+
+tracepoint:syscalls:sys_enter_execve {
+  @argvs[tid] = str(args->filename);
+  @start[tid] = nsecs;
+}
+
+tracepoint:syscalls:sys_exit_execve /@start[pid]/ {
+  printf("%-7u ", elapsed / 1000);
+  printf("EXEC  %-8d %-8d %-13s %-7d %-15s\n",
+    pid,
+    tid,
+    "N/A",
+    (nsecs - @start[tid]) / 1000, // ELAPSED
+    @argvs[tid]
+  );
+
+  // Debugging output.
+  if 0 {
+    printf("%-7u %-5d %-16s %-8d %-16s %-8d ",
+      (nsecs - @start[pid]) / 1000, // ELAPSED
+      args->ret,                    // RET
+      curtask->parent->comm,        // PCOMM
+      curtask->parent->pid,         // PPID
+      curtask->comm,                // COMM
+      curtask->pid                  // PID
+    );
+    printf("%s\n", @argvs[pid]);
+  }
+
+  delete(@argvs[tid]);
+  delete(@start[tid]);
+}

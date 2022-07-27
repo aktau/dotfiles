@@ -1,0 +1,85 @@
+#!/usr/bin/env bpftrace
+
+// USAGE
+//
+//  exectimesnoop.bt [0|1|2]
+//
+// OPTIONS
+//
+//   0  -> show EXIT events only
+//   1  -> show EXIT events and EXEC events (for successful EXECs)
+//   2  -> show EXIT events and EXEC events
+//
+// TODO
+//
+//  https://github.com/iovisor/bpftrace/pull/769
+//
+//   When bpftrace gets the capability to save the result of joining an array
+//   to a variable (or a map), then we can print the argv from
+//   syscalls:sys_enter_exeve in tracepoint:sched:sched_process_exit.
+
+BEGIN {
+  printf("%-10s ", "TIME(μs)");
+  printf("%-5s %-8s %-8s %-13s %-12s %-12s %-15s %-15s\n",
+          "TYPE", "PPID", "PID", ($1 >= 1) ? "EXIT/RET" : "EXIT", "LAT_EXEC(ms)", "LAT_PROC(ms)", "PCOMM", "COMM");
+}
+
+tracepoint:syscalls:sys_enter_execve {
+  @argvs[tid] = str(args->filename);
+  @start[tid] = nsecs;
+}
+
+// NOTE: execvp(3) et al. are libc calls that interpret $PATH and try to
+// execve(2) each executable (although I suppose some implementations try a
+// stat(2) call instead, but since execve(2) also does that work it's
+// redundant). For example when `nvim` attempts to exec into the `cs` binary on
+// my workstation:
+//
+//  TIME(μs) TYPE   PID      TID      EXIT          LAT(ms) PCOMM           COMM
+//  233368987 EXEC  352211   352211   -             0       nvim            /usr/local/bin/cs
+//  233369136 EXEC  352211   352211   -             0       nvim            /usr/sbin/cs
+//  233370233 EXEC  352211   352211   -             1       nvim            /usr/bin/cs
+//  233543133 EXIT  352211   352211   0             174     nvim            /usr/bin/cs
+//
+// Most of those will yield ENOENT from execve(2). Since this is sp
+//
+// Invocations from (e.g.) shells don't show this generally because shells cache
+// the correct path.
+tracepoint:syscalls:sys_exit_execve /@start[pid] && ($1 >= 2 || args->ret == 0)/ {
+  // Only print EXEC exits (with execve(2) return codes) if debugging level is
+  // >= 1.
+  if ($1 >= 1) {
+    printf("%-9u ", elapsed / 1000);
+    printf("EXEC  %-8d %-8d %-13d %-12d %-12s %-15s %-15s\n",
+      curtask->parent->pid,                     // PPID
+      pid,                                      // PID
+      args->ret,                                // EXIT
+      (nsecs - @start[tid]) / 1000000,          // LAT_EXEC(ms)
+      "-",                                      // LAT_PROC(ms)
+      curtask->parent->comm,                    // PCOMM
+      @argvs[tid]                               // COMM (extended)
+    );
+  }
+
+  @procstart[tid] = nsecs
+}
+
+// sched_process_exit is called for every thread (tid) that exits. We just want
+// to match the main thread (process). Luckily we only have the main process in
+// the @start map.
+tracepoint:sched:sched_process_exit /@start[tid]/ {
+  printf("%-9u ", elapsed / 1000);
+  printf("EXIT  %-8d %-8d %-13d %-12d %-12d %-15s %-15s\n",
+    curtask->parent->pid,                      // PPID
+    pid,                                       // PID
+    curtask->exit_code,                        // EXIT
+    (@procstart[tid] - @start[tid]) / 1000000, // LAT_EXEC(ms)
+    (nsecs - @procstart[tid]) / 1000000,       // LAT_PROC(ms)
+    curtask->parent->comm,                     // PCOMM
+    @argvs[tid]                                // COMM (extended)
+  );
+
+  delete(@argvs[tid]);
+  delete(@start[tid]);
+  delete(@procstart[tid]);
+}
