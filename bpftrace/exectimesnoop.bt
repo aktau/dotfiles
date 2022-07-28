@@ -6,9 +6,10 @@
 //
 // OPTIONS
 //
-//   0  -> show EXIT events only
-//   1  -> show EXIT events and EXEC events (for successful EXECs)
-//   2  -> show EXIT events and EXEC events
+//   -1  -> show EXIT events and EXEC events with full argv
+//   0   -> show EXIT events only (default)
+//   1   -> show EXIT events and EXEC events (for successful EXECs) w/ retvals
+//   2   -> show EXIT events and EXEC events w/ retvals
 //
 // TODO
 //
@@ -17,6 +18,17 @@
 //   When bpftrace gets the capability to save the result of joining an array
 //   to a variable (or a map), then we can print the argv from
 //   syscalls:sys_enter_exeve in tracepoint:sched:sched_process_exit.
+//
+// EXAMPLES
+//
+//  Display all process exits, including the time
+//
+//      $ exectimesnoop.bt
+//
+//  Display all process exits, and all execve(2) calls with full command-line
+//  arguments.
+//
+//      $ exectimesnoop.bt -- -1
 
 BEGIN {
   printf("%-10s ", "TIME(μs)");
@@ -27,6 +39,23 @@ BEGIN {
 tracepoint:syscalls:sys_enter_execve {
   @argvs[tid] = str(args->filename);
   @start[tid] = nsecs;
+
+  // If passing (e.g.) -1, print out the actual argv. This is spammy, but the
+  // only way to get the programs actual arguments until
+  // https://github.com/iovisor/bpftrace/pull/769 is resolved.
+  if ($1 < 0) {
+    printf("%-9u ", elapsed / 1000);
+    printf("EXEC  %-8d %-8d %-13s %-12s %-12s %-15s %-15s ",
+      curtask->parent->pid,                     // PPID
+      pid,                                      // PID
+      "-",                                      // EXIT
+      "-",          // LAT_EXEC(ms)
+      "-",                                      // LAT_PROC(ms)
+      curtask->parent->comm,                    // PCOMM
+       str(args->filename)                      // COMM (extended)
+    );
+    join(args->argv)
+  }
 }
 
 // NOTE: execvp(3) et al. are libc calls that interpret $PATH and try to
