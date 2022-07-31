@@ -211,23 +211,13 @@ set laststatus=2                  " Show the status line all the time
 " terminals. The Tc bit is a long way from being standardized, and at least with
 " an environment variable it's easy for me to override. Some terminals (like
 " hterm) set the environment variable themselves, which is nice.
-if has('termguicolors') && !empty($COLORTERM)
+if has('termguicolors') && (&termguicolors || !empty($COLORTERM))
   set termguicolors
 
   let g:oceanic_next_terminal_bold = 1
   let g:oceanic_next_terminal_italic = 1
 
   colorscheme OceanicNext
-else
-  " Set a colorscheme. This is really stupid though, static_tomorrownight changes
-  " some values. Then changing the background changes the colorscheme back to the
-  " default (because g:colors_name in static_tomorrownight doesn't match the name
-  " of the file). This results in something I find pleasant to use. Removing the
-  " colorscheme invocation should work, but there are apparently some things the
-  " default scheme doesn't override which I like.
-  set t_Co=256                      " Set terminal to 256 colors
-  colorscheme static_tomorrownight
-  set background=dark
 endif
 
 " clear trailing spaces on save
