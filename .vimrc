@@ -477,17 +477,14 @@ au BufRead,BufNewFile mutt{ng,}-*-\w\+ set ft=mail
 au FileType go setlocal listchars=tab:\ \ ,trail:…
 
 " tries to get buffer reloading to work correctly in terminals
+"
+" Remove this is if https://github.com/neovim/neovim/issues/1380 is ever fixed.
 augroup checktime
   au!
   if !has("gui_running")
     " silent! necessary otherwise throws errors when using command
     " line window.
-    autocmd BufEnter        * silent! checktime
-    autocmd CursorHold      * silent! checktime
-    autocmd CursorHoldI     * silent! checktime
-    " these two _may_ slow things down. Remove if they do.
-    " autocmd CursorMoved     * silent! checktime
-    " autocmd CursorMovedI    * silent! checktime
+    autocmd BufEnter,CursorHold,CursorHoldI * silent! checktime
   endif
 augroup END
 
