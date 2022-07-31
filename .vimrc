@@ -278,7 +278,6 @@ nmap Q gqap
 map <leader>qc :cclose<cr>
 
 " switch split windows
-nnoremap <leader>s <C-w>v<C-w>l
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
@@ -286,9 +285,6 @@ nnoremap <C-l> <C-w>l
 
 " re-select text you just pasted
 nnoremap <leader>v V`]
-
-" select last matched item
-nnoremap <leader>/ //e<Enter>v??<Enter>
 
 " see what unsaved changes you have
 nnoremap <leader>u :w !diff - %<CR>
