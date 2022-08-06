@@ -90,13 +90,16 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'xuhdev/SingleCompile'
 
-" themes
-Plug 'arcticicestudio/nord-vim'
-Plug 'drewtempelmeyer/palenight.vim'
-Plug 'gruvbox-community/gruvbox'
-Plug 'lifepillar/vim-solarized8'
+" themes (only uncomment the ones I use frequently, to pollute rtp less)
+" Plug 'AhmedAbdulrahman/aylin.vim'
+" Plug 'Rigellute/rigel'
+" Plug 'arcticicestudio/nord-vim'
+" Plug 'drewtempelmeyer/palenight.vim'
+" Plug 'gruvbox-community/gruvbox'
+" Plug 'lifepillar/vim-solarized8'
 Plug 'mhartington/oceanic-next'
 Plug 'robertmeta/nofrils'
+" Plug 'sainnhe/sonokai'
 
 " language support
 Plug 'exu/pgsql.vim'
