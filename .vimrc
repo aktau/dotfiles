@@ -63,6 +63,10 @@ if has('nvim')
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/nvim-cmp' " Async autocomplete using nvim builtin LSP.
   Plug 'hrsh7th/vim-vsnip' " A snippet plugin is required for hrsh7th/nvim-cmp.
+
+  " nvim-telescope
+  Plug 'nvim-lua/plenary.nvim'
+  Plug 'nvim-telescope/telescope.nvim'
 endif
 
 " original repos on github
@@ -438,6 +442,12 @@ nmap <Leader>a<bar> :Tabularize /\|<CR>
 vmap <Leader>a<bar> :Tabularize /\|<CR>
 nmap <Leader>a<tab> :Tabularize /\<tab><CR>
 vmap <Leader>a<tab> :Tabularize /\<tab><CR>
+
+if has('nvim')
+  " Find files using Telescope command-line sugar.
+  nnoremap <leader>ff <cmd>Telescope find_files hidden=true no_ignore=true<cr>
+  nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+endif
 
 " vim-unimpaired (not actually part of the plugin, but similar in spirit)
 nmap <silent> [g :tabprevious<CR>
