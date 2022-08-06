@@ -22,29 +22,28 @@ tracepoint:syscalls:sys_enter_clone /(args->clone_flags & CLONE_THREAD) == 0/ {
     $flags = args->clone_flags;
     printf(" flags=(");
     // https://github.com/iovisor/bpftrace/issues/2304.
-    //
-    // if ($flags & CLONE_CHILD_CLEARTID) { printf("CLONE_CHILD_CLEARTID|"); }
-    // if ($flags & CLONE_CHILD_SETTID)   { printf("CLONE_CHILD_SETTID|");   }
-    // if ($flags & CLONE_FILES)          { printf("CLONE_FILES|");          }
-    // if ($flags & CLONE_FS)             { printf("CLONE_FS|");             }
-    // if ($flags & CLONE_IO)             { printf("CLONE_IO|");             }
-    // if ($flags & CLONE_NEWCGROUP)      { printf("CLONE_NEWCGROUP|");      }
-    // if ($flags & CLONE_NEWIPC)         { printf("CLONE_NEWIPC|");         }
-    // if ($flags & CLONE_NEWNET)         { printf("CLONE_NEWNET|");         }
-    // if ($flags & CLONE_NEWNS)          { printf("CLONE_NEWNS|");          }
-    // if ($flags & CLONE_NEWPID)         { printf("CLONE_NEWPID|");         }
-    // if ($flags & CLONE_NEWUSER)        { printf("CLONE_NEWUSER|");        }
-    // if ($flags & CLONE_NEWUTS)         { printf("CLONE_NEWUTS|");         }
-    // if ($flags & CLONE_PARENT)         { printf("CLONE_PARENT|");         }
-    // if ($flags & CLONE_PARENT_SETTID)  { printf("CLONE_PARENT_SETTID|");  }
-    // if ($flags & CLONE_PTRACE)         { printf("CLONE_PTRACE|");         }
-    // if ($flags & CLONE_SETTLS)         { printf("CLONE_SETTLS|");         }
-    // if ($flags & CLONE_SIGHAND)        { printf("CLONE_SIGHAND|");        }
-    // if ($flags & CLONE_SYSVSEM)        { printf("CLONE_SYSVSEM|");        }
-    // if ($flags & CLONE_THREAD)         { printf("CLONE_THREAD|");         }
-    // if ($flags & CLONE_UNTRACED)       { printf("CLONE_UNTRACED|");       }
-    // if ($flags & CLONE_VFORK)          { printf("CLONE_VFORK|");          }
-    // if ($flags & CLONE_VM)             { printf("CLONE_VM|");             }
+    if ($flags & CLONE_CHILD_CLEARTID) { printf("CLONE_CHILD_CLEARTID|"); }
+    if ($flags & CLONE_CHILD_SETTID)   { printf("CLONE_CHILD_SETTID|");   }
+    if ($flags & CLONE_FILES)          { printf("CLONE_FILES|");          }
+    if ($flags & CLONE_FS)             { printf("CLONE_FS|");             }
+    if ($flags & CLONE_IO)             { printf("CLONE_IO|");             }
+    if ($flags & CLONE_NEWCGROUP)      { printf("CLONE_NEWCGROUP|");      }
+    if ($flags & CLONE_NEWIPC)         { printf("CLONE_NEWIPC|");         }
+    if ($flags & CLONE_NEWNET)         { printf("CLONE_NEWNET|");         }
+    if ($flags & CLONE_NEWNS)          { printf("CLONE_NEWNS|");          }
+    if ($flags & CLONE_NEWPID)         { printf("CLONE_NEWPID|");         }
+    if ($flags & CLONE_NEWUSER)        { printf("CLONE_NEWUSER|");        }
+    if ($flags & CLONE_NEWUTS)         { printf("CLONE_NEWUTS|");         }
+    if ($flags & CLONE_PARENT)         { printf("CLONE_PARENT|");         }
+    if ($flags & CLONE_PARENT_SETTID)  { printf("CLONE_PARENT_SETTID|");  }
+    if ($flags & CLONE_PTRACE)         { printf("CLONE_PTRACE|");         }
+    if ($flags & CLONE_SETTLS)         { printf("CLONE_SETTLS|");         }
+    if ($flags & CLONE_SIGHAND)        { printf("CLONE_SIGHAND|");        }
+    if ($flags & CLONE_SYSVSEM)        { printf("CLONE_SYSVSEM|");        }
+    if ($flags & CLONE_THREAD)         { printf("CLONE_THREAD|");         }
+    if ($flags & CLONE_UNTRACED)       { printf("CLONE_UNTRACED|");       }
+    if ($flags & CLONE_VFORK)          { printf("CLONE_VFORK|");          }
+    if ($flags & CLONE_VM)             { printf("CLONE_VM|");             }
     printf(")\n");
   }
   @startforkparent[tid] = nsecs;
