@@ -97,7 +97,7 @@ tracepoint:syscalls:sys_exit_execve /@start[pid]/ {
   );
 
   // Debugging output.
-  if 0 {
+  if (0) {
     printf("%-7u %-5d %-16s %-8d %-16s %-8d ",
       (nsecs - @start[pid]) / 1000, // ELAPSED
       args->ret,                    // RET
