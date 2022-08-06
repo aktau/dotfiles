@@ -115,7 +115,10 @@ if override_lsp ~= nil then
 
       -- Make path name absolute.
       if string.sub(fname, 1, 1) ~= "/" then
-        fname = vim.loop.fs_realpath(fname)
+        -- I only know of vim.fn.fnamemodify() or vim.loop.fs_realpath() to
+        -- make a relative path absolute. However, the latter requires that the
+        -- file actually exists (which isn't always the case): use the former.
+        fname = vim.fn.fnamemodify(fname, ":p")
       end
 
       for _, root_for_override_lsp in ipairs(override_lsp.roots) do
