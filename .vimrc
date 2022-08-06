@@ -78,7 +78,6 @@ Plug 'junegunn/fzf'  " This downloads the whole FZF repo even if we only want fz
 Plug 'luochen1990/rainbow'
 Plug 'mhinz/vim-signify'
 Plug 'rhysd/clever-f.vim'
-Plug 'rking/ag.vim'
 Plug 'roman/golden-ratio'
 Plug 'sgur/vim-editorconfig'
 Plug 'tpope/vim-abolish'
@@ -328,6 +327,40 @@ if has('nvim')
   tnoremap <C-l> <C-\><C-N><C-w>l
 endif
 
+" vimgrep / ripgrep
+"
+" Try to use the native grep functionality instead of the emulation that
+" improves upon :grep here written down by romainl@ [1]. I think we can probably
+" fix this in Neovim. I have some CLs lined up, to avoid temporary files,
+" sub-shells and spurious I/O. Now that the refactor of replace_makeprg is in
+" (https://github.com/neovim/neovim/issues/19570) I can even get rid of one of
+" my spurious commits.
+"
+" For now, typing <leader>g is fairly OK.
+"
+" TODO: Perhaps integrate
+"       https://vi.stackexchange.com/questions/8855/how-can-i-change-the-default-grep-call-grepprg-to-exclude-directories.
+"
+" [1]: https://gist.github.com/romainl/56f0c28ef953ffc157f36cc495947ab3
+if executable('rg')
+  set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+  set grepformat=%f:%l:%c:%m,%f:%l:%m
+endif
+nnoremap <leader>g :silent lgrep!
+" :Grep - search and then open the window
+" Source: https://vonheikemen.github.io/devlog/tools/vim-and-the-quickfix-list
+" command! -nargs=+ Grep execute 'silent grep! <args>' | copen
+
+" Open the quickfix/loclist window automatically when it is filled.
+augroup qf
+  autocmd!
+
+  " Do :cwindow if a quickfix-filling command was used (no prefix, :grep), or
+  " :lwindow if a location-filling command was used (:lgrep, ...).
+  autocmd QuickFixCmdPost [^l]* cwindow
+  autocmd QuickFixCmdPost l*    lwindow
+augroup END
+
 """"""""""""""""""""""
 " plugin customization
 """"""""""""""""""""""
@@ -377,11 +410,6 @@ else
     \     'fugitive': 'fugitive#statusline',
     \   }
     \ }
-endif
-
-" rking/ag.vim
-if executable('rg')
-  let g:ag_prg="rg --no-heading --vimgrep"
 endif
 
 " vim-signify
