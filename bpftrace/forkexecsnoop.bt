@@ -3,14 +3,14 @@
 #include <linux/sched.h>
 
 BEGIN {
-  printf("%-7s ", "TIME(μs)");
+  printf("%-10s ", "TIME(μs)");
   printf("%-5s %-8s %-8s %-13s %-7s %-15s\n",
           "TYPE", "PID", "TID", "PTID/RETV", "LAT(μs)", "COMM");
 }
 
 tracepoint:syscalls:sys_enter_clone /(args->clone_flags & CLONE_THREAD) == 0/ {
   if ($1 >= 1) {
-    printf("%-7u ", elapsed / 1000);
+    printf("%-9u ", elapsed / 1000);
     printf("CLONE %-8d %-8d %-13s %-7s %-15s",
       pid,
       tid,
@@ -54,7 +54,7 @@ tracepoint:syscalls:sys_enter_clone /(args->clone_flags & CLONE_THREAD) == 0/ {
 tracepoint:syscalls:sys_exit_clone /args->ret == 0 && @startforkchild[curtask->parent->pid]/ {
   $ptid = curtask->parent->pid; // curtask->parent->pid is the parents tid.
 
-  printf("%-7u ", elapsed / 1000);
+  printf("%-9u ", elapsed / 1000);
   printf("CHILD %-8d %-8d ptid=%-8d %-7d %-15s\n",
     pid,
     tid,
@@ -68,7 +68,7 @@ tracepoint:syscalls:sys_exit_clone /args->ret == 0 && @startforkchild[curtask->p
 
 // Parent exit (ret > 1 and not a thread clone return).
 tracepoint:syscalls:sys_exit_clone /args->ret > 0 && @startforkparent[tid]/ {
-  printf("%-7u ", elapsed / 1000);
+  printf("%-9u ", elapsed / 1000);
   printf("PARNT %-8d %-8d retv=%-8d %-7d %-15s\n",
     pid,
     tid,
@@ -86,7 +86,7 @@ tracepoint:syscalls:sys_enter_execve {
 }
 
 tracepoint:syscalls:sys_exit_execve /@start[pid]/ {
-  printf("%-7u ", elapsed / 1000);
+  printf("%-9u ", elapsed / 1000);
   printf("EXEC  %-8d %-8d %-13s %-7d %-15s\n",
     pid,
     tid,
