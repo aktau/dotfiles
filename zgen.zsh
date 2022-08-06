@@ -24,6 +24,19 @@ if ! zgen saved ; then
     zgen oh-my-zsh robbyrussell
   fi
 
+  # If I ever decide against this, I should still consider using
+  #
+  #   bindkey '^R' history-incremental-pattern-search-backward
+  #
+  # Instead of the default, which is
+  #
+  #   bindkey '^R' history-incremental-search-backward
+  #
+  # See https://unix.stackexchange.com/questions/44115/how-do-i-perform-a-reverse-history-search-in-zshs-vi-mode
+  if hash fzf &>/dev/null ; then
+    zgen load junegunn/fzf shell/key-bindings.zsh
+  fi
+
   # Generate the init script from plugins above.
   zgen save
 fi
