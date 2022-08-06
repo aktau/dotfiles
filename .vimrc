@@ -102,6 +102,7 @@ Plug 'robertmeta/nofrils'
 
 " language support
 Plug 'exu/pgsql.vim'
+Plug 'google/vim-jsonnet'
 Plug 'mmarchini/bpftrace.vim'
 Plug 'nfnty/vim-nftables'
 Plug 'rodjek/vim-puppet'
