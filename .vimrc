@@ -231,6 +231,34 @@ autocmd BufWritePre * kz|:%s/\s\+$//e|'z
 
 autocmd FileType python setlocal tabstop=8 expandtab shiftwidth=4 softtabstop=4
 
+" Edit the hg/git commit message in the current editor in a new split.
+"
+" Requires Neovim and neovim-remote (the `nvr` command):
+"
+"   pip3 install neovim-remote
+"
+" Based on the instructions at https://github.com/mhinz/neovim-remote.
+if has('nvim') && executable('nvr')
+  " Set the source control systems' editor (e.g.: git commit --amend) to:
+  "
+  "  1. Open a buffer in the current editing session using `nvr --servername`.
+  "  2. Wait until the buffer is deleted (--remote-wait) before returning.
+  "  3. Delete the buffer when it is closed (bufhidden=wipe).
+  let editor = 'nvr -cc split --remote-wait +"setlocal bufhidden=wipe" --servername '.v:servername
+  let $HGEDITOR = editor
+  let $GIT_EDITOR = editor
+  let $P4EDITOR = editor
+
+  " TODO: auto-detect repository type and reduce to a single mapping.
+  "
+  " Use job control instead of `!...`  because these commands need to block, and
+  " their blocking nature prevents Neovim from opening the desired split.
+  nnoremap <leader>ch :<C-u>call jobstart(['hg', 'reword'])<CR>
+  nnoremap <leader>cg :<C-u>call jobstart(['git', 'commit', '--verbose', '--amend'])<CR>
+  nnoremap <leader>cc :<C-u>call jobstart(['git', 'commit', '--verbose'])<CR>
+  nnoremap <leader>cp :<C-u>call jobstart(['p4', 'change'])<CR>
+endif
+
 " indent/unindent visual mode selection with tab/shift+tab
 vmap <tab> >gv
 vmap <s-tab> <gv
