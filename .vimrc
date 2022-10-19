@@ -166,8 +166,7 @@ set wildignore=*.o,*.obj,*~       " Stuff to ignore when tab completing
 set wildignore+=*/.git/objects/*
 set wildignore+=*/.git/refs/*
 set wildignore+=*/.hg/*,*/.svn/*
-set wildignore+=*/tmp/*,*.so
-set wildignore+=*.swp,*.zip
+set wildignore+=*.swp,*.zip,*.so
 
 set magic                         " magic matching
 
