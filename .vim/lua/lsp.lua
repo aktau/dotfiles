@@ -134,12 +134,19 @@ if override_lsp ~= nil then
   register_server_for_filetypes(override_lsp.name, override_lsp.filetypes)
 end
 
-local capabilities = {}
+local capabilities = vim.lsp.protocol.make_client_capabilities()
 
 local has_cmp, cmp = pcall(require, 'cmp')
 local has_cmp_nvim_lsp, cmp_nvim_lsp = pcall(require, 'cmp_nvim_lsp')
 if has_cmp and has_cmp_nvim_lsp then
-  capabilities = cmp_nvim_lsp.update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  -- The cmp_nvim_lsp.default_capabilities() function takes an "override" table
+  -- argument. It is **NOT** used as a base, it just overrides the specific
+  -- fields that default_capabilities() would otherwise set. This strangeness
+  -- likely works for users because cmp_nvim_lsp is meant to be used with
+  -- nvim-lspconfig which by default merges capabilities using tbl_deep_extend,
+  -- and always takes make_client_capabilities() as the base since
+  -- https://github.com/neovim/nvim-lspconfig/commit/b6d9e427c9fafca5b84a1f429bef4df3ef63244b.
+  capabilities = vim.tbl_deep_extend("force", capabilities, cmp_nvim_lsp.default_capabilities())
 
   cmp.setup({
     snippet = {
