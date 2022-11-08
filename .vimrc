@@ -180,6 +180,9 @@ set diffopt+=vertical             " Vertical diff windows on :diffsplit.
 " minor patchlevel 0 (meaning it doesn't consider any Vim 8.1 patches to be
 " integrated).
 set diffopt+=algorithm:patience
+if has('nvim')
+  set diffopt+=linematch:50
+endif
 
 set visualbell
 set noerrorbells
