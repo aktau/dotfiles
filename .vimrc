@@ -173,6 +173,13 @@ set magic                         " magic matching
 " small tweaks
 set shell=/bin/zsh
 set diffopt+=vertical             " Vertical diff windows on :diffsplit.
+" Vim 8 and Neovim have libxdiff built-in, and can be told to use the patience
+" algorithm, which I like better.
+"
+" Sadly, the patch-level check doesn't wor for Neovim because it remains at
+" minor patchlevel 0 (meaning it doesn't consider any Vim 8.1 patches to be
+" integrated).
+set diffopt+=algorithm:patience
 
 set visualbell
 set noerrorbells
@@ -201,14 +208,6 @@ set timeoutlen=500
 " disable vim-signify auto-update. This would allow the snappy experience of the
 " nvim-lsp diagnostic popup again.
 set updatetime=500
-
-" Vim 8 and Neovim have libxdiff built-in, and can be told to use the patience
-" algorithm, which I like better.
-"
-" Sadly, the patch-level check doesn't wor for Neovim because it remains at
-" minor patchlevel 0 (meaning it doesn't consider any Vim 8.1 patches to be
-" integrated).
-set diffopt+=algorithm:patience
 
 set laststatus=2                  " Show the status line all the time
 
