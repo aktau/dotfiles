@@ -64,3 +64,4 @@ Abolish a{c,cc}ro{s,ss}                              a{c}ro{ss}
 Abolish plagueing                                    plaguing
 Abolish ap{p,}rop{r,}iate                            ap{p}rop{r}iate
 Abolish ac{c,}om{m,}odate                            ac{c}om{m}odate
+Abolish quit{ing,er}                                 quitt{ing,er}
