@@ -243,8 +243,11 @@ local function goimports()
         vim.lsp.util.apply_workspace_edit(action.edit)
       end
       if action.command then
+        -- If the response was a Command[], then the inner "command' is a
+        -- string, if the response was a CodeAction, then the inner command is a
+        -- Command.
         local command = type(action.command) == "table" and action.command or action
-        vim.lsp.buf.execute_command(action.command)
+        vim.lsp.buf.execute_command(command)
       end
     end
   end
