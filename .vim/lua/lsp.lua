@@ -240,7 +240,7 @@ local function goimports()
       -- it is a CodeAction, it can have either an edit, a command or both.
       -- Edits should be executed first.
       if action.edit then
-        vim.lsp.util.apply_workspace_edit(action.edit)
+        vim.lsp.util.apply_workspace_edit(action.edit, "UTF-8")
       end
       if action.command then
         -- If the response was a Command[], then the inner "command' is a
