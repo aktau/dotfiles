@@ -199,6 +199,7 @@ vim.api.nvim_create_autocmd("FileType", {
           cmd = config.cmd,
           root_dir = root_dir,
           capabilities = capabilities,
+          settings = config.settings,
         })
         return
       end
