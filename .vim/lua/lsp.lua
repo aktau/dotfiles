@@ -230,9 +230,9 @@ vim.api.nvim_create_autocmd("FileType", {
 -- the hardcoded "1" indexing. I combined this with a look at more recent
 -- versions (0.6.0-git) of the Neovim LSP implementation to arrive at the
 -- current version.
-local function goimports()
+local function doCodeAction(action)
   local params = vim.lsp.util.make_range_params()
-  params.context = { only = { "source.organizeImports" } }
+  params.context = { only = { action } }
 
   local response = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
   for _, r in pairs(response or {}) do
@@ -301,16 +301,17 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- discussion on how to do this with nvim-lsp:
     -- https://github.com/neovim/nvim-lsp/issues/115.
     --
-    -- TODO: When gopls implements willSaveWaitUntil (no issue yet), use it
-    --       instead as it saves a roundtrip:
-    --       https://github.com/Microsoft/language-server-protocol/issues/726.
+    -- TODO: When gopls implements willSaveWaitUntil
+    --       (https://github.com/golang/go/issues/57281), remove this.
     if client.server_capabilities.documentFormattingProvider then
       -- With gopls, textDocument/formatting only runs gofmt. If we also want
       -- goimports a specific code action. See
       -- https://github.com/Microsoft/language-server-protocol/issues/726.
-      if vim.bo[bufnr].filetype == "go" then
-        aucmd("BufWritePre", function() goimports() end)
+      local ft = vim.bo[bufnr].filetype
+      if     ft == "go"     then aucmd("BufWritePre", function() doCodeAction("source.organizeImports") end)
+      elseif ft == "python" then aucmd("BufWritePre", function() doCodeAction("quickfix.tidyImports") end)
       end
+
       aucmd("BufWritePre", function() vim.lsp.buf.format({timeout_ms=1000}) end)
     end
 
