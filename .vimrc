@@ -378,7 +378,7 @@ endif
 " [1]: https://gist.github.com/romainl/56f0c28ef953ffc157f36cc495947ab3
 if executable('rg')
   set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
-  set grepformat=%f:%l:%c:%m,%f:%l:%m
+  set grepformat=%f:%l:%c:%m
 endif
 nnoremap <leader>g :silent lgrep!
 " :Grep - search and then open the window
