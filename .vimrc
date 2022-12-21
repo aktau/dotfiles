@@ -78,6 +78,7 @@ if has('nvim')
 else
   Plug 'itchyny/lightline.vim'
 endif
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'junegunn/fzf'  " This downloads the whole FZF repo even if we only want fzf.vim, so bet it.
 Plug 'luochen1990/rainbow'
 Plug 'mhinz/vim-signify'
@@ -429,6 +430,29 @@ if has('nvim')
       lualine_x = {"encoding", "fileformat", "filetype"},
       lualine_y = {"progress"},
       lualine_z = {"location"}
+    },
+  })
+
+  -- nvim-treesitter
+  local treesitter_parsers = {
+    "help",  -- Vim help.
+    "lua",  -- Want highlighting of lua nested in viml.
+    "markdown",  -- Doesn't desync, and supports nested syntaxes (code blocks).
+    "markdown_inline",  -- Nested syntax support for markdown.
+    "vim",  -- Doesn't desync, unlike the regex parser.
+  }
+  require('nvim-treesitter.configs').setup({
+    -- For now, only do this for languages where markdown is clearly better.
+    ensure_installed = treesitter_parsers,
+    sync_install = false,
+    highlight = {
+      enable = true,
+      -- Disable for languages that I don't explicitly install, even if the
+      -- module is somehow available. Prevent the Christmas tree effect.
+      disable = function(lang, bufnr)
+        return not vim.tbl_contains(treesitter_parsers, lang)
+      end,
+      additional_vim_regex_highlighting = false,
     },
   })
 END
