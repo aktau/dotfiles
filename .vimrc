@@ -500,6 +500,12 @@ if has('nvim')
   " Find files using Telescope command-line sugar.
   nnoremap <leader>ff <cmd>Telescope find_files hidden=true no_ignore=true<cr>
   nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+  " Command palette, type alt+p (sadly ctrl+shift+p doesn't seem to work right,
+  " ChromeOS intercepts it).
+  "
+  " TODO: Check out https://github.com/LinArcX/telescope-command-palette.nvim to
+  "       define functions only available from the palette.
+  nnoremap <m-p> <cmd>Telescope commands<cr>
 endif
 
 " vim-unimpaired (not actually part of the plugin, but similar in spirit)
