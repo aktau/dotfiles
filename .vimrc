@@ -265,6 +265,11 @@ endif
 vmap <tab> >gv
 vmap <s-tab> <gv
 
+" Shift visual selection up/down with J/K, while re-indenting.
+" Source: ThePrimeagen (https://youtu.be/w7i4amO_zaE?t=1555)
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
 " Prefer :tjump over :tag, see https://stackoverflow.com/q/7640663/558819.
 nnoremap <c-]> g<c-]>
 vnoremap <c-]> g<c-]>
@@ -317,8 +322,12 @@ nnoremap <leader>u :w !diff - %<CR>
 
 " go to the end of the copied/yank text
 vnoremap <silent> y y`]
-vnoremap <silent> p p`]
 nnoremap <silent> p p`]
+
+" Paste copied text into visual selection without overwriting the current copied
+" text (so you can past multiple times. Visual mode only (x), not select mode.
+" Source: ThePrimeagen (https://youtu.be/w7i4amO_zaE?t=1624)
+xnoremap p "_dP
 
 " enable the dot command in visual mode
 vnoremap . :norm.<CR>
