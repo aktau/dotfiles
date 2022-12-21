@@ -96,7 +96,7 @@ Plug 'xuhdev/SingleCompile'
 " themes (only uncomment the ones I use frequently, to pollute rtp less)
 " Plug 'AhmedAbdulrahman/aylin.vim'
 " Plug 'Rigellute/rigel'
-" Plug 'arcticicestudio/nord-vim'
+" Plug 'andersevenrud/nordic.nvim'
 " Plug 'drewtempelmeyer/palenight.vim'
 " Plug 'gruvbox-community/gruvbox'
 " Plug 'lifepillar/vim-solarized8'
