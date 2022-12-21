@@ -79,7 +79,6 @@ else
   Plug 'itchyny/lightline.vim'
 endif
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-Plug 'junegunn/fzf'  " This downloads the whole FZF repo even if we only want fzf.vim, so bet it.
 Plug 'luochen1990/rainbow'
 Plug 'mhinz/vim-signify'
 Plug 'rhysd/clever-f.vim'
@@ -506,15 +505,18 @@ nmap <Leader>a<tab> :Tabularize /\<tab><CR>
 vmap <Leader>a<tab> :Tabularize /\<tab><CR>
 
 if has('nvim')
-  " Find files using Telescope command-line sugar.
-  nnoremap <leader>ff <cmd>Telescope find_files hidden=true no_ignore=true<cr>
-  nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+  " ctrl-p: find files.
+  nnoremap <silent> <c-p> <cmd>Telescope find_files hidden=true<cr>
+  " ctrl-alt-p: find files but don't take .gitignore into account.
+  nnoremap <silent> <c-m-p> <cmd>Telescope find_files hidden=true no_ignore=true<cr>
+  " Like <leader>g but much more dynamic.
+  nnoremap <silent> <c-g> <cmd>Telescope live_grep<cr>
   " Command palette, type alt+p (sadly ctrl+shift+p doesn't seem to work right,
   " ChromeOS intercepts it).
   "
   " TODO: Check out https://github.com/LinArcX/telescope-command-palette.nvim to
   "       define functions only available from the palette.
-  nnoremap <m-p> <cmd>Telescope commands<cr>
+  nnoremap <silent> <m-p> <cmd>Telescope commands<cr>
 endif
 
 " vim-unimpaired (not actually part of the plugin, but similar in spirit)
@@ -522,9 +524,6 @@ nmap <silent> [g :tabprevious<CR>
 nmap <silent> ]g :tabnext<CR>
 nmap <silent> [G :tabrewind<CR>
 nmap <silent> ]G :tablast<CR>
-
-" fzf
-nnoremap <silent> <c-p> :FZF<CR>
 
 " rainbow
 let g:rainbow_active = 0 " Disabled by default, toggle with :RainbowToggle.
