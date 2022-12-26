@@ -71,6 +71,47 @@ local configs = {
     -- deduplication point. We only want one EFM so just set it to /.
     root_dir = function() return "/" end,
   },
+  ["sumneko_lua"] = {
+    cmd = { "lua-language-server" },
+    filetypes = { "lua" },
+    root_dir = function(fname)
+      return vim.fs.dirname(find_up(fname, {
+        ".luarc.json",
+        ".luarc.jsonc",
+        ".luacheckrc",
+        ".stylua.toml",
+        "stylua.toml",
+        "selene.toml",
+        "selene.yml",
+      })) or find_up(fname, {
+        "lua",  -- A lua dir.
+      }) or vim.fs.dirname(find_up(fname, {
+        ".git",
+      })) or os.getenv("HOME")
+    end,
+    settings = {
+      Lua = {
+        telemetry = {
+          enable = false
+        },
+        runtime = {
+          version = "LuaJIT",  -- Neovim uses LuaJIT.
+        },
+        diagnostics = {
+          globals = { "vim" },  -- Global variable in Neovim.
+        },
+        completion = {
+          enable = true,
+        },
+        workspace = {
+          library = vim.api.nvim_get_runtime_file("", true),  -- Runtime libs.
+          -- Prevent questions about working environment
+          -- (https://github.com/neovim/nvim-lspconfig/issues/1700).
+          checkThirdParty = false,
+        },
+      },
+    },
+  },
 }
 
 -- Lookup table of LSP servers by filetype.
