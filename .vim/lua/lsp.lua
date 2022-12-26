@@ -20,10 +20,17 @@ vim.diagnostic.config({
   }
 })
 
--- Find the nearest parent directory (of `start`) that contains a file in
--- `basenames`.
-local function find_first_parent(start, basenames)
-  return vim.fs.dirname(vim.fs.find(basenames, { path = vim.fs.dirname(fname), upward = true })[1])
+local function path_absolute(filename)
+  if filename == nil or filename == "" or string.sub(filename, 1, 1) == '/' then
+    return filename
+  end
+  return vim.loop.fs_realpath(filename)
+end
+
+-- Return the first file/dir in `names` found in an upwards traversal (starting
+-- at `start`).
+local function find_up(start, names)
+  return path_absolute(vim.fs.find(names, { path = vim.fs.dirname(start), upward = true })[1])
 end
 
 local configs = {
@@ -31,30 +38,28 @@ local configs = {
     cmd = { "clangd" },
     filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
     root_dir = function(fname)
-      local wd = vim.fs.dirname(fname)
-      return find_first_parent(wd, {
+      return vim.fs.dirname(find_up(fname, {
         ".clangd",
         ".clang-tidy",
         ".clang-format",
         "compile_commands.json",
         "compile_flags.txt",
         "configure.ac", -- AutoTools
-      }) or find_first_parent(wd, {
+      })) or vim.fs.dirname(find_up(fname, {
         ".git",
-      })
+      }))
     end,
   },
   ["gopls"] = {
     cmd = { "gopls" },
     filetypes = { "go", "gomod", "gotmpl" },
     root_dir = function(fname)
-      local wd = vim.fs.dirname(fname)
-      return find_first_parent(wd, {
+      return vim.fs.dirname(find_up(fname, {
         "go.work",
-      }) or find_first_parent(wd, {
+      })) or vim.fs.dirname(find_up(fname, {
         "go.mod",
         ".git",
-      })
+      }))
     end,
   },
   ["efm"] = {
