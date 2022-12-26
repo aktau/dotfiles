@@ -408,6 +408,40 @@ augroup END
 """"""""""""""""""""""
 
 if has('nvim')
+  " telescope.nvim
+
+  " ctrl-p: find files.
+  nnoremap <silent> <c-p> <cmd>Telescope find_files hidden=true<cr>
+  " ctrl-alt-p: find files but don't take .gitignore into account.
+  nnoremap <silent> <c-m-p> <cmd>Telescope find_files hidden=true no_ignore=true<cr>
+  " Like <leader>g but much more dynamic.
+  nnoremap <silent> <c-g> <cmd>Telescope live_grep<cr>
+  " Better help tags search. Regrettably c-h is already taken by split nav.
+  nnoremap <silent> <c-f> <cmd>Telescope help_tags<cr>
+  " Command palette, type alt+p (sadly ctrl+shift+p doesn't seem to work right,
+  " ChromeOS intercepts it).
+  "
+  " TODO: Check out https://github.com/LinArcX/telescope-command-palette.nvim to
+  "       define functions only available from the palette.
+  nnoremap <silent> <m-p> <cmd>Telescope commands<cr>
+
+  lua << END
+  local actions = require("telescope.actions")
+  require("telescope").setup({
+    defaults = {
+      mappings = {
+        -- Quite on escape (in insert mode).
+        i = {
+            ["<esc>"] = actions.close,
+            -- Cycle through previous selected prompts.
+            ["<C-Down>"] = actions.cycle_history_next,
+            ["<C-Up>"] = actions.cycle_history_prev,
+        },
+      },
+    },
+  })
+END
+
   " nvim-lsp
   lua require('lsp')
 
@@ -503,21 +537,6 @@ nmap <Leader>a<bar> :Tabularize /\|<CR>
 vmap <Leader>a<bar> :Tabularize /\|<CR>
 nmap <Leader>a<tab> :Tabularize /\<tab><CR>
 vmap <Leader>a<tab> :Tabularize /\<tab><CR>
-
-if has('nvim')
-  " ctrl-p: find files.
-  nnoremap <silent> <c-p> <cmd>Telescope find_files hidden=true<cr>
-  " ctrl-alt-p: find files but don't take .gitignore into account.
-  nnoremap <silent> <c-m-p> <cmd>Telescope find_files hidden=true no_ignore=true<cr>
-  " Like <leader>g but much more dynamic.
-  nnoremap <silent> <c-g> <cmd>Telescope live_grep<cr>
-  " Command palette, type alt+p (sadly ctrl+shift+p doesn't seem to work right,
-  " ChromeOS intercepts it).
-  "
-  " TODO: Check out https://github.com/LinArcX/telescope-command-palette.nvim to
-  "       define functions only available from the palette.
-  nnoremap <silent> <m-p> <cmd>Telescope commands<cr>
-endif
 
 " vim-unimpaired (not actually part of the plugin, but similar in spirit)
 nmap <silent> [g :tabprevious<CR>
