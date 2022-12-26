@@ -30,7 +30,7 @@ end
 -- Return the first file/dir in `names` found in an upwards traversal (starting
 -- at `start`).
 local function find_up(start, names)
-  return path_absolute(vim.fs.find(names, { path = vim.fs.dirname(start), upward = true })[1])
+  return vim.fs.find(names, { path = vim.fs.dirname(start), upward = true })[1]
 end
 
 local configs = {
@@ -238,7 +238,11 @@ vim.api.nvim_create_autocmd("FileType", {
       -- Start the first LSP in servers_by_filetype[ft] that returns a matching
       -- root_dir.
       local config = configs[server_name]
-      local root_dir = config.root_dir(args.file)
+      -- Autcommands supply the file in relative (to cwd) fashion, but
+      -- vim.fs.find (used in many root_dir functions) doesn't appear to search
+      -- upwards from the relative root. Instead of handling it downstream,
+      -- absolutize here.
+      local root_dir = config.root_dir(path_absolute(args.file))
       if root_dir ~= nil then
         vim.lsp.start({
           name = server_name,
