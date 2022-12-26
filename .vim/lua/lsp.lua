@@ -8,10 +8,10 @@
 -- vim.lsp.diagnostic.on_publish_diagnostics.
 vim.diagnostic.config({
   severity_sort = true,
-  signs = true,              -- Apply signs for diagnostics.
-  underline = true,          -- Apply underlines to diagnostics.
-  update_in_insert = false,  -- Do not update diagnostics while still inserting.
-  virtual_text = true,       -- Apply virtual text to line endings.
+  signs = true, -- Apply signs for diagnostics.
+  underline = true, -- Apply underlines to diagnostics.
+  update_in_insert = false, -- Do not update diagnostics while still inserting.
+  virtual_text = true, -- Apply virtual text to line endings.
   float = {
     border = "single",
     header = false,
@@ -84,7 +84,7 @@ local configs = {
         "selene.toml",
         "selene.yml",
       })) or find_up(fname, {
-        "lua",  -- A lua dir.
+        "lua", -- A lua dir.
       }) or vim.fs.dirname(find_up(fname, {
         ".git",
       })) or os.getenv("HOME")
@@ -95,16 +95,16 @@ local configs = {
           enable = false
         },
         runtime = {
-          version = "LuaJIT",  -- Neovim uses LuaJIT.
+          version = "LuaJIT", -- Neovim uses LuaJIT.
         },
         diagnostics = {
-          globals = { "vim" },  -- Global variable in Neovim.
+          globals = { "vim" }, -- Global variable in Neovim.
         },
         completion = {
           enable = true,
         },
         workspace = {
-          library = vim.api.nvim_get_runtime_file("", true),  -- Runtime libs.
+          library = vim.api.nvim_get_runtime_file("", true), -- Runtime libs.
           -- Prevent questions about working environment
           -- (https://github.com/neovim/nvim-lspconfig/issues/1700).
           checkThirdParty = false,
@@ -123,7 +123,7 @@ local function register_server_for_filetypes(server_name, filetypes)
   -- Prepend `item` to the list (`tbl`), or create the list.
   local function tbl_prepend(tbl, item)
     if tbl == nil then
-      return {item}
+      return { item }
     end
     table.insert(tbl, 1, item)
     return tbl
@@ -254,7 +254,9 @@ vim.api.nvim_create_autocmd("FileType", {
         return
       end
     end
-    print("WARNING: the filetype", ft, "is claimed by at least one LSP server config, but none were executable or had a non-nil root_dir, available:", vim.inspect(servers))
+    print("WARNING: the filetype", ft,
+      "is claimed by at least one LSP server config, but none were executable or had a non-nil root_dir, available:",
+      vim.inspect(servers))
   end,
 })
 
@@ -320,7 +322,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- does something similar. See https://github.com/neovim/neovim/issues/15309
     -- for a discussion. E.g., perform <c-w><c-]> to go to a definition in a new
     -- split.
-    vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"-- <C-x><C-o> in insert mode.
+    vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc" -- <C-x><C-o> in insert mode.
     vim.bo[bufnr].formatexpr = "v:lua.vim.lsp.formatexpr"
     vim.bo[bufnr].tagfunc = "v:lua.vim.lsp.tagfunc"
 
@@ -339,8 +341,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
     vim.keymap.set("n", "gs", vim.lsp.buf.signature_help, opts)
     vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, opts)
     vim.keymap.set("n", "ga", vim.lsp.buf.code_action, opts)
-    vim.keymap.set("n", "[d", function() vim.diagnostic.goto_prev({float = false}) end, opts)
-    vim.keymap.set("n", "]d", function() vim.diagnostic.goto_next({float = false}) end, opts)
+    vim.keymap.set("n", "[d", function() vim.diagnostic.goto_prev({ float = false }) end, opts)
+    vim.keymap.set("n", "]d", function() vim.diagnostic.goto_next({ float = false }) end, opts)
 
     local lsp_buffer_augroup = vim.api.nvim_create_augroup("lsp-buffer", {})
     local function aucmd(event, callback)
@@ -358,11 +360,11 @@ vim.api.nvim_create_autocmd("LspAttach", {
       -- goimports a specific code action. See
       -- https://github.com/Microsoft/language-server-protocol/issues/726.
       local ft = vim.bo[bufnr].filetype
-      if     ft == "go"     then aucmd("BufWritePre", function() doCodeAction("source.organizeImports") end)
+      if ft == "go" then aucmd("BufWritePre", function() doCodeAction("source.organizeImports") end)
       elseif ft == "python" then aucmd("BufWritePre", function() doCodeAction("quickfix.tidyImports") end)
       end
 
-      aucmd("BufWritePre", function() vim.lsp.buf.format({timeout_ms=1000}) end)
+      aucmd("BufWritePre", function() vim.lsp.buf.format({ timeout_ms = 1000 }) end)
     end
 
     if client.server_capabilities.documentHighlightProvider then
