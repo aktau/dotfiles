@@ -73,12 +73,12 @@ endif
 Plug 'b4winckler/vim-angry'
 Plug 'godlygeek/tabular'
 if has('nvim')
-  Plug 'nvim-lualine/lualine.nvim'
   Plug 'arkav/lualine-lsp-progress'
+  Plug 'nvim-lualine/lualine.nvim'
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 else
   Plug 'itchyny/lightline.vim'
 endif
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'luochen1990/rainbow'
 Plug 'mhinz/vim-signify'
 Plug 'rhysd/clever-f.vim'
