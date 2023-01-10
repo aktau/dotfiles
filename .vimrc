@@ -108,7 +108,6 @@ Plug 'exu/pgsql.vim'
 Plug 'google/vim-jsonnet'
 Plug 'mmarchini/bpftrace.vim'
 Plug 'nfnty/vim-nftables'
-Plug 'rodjek/vim-puppet'
 Plug 'rust-lang/rust.vim'
 
 call plug#end()
