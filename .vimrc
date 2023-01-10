@@ -103,7 +103,6 @@ Plug 'robertmeta/nofrils'
 " Plug 'sainnhe/sonokai'
 
 " language support
-Plug 'exu/pgsql.vim'
 Plug 'google/vim-jsonnet'
 Plug 'mmarchini/bpftrace.vim'
 Plug 'nfnty/vim-nftables'
