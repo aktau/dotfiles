@@ -83,7 +83,6 @@ Plug 'luochen1990/rainbow'
 Plug 'mhinz/vim-signify'
 Plug 'rhysd/clever-f.vim'
 Plug 'roman/golden-ratio'
-Plug 'sgur/vim-editorconfig'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive', PlugCond(empty(filter(copy(g:fs_remote_folders), {_, dir -> getcwd() =~ '^' . dir})))
