@@ -87,7 +87,6 @@ Plug 'tpope/vim-fugitive', PlugCond(empty(filter(copy(g:fs_remote_folders), {_, 
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
-Plug 'xuhdev/SingleCompile'
 
 " themes (only uncomment the ones I use frequently, to pollute rtp less)
 " Plug 'AhmedAbdulrahman/aylin.vim'
@@ -513,9 +512,6 @@ endif
 
 " vim-signify
 let g:signify_sign_change = '~'              " The default is '!', but I prefer vim-gitgutter's '~'
-
-" SingleCompile
-nnoremap <leader>r :SCCompileRun<cr>
 
 " tabularize
 " some keybinds taken from the excellent vimcasts episode on Tabularize
