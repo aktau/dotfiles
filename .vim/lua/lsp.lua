@@ -332,6 +332,13 @@ vim.api.nvim_create_autocmd("LspAttach", {
     if client.server_capabilities.hoverProvider then
       vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
     end
+    -- Disable semantic highlighting. It has the Christmas tree effect [1] and
+    -- there's some bug triggered by an internal LSP I haven't yet tracked down
+    -- [2].
+    --
+    -- [1]: https://www.reddit.com/r/neovim/comments/zkvk18/colorscheme_modifications_to_reduce_christmas/
+    -- [2]: https://github.com/neovim/neovim/issues/21387
+    client.server_capabilities.semanticTokensProvider = nil
     vim.keymap.set("n", "<Leader>rn", vim.lsp.buf.rename, opts)
     vim.keymap.set("n", "g0", vim.lsp.buf.document_symbol, opts)
     vim.keymap.set("n", "gW", vim.lsp.buf.workspace_symbol, opts)
