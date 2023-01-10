@@ -76,8 +76,6 @@ if has('nvim')
   Plug 'arkav/lualine-lsp-progress'
   Plug 'nvim-lualine/lualine.nvim'
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-else
-  Plug 'itchyny/lightline.vim'
 endif
 Plug 'luochen1990/rainbow'
 Plug 'mhinz/vim-signify'
@@ -511,17 +509,6 @@ END
     },
   })
 END
-else
-  " lightline
-  let g:lightline = {
-    \   'active': {
-    \     'left': [ [ 'mode', 'paste' ],
-    \               [ 'fugitive', 'readonly', 'relativepath', 'modified' ] ]
-    \   },
-    \   'component_function': {
-    \     'fugitive': 'fugitive#statusline',
-    \   }
-    \ }
 endif
 
 " vim-signify
