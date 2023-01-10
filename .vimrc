@@ -106,7 +106,6 @@ Plug 'robertmeta/nofrils'
 Plug 'google/vim-jsonnet'
 Plug 'mmarchini/bpftrace.vim'
 Plug 'nfnty/vim-nftables'
-Plug 'rust-lang/rust.vim'
 
 call plug#end()
 
@@ -513,12 +512,6 @@ let g:signify_sign_change = '~'              " The default is '!', but I prefer 
 
 " SingleCompile
 nnoremap <leader>r :SCCompileRun<cr>
-
-" rust.vim
-let g:rustfmt_autosave = 1
-" Rust uses textwidth=99, to disable this, use let g:rust_recommended_style = 0.
-" Otherwise adjust colorcolumn to match.
-au FileType rust setlocal colorcolumn=100
 
 " tabularize
 " some keybinds taken from the excellent vimcasts episode on Tabularize
