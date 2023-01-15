@@ -165,6 +165,9 @@ set magic                         " magic matching
 
 " small tweaks
 set shell=/bin/zsh
+" The default is `-c`. Add `-f` to inihit loading of files like .zshenv, .zshrc,
+" et cetera (only read /etc/zsh/zshenv). Improves startup speed.
+set shellcmdflag=-fc
 set diffopt+=vertical             " Vertical diff windows on :diffsplit.
 " Vim 8 and Neovim have libxdiff built-in, and can be told to use the patience
 " algorithm, which I like better.
