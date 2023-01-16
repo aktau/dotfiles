@@ -307,15 +307,19 @@ map <leader>qc :cclose<cr>
 "
 " Source: https://stackoverflow.com/a/49345500
 function! <SID>OpenQuickfixInSplit()
-  " 1. the current line is the result idx as we are in the quickfix.
+  " 1. Determine whether we're in a location list or quickfix window. Approach
+  "    adopted from vim-unimpaired.
+  let l:win = getwininfo(win_getid())[0]
+  " 2. the current line is the result idx as we are in the quickfix.
   let l:qf_idx = line('.')
-  " 2. jump to the previous window.
+  " 3. jump to the previous window.
   wincmd p
-  " 3. switch to a new split.
+  " 4. switch to a new split.
   vnew
-  " 4. open the 'current' item of the quickfix list in the newly created buffer
-  "    (the current means, the one focused before switching to the new buffer)
-  execute l:qf_idx . 'cc'
+  " 5. open the 'current' item of the quickfix or loclist list in the newly
+  "    created buffer (the current means, the one focused before switching to
+  "    the new buffer)
+  execute l:qf_idx . (get(l:win, 'loclist') ? 'll' : 'cc')
 endfunction
 
 autocmd FileType qf nnoremap <buffer> <C-v> :call <SID>OpenQuickfixInSplit()<CR>
