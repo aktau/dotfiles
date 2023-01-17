@@ -95,6 +95,9 @@ bindkey '^[[F' forward-word
 # Random user configuration. #
 ##############################
 
+# Minimal tmux/fzf integration: CTRL-E to select and enter a tmux session.
+hash tmux &>/dev/null && hash fzf &>/dev/null && source ${0:A:h}/zsh/tmux-fzf.zsh
+
 # Aliases
 
 alias gl='git pull'
