@@ -31,7 +31,7 @@ files=(
   .ctags
   .fdignore
   .lua
-  .newsbeuter
+  .newsboat
   .psqlrc
   .tmux.conf
   .vim
