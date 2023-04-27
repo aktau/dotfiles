@@ -34,6 +34,7 @@ files=(
   .newsboat
   .psqlrc
   .tmux.conf
+  .tmux.gruvbox.theme
   .vim
   .vimrc
   .zshrc-extra
