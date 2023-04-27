@@ -5,9 +5,9 @@
 .vim/undo
 .vim/view
 .vim/autoload/plug.vim*
-.newsbeuter/*.db
-.newsbeuter/*.lock
-.newsbeuter/history.*
+.newsboat/*.db
+.newsboat/*.lock
+.newsboat/history.*
 .netrwhist
 
 tags
