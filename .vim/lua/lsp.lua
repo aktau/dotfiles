@@ -272,9 +272,9 @@ vim.api.nvim_create_autocmd("FileType", {
 -- the hardcoded "1" indexing. I combined this with a look at more recent
 -- versions (0.6.0-git) of the Neovim LSP implementation to arrive at the
 -- current version.
-local function doCodeAction(action)
+local function doCodeAction(name)
   local params = vim.lsp.util.make_range_params()
-  params.context = { only = { action } }
+  params.context = { only = { name } }
 
   local response = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
   for _, r in pairs(response or {}) do
