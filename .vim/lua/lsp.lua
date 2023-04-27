@@ -8,10 +8,10 @@
 -- vim.lsp.diagnostic.on_publish_diagnostics.
 vim.diagnostic.config({
   severity_sort = true,
-  signs = true, -- Apply signs for diagnostics.
-  underline = true, -- Apply underlines to diagnostics.
+  signs = true,             -- Apply signs for diagnostics.
+  underline = true,         -- Apply underlines to diagnostics.
   update_in_insert = false, -- Do not update diagnostics while still inserting.
-  virtual_text = true, -- Apply virtual text to line endings.
+  virtual_text = true,      -- Apply virtual text to line endings.
   float = {
     border = "single",
     header = false,
@@ -44,7 +44,7 @@ local configs = {
         ".clang-format",
         "compile_commands.json",
         "compile_flags.txt",
-        "configure.ac", -- AutoTools
+        "configure.ac",     -- AutoTools
       })) or vim.fs.dirname(find_up(fname, {
         ".git",
       }))
@@ -84,7 +84,7 @@ local configs = {
         "selene.toml",
         "selene.yml",
       })) or find_up(fname, {
-        "lua", -- A lua dir.
+        "lua",     -- A lua dir.
       }) or vim.fs.dirname(find_up(fname, {
         ".git",
       })) or os.getenv("HOME")
@@ -357,8 +357,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
       -- goimports a specific code action. See
       -- https://github.com/Microsoft/language-server-protocol/issues/726.
       local ft = vim.bo[bufnr].filetype
-      if ft == "go" then aucmd("BufWritePre", function() doCodeAction("source.organizeImports") end)
-      elseif ft == "python" then aucmd("BufWritePre", function() doCodeAction("quickfix.tidyImports") end)
+      if ft == "go" then
+        aucmd("BufWritePre", function() doCodeAction("source.organizeImports") end)
+      elseif ft == "python" then
+        aucmd("BufWritePre", function() doCodeAction("quickfix.tidyImports") end)
       end
 
       aucmd("BufWritePre", function() vim.lsp.buf.format({ timeout_ms = 1000 }) end)
