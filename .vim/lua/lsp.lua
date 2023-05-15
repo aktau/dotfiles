@@ -44,7 +44,7 @@ local configs = {
         ".clang-format",
         "compile_commands.json",
         "compile_flags.txt",
-        "configure.ac",     -- AutoTools
+        "configure.ac", -- AutoTools
       })) or vim.fs.dirname(find_up(fname, {
         ".git",
       }))
@@ -57,8 +57,9 @@ local configs = {
       return vim.fs.dirname(find_up(fname, {
         "go.work",
       })) or vim.fs.dirname(find_up(fname, {
-        "go.mod",
         ".git",
+      })) or vim.fs.dirname(find_up(fname, {
+        "go.mod",
       }))
     end,
   },
@@ -84,7 +85,7 @@ local configs = {
         "selene.toml",
         "selene.yml",
       })) or find_up(fname, {
-        "lua",     -- A lua dir.
+        "lua", -- A lua dir.
       }) or vim.fs.dirname(find_up(fname, {
         ".git",
       })) or os.getenv("HOME")
