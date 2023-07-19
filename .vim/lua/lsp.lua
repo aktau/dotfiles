@@ -1,6 +1,6 @@
 -- for debugging
 --  :lua require('vim.lsp.log').set_level("debug")
---  :lua print(vim.inspect(vim.lsp.buf_get_clients()))
+--  :lua print(vim.inspect(vim.lsp.get_clients({bufnr = 0})))
 --  :lua print(vim.lsp.get_log_path())
 --  :lua print(vim.inspect(vim.tbl_keys(vim.lsp.callbacks)))
 
@@ -24,7 +24,7 @@ local function path_absolute(filename)
   if filename == nil or filename == "" or string.sub(filename, 1, 1) == '/' then
     return filename
   end
-  return vim.loop.fs_realpath(filename)
+  return vim.uv.fs_realpath(filename)
 end
 
 -- Return the first file/dir in `names` found in an upwards traversal (starting
@@ -162,7 +162,7 @@ if override_lsp ~= nil then
 
       -- Make path name absolute.
       if string.sub(fname, 1, 1) ~= "/" then
-        -- I only know of vim.fn.fnamemodify() or vim.loop.fs_realpath() to
+        -- I only know of vim.fn.fnamemodify() or vim.uv.fs_realpath() to
         -- make a relative path absolute. However, the latter requires that the
         -- file actually exists (which isn't always the case): use the former.
         fname = vim.fn.fnamemodify(fname, ":p")

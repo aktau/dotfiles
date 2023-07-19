@@ -468,7 +468,7 @@ END
   -- fixed.
   local function lsp_client_names()
     local clients = {}
-    for idx, client in pairs(vim.lsp.buf_get_clients()) do
+    for idx, client in pairs(vim.lsp.get_clients({bufnr = 0})) do
       clients[idx] = client.name
     end
     if next(clients) == nil then
