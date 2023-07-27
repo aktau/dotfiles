@@ -273,7 +273,7 @@ vim.api.nvim_create_autocmd("FileType", {
 -- the hardcoded "1" indexing. I combined this with a look at more recent
 -- versions (0.6.0-git) of the Neovim LSP implementation to arrive at the
 -- current version.
-local function doCodeAction(name)
+local function doCodeAction(name, offset_encoding)
   local params = vim.lsp.util.make_range_params()
   params.context = { only = { name } }
 
@@ -284,7 +284,7 @@ local function doCodeAction(name)
       -- it is a CodeAction, it can have either an edit, a command or both.
       -- Edits should be executed first.
       if action.edit then
-        vim.lsp.util.apply_workspace_edit(action.edit, "UTF-8")
+        vim.lsp.util.apply_workspace_edit(action.edit, offset_encoding)
       end
       if action.command then
         -- If the response was a Command[], then the inner "command' is a
@@ -359,9 +359,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
       -- https://github.com/Microsoft/language-server-protocol/issues/726.
       local ft = vim.bo[bufnr].filetype
       if ft == "go" then
-        aucmd("BufWritePre", function() doCodeAction("source.organizeImports") end)
+        aucmd("BufWritePre", function() doCodeAction("source.organizeImports", client.offset_encoding) end)
       elseif ft == "python" then
-        aucmd("BufWritePre", function() doCodeAction("quickfix.tidyImports") end)
+        aucmd("BufWritePre", function() doCodeAction("quickfix.tidyImports", client.offset_encoding) end)
       end
 
       aucmd("BufWritePre", function() vim.lsp.buf.format({ timeout_ms = 1000 }) end)
