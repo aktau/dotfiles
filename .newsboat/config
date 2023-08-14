@@ -1,5 +1,6 @@
 auto-reload yes
 browser open
+confirm-mark-feed-read no
 reload-threads 4
 show-read-feeds no
 show-read-articles no
