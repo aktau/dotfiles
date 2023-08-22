@@ -62,6 +62,27 @@ local configs = {
         "go.mod",
       }))
     end,
+    settings = {
+      gopls = {
+        codelenses = {
+          gc_details = true,    -- This is the only lens that defaults to false, enable it.
+        },
+        usePlaceholders = true, -- Enables placeholders for function parameters or struct fields in completion responses.
+        analyses = {
+          fieldalignment = true,
+          nilness = true,
+          shadow = true, -- Check for shadowed variables where the shadowed variable is used in the outer scope afterwards.
+          useany = true, -- Check for constraints that could be simplified to "any".
+          unusedparams = true,
+          unusedwrite = true,
+        },
+        staticcheck = true, -- Enable extra staticcheck analyzers.
+      },
+      hints = {
+        constantValues = true, -- Shows values for constants (when using iota).
+        -- parameterNames = true, -- Show parameter names when calling functions.
+      },
+    },
   },
   ["efm"] = {
     cmd = { "efm-langserver" },
