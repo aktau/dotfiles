@@ -360,6 +360,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
     vim.keymap.set("n", "gs", vim.lsp.buf.signature_help, opts)
     vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, opts)
     vim.keymap.set("n", "ga", vim.lsp.buf.code_action, opts)
+    vim.keymap.set("n", "<Leader>cl", vim.lsp.codelens.refresh, opts) -- Show available codelenses.
+    vim.keymap.set("n", "<Leader>cL", vim.lsp.codelens.clear, opts)
+    vim.keymap.set("n", "<Leader>cr", vim.lsp.codelens.run, opts)     -- Show the data in the lens (on the selected line, which may be at the top of the buffer for whole-file lenses).
     vim.keymap.set("n", "[d", function() vim.diagnostic.goto_prev({ float = false }) end, opts)
     vim.keymap.set("n", "]d", function() vim.diagnostic.goto_next({ float = false }) end, opts)
 
