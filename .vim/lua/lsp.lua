@@ -392,8 +392,22 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end
 
     if client.server_capabilities.documentHighlightProvider then
+      -- may not need this if your colorscheme supports these highlight groups
+      -- already. Support for mhartingon/oceanic-next (my current scheme) is
+      -- requested in https://github.com/mhartington/oceanic-next/issues/120.
+      -- Alternatively (more understated):
+      --
+      --  vim.cmd("hi LspReferenceWrite cterm=undercurl gui=undercurl guibg=#3c3836")
+      vim.cmd([[
+        if !hlexists('LspReferenceRead')
+          hi! link LspReferenceRead Visual
+          hi! link LspReferenceText Visual
+          hi! link LspReferenceWrite Visual
+        endif
+      ]])
+
       aucmd("CursorHold", function() vim.lsp.buf.document_highlight() end)
-      aucmd("CursorMoved", function() vim.lsp.util.buf_clear_references() end)
+      aucmd("CursorMoved", function() vim.lsp.buf.clear_references() end)
     end
 
     -- Draw a popup window showing all diagnostics.
