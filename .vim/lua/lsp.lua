@@ -318,6 +318,10 @@ local function doCodeAction(name, offset_encoding)
   end
 end
 
+-- Make this global, to avoid looking it up every LspAttach (and we'd need to
+-- avoid clearing with  clear = false} (clearing is the default).
+local lsp_buffer_augroup = vim.api.nvim_create_augroup("lsp-buffer", {})
+
 -- Setup keybindings once an LSP client is attached.
 vim.api.nvim_create_autocmd("LspAttach", {
   group = lsp_augroup,
@@ -366,7 +370,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     vim.keymap.set("n", "[d", function() vim.diagnostic.goto_prev({ float = false }) end, opts)
     vim.keymap.set("n", "]d", function() vim.diagnostic.goto_next({ float = false }) end, opts)
 
-    local lsp_buffer_augroup = vim.api.nvim_create_augroup("lsp-buffer", {})
     local function aucmd(event, callback)
       vim.api.nvim_create_autocmd(event, { group = lsp_buffer_augroup, buffer = bufnr, callback = callback })
     end
