@@ -487,7 +487,7 @@ END
 
   -- nvim-treesitter
   local treesitter_parsers = {
-    "help",  -- Vim help.
+    "vimdoc",  -- Vim help.
     "lua",  -- Want highlighting of lua nested in viml.
     "markdown",  -- Doesn't desync, and supports nested syntaxes (code blocks).
     "markdown_inline",  -- Nested syntax support for markdown.
