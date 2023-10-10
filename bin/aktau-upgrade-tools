@@ -1,0 +1,49 @@
+#!/bin/bash
+#
+# Jerry-rigged linuxbrew for some tools that I really like to be up-to-date.
+
+set -euo pipefail
+
+git-fetch-and-cd() {
+  repo="$1"
+  dir="$2"
+  if [[ ! -d "${dir}" ]] ; then
+    git clone "${repo}" "${dir}"
+  fi
+  cd "${dir}"
+  git pull
+}
+
+# Per-workstation extensions.
+extension="${HOME}/.local/bin/aktau/aktau-upgrade-tools"
+if [[ -x "${extension}"  ]] ; then
+  echo "Running ${extension}"
+  ${extension}
+else
+  echo "No executable extension found in ${extension}"
+fi
+
+(
+  git-fetch-and-cd https://github.com/neovim/neovim.git "$HOME/github/neovim/neovim"
+  make distclean
+  CFLAGS='-fno-omit-frame-pointer' env -u LUA_PATH -u LUA_CPATH make install
+)
+nvim -c 'PlugUpgrade | PlugUpdate | TSUpdateSync | qa'
+
+# Language servers.
+
+# Do *not* pass the -u flag to gomodule enabled binaries:
+# https://github.com/golang/go/issues/42927#issuecomment-749595963.
+go install golang.org/x/tools/gopls@latest
+go install github.com/mattn/efm-langserver@latest
+
+(
+  git-fetch-and-cd https://github.com/sumneko/lua-language-server.git "$HOME/github/sumneko/lua-language-server"
+  git clean -d -x --quiet --force
+  git submodule update --depth 1 --init --recursive
+  (
+    cd 3rd/luamake
+    ./compile/install.sh
+  )
+  ./3rd/luamake/luamake rebuild
+)
