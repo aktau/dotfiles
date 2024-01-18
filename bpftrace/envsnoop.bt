@@ -1,0 +1,58 @@
+#!/usr/bin/env bpftrace
+
+// USAGE
+//
+//  envsnoop.bt [0|1]
+//
+// OPTIONS
+//
+//  0: print "all" environment variables (truncated). This is beholden to
+//     bpftrace string limits.
+//  1: Filter for specific environment variable, this must be overwritten in the
+//     program for the time being.
+//
+// EXAMPLES
+//
+//  Display the environment variables (truncated) for every exec'ed binary.
+//
+//      $ envsnoop.bt
+//
+//  Due to eBPF limitations, scanning the environment array has an iteration
+//  limit. It's currentl 50, and that already requides overriding an envvar.
+//
+//      s sudo BPFTRACE_LOG_SIZE=20000000 BPFTRACE_STRLEN=200 ./envsnoop.bt 1
+
+BEGIN {
+  printf("%-10s ", "TIME(μs)");
+  printf("%-8s %-8s %-15s %-40s\t%s\n",
+          "PPID", "PID", "PCOMM", "COMM", "ENV");
+}
+
+tracepoint:syscalls:sys_enter_execve {
+  if ($1 == 0) {
+    printf("%-9u ", elapsed / 1000);
+    printf("%-8d %-8d %-15s %-40s\t",
+        curtask->parent->pid,    // PPID
+        pid,                     // PID
+        curtask->parent->comm,   // PCOMM
+        str(args.filename)       // COMM (extended)
+    );
+    join(args.envp);
+  } else {
+    $p = args.envp;
+    $i = 0; while ($i <= 50) { // Should be ($p != 0x0), but that's a loop...
+      if (strncmp("PPROF_BINARY_PATH=", str(*$p), 18) == 0) {
+        printf("%-9u ", elapsed / 1000);
+        printf("%-8d %-8d %-15s %-40s\t",
+            curtask->parent->pid,  // PPID
+            pid,                   // PID
+            curtask->parent->comm, // PCOMM
+            str(args.filename)     // COMM (extended)
+        );
+        printf("%s\n", str(*$p));
+      }
+      $i++;
+      $p++;
+    }
+  }
+}
