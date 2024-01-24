@@ -47,7 +47,7 @@ function concat(acc, val) {
 
 BEGIN {
   if (ARGC != 4) {
-    print "Usage: groupby [AWK-OPTIONS] <group-col1,group-col2,...> <agg-col> <sum|concat|count>" > "/dev/stderr"
+    print "Usage: groupby [AWK-OPTIONS] <group-col1,group-col2,...> <agg-col1,agg-col2,...> <sum|concat|count>" > "/dev/stderr"
     exit(1)
   }
   groupcol = ARGV[1]
@@ -88,8 +88,7 @@ ngroupcols {
   next
 }
 
-# Grouping on a single column, aggregating on multiple columns.
-ngroupcols && naggcols {
+naggcols {
   agg = $aggcols[1]
   for (i = 2 ; i <= naggcols ; i++) {
     agg = agg OFS $aggcols[i]
