@@ -497,11 +497,12 @@ END
 
   -- nvim-treesitter
   local treesitter_parsers = {
-    "vimdoc",  -- Vim help.
     "lua",  -- Want highlighting of lua nested in viml.
     "markdown",  -- Doesn't desync, and supports nested syntaxes (code blocks).
     "markdown_inline",  -- Nested syntax support for markdown.
+    "sql",  -- Enable highlighted SQL in markdown blocks.
     "vim",  -- Doesn't desync, unlike the regex parser.
+    "vimdoc",  -- Vim help.
   }
   require('nvim-treesitter.configs').setup({
     -- For now, only do this for languages where markdown is clearly better.
