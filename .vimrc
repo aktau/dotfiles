@@ -235,7 +235,7 @@ autocmd FileType python setlocal tabstop=8 expandtab shiftwidth=4 softtabstop=4
 "
 " Requires Neovim and neovim-remote (the `nvr` command):
 "
-"   pip3 install neovim-remote
+"   pip3 install --user neovim-remote
 "
 " Based on the instructions at https://github.com/mhinz/neovim-remote.
 if has('nvim') && executable('nvr')
