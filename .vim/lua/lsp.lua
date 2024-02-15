@@ -344,9 +344,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     -- (Potentially) override some keybindings to use LSP functionality.
     local client = vim.lsp.get_client_by_id(args.data.client_id)
-    local opts = { silent = true, buffer = bufnr }
+    local function map(mode, key, fn, desc)
+      vim.keymap.set(mode, key, fn, { silent = true, buffer = bufnr, desc = desc })
+    end
     if client.server_capabilities.hoverProvider then
-      vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+      map("n", "K", vim.lsp.buf.hover,
+        "Displays hover information about the symbol under the cursor in a floating window.")
     end
     -- Disable semantic highlighting. It has the Christmas tree effect [1] and
     -- there's some bug triggered by an internal LSP I haven't yet tracked down
@@ -355,20 +358,24 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- [1]: https://www.reddit.com/r/neovim/comments/zkvk18/colorscheme_modifications_to_reduce_christmas/
     -- [2]: https://github.com/neovim/neovim/issues/21387
     client.server_capabilities.semanticTokensProvider = nil
-    vim.keymap.set("n", "<Leader>rn", vim.lsp.buf.rename, opts)
-    vim.keymap.set("n", "g0", vim.lsp.buf.document_symbol, opts)
-    vim.keymap.set("n", "gW", vim.lsp.buf.workspace_symbol, opts)
-    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-    vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-    vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-    vim.keymap.set("n", "gs", vim.lsp.buf.signature_help, opts)
-    vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, opts)
-    vim.keymap.set("n", "ga", vim.lsp.buf.code_action, opts)
-    vim.keymap.set("n", "<Leader>cl", vim.lsp.codelens.refresh, opts) -- Show available codelenses.
-    vim.keymap.set("n", "<Leader>cL", vim.lsp.codelens.clear, opts)
-    vim.keymap.set("n", "<Leader>cr", vim.lsp.codelens.run, opts)     -- Show the data in the lens (on the selected line, which may be at the top of the buffer for whole-file lenses).
-    vim.keymap.set("n", "[d", function() vim.diagnostic.goto_prev({ float = false }) end, opts)
-    vim.keymap.set("n", "]d", function() vim.diagnostic.goto_next({ float = false }) end, opts)
+    map("n", "<Leader>rn", vim.lsp.buf.rename, "Rename symbol")
+    map("n", "g0", vim.lsp.buf.document_symbol, "Lists all symbols in the current buffer in the quickfix window.")
+    map("n", "gW", vim.lsp.buf.workspace_symbol, "Lists all symbols in the current workspace in the quickfix window.")
+    map("n", "gd", vim.lsp.buf.definition, "Jumps to the definition of the symbol under the cursor.")
+    map("n", "gi", vim.lsp.buf.implementation,
+      "Lists all the implementations for the symbol under the cursor in the quickfix window.")
+    map("n", "gr", vim.lsp.buf.references,
+      "Lists all the references to the symbol under the cursor in the quickfix window.")
+    map("n", "gs", vim.lsp.buf.signature_help,
+      "Displays signature information about the symbol under the cursor in a floating window.")
+    map("n", "gt", vim.lsp.buf.type_definition, "Jumps to the definition of the type of the symbol under the cursor.")
+    map("n", "ga", vim.lsp.buf.code_action, "Selects a code action available at the current cursor position.")
+    map("n", "<Leader>cl", vim.lsp.codelens.refresh, "Show available codelenses.")
+    map("n", "<Leader>cL", vim.lsp.codelens.clear, "Clear the lenses.")
+    map("n", "<Leader>cr", vim.lsp.codelens.run,
+      "Show the data in the lens on the selected line (may be at the top of the buffer for whole-file lenses).")
+    map("n", "[d", function() vim.diagnostic.goto_prev({ float = false }) end, "Jump to previous diagnostic.")
+    map("n", "]d", function() vim.diagnostic.goto_next({ float = false }) end, "Jump to next diagnostic.")
 
     local function aucmd(event, callback)
       vim.api.nvim_create_autocmd(event, { group = lsp_buffer_augroup, buffer = bufnr, callback = callback })
