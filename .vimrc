@@ -80,7 +80,6 @@ if has('nvim')
   Plug 'nvim-lualine/lualine.nvim'
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 endif
-Plug 'luochen1990/rainbow'
 Plug 'mhinz/vim-signify'
 Plug 'rhysd/clever-f.vim'
 Plug 'roman/golden-ratio'
