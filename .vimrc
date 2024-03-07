@@ -98,7 +98,7 @@ Plug 'tpope/vim-unimpaired'
 " Plug 'gruvbox-community/gruvbox'
 " Plug 'lifepillar/vim-solarized8'
 Plug 'mhartington/oceanic-next'
-Plug 'robertmeta/nofrils'
+" Plug 'robertmeta/nofrils'
 " Plug 'sainnhe/sonokai'
 
 " language support
