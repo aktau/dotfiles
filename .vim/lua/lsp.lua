@@ -279,34 +279,15 @@ vim.api.nvim_create_autocmd("FileType", {
 local lsp_buffer_augroup = vim.api.nvim_create_augroup("lsp-buffer", {})
 
 -- Setup keybindings once an LSP client is attached.
+--
+-- NOTE: Neovim already sets up a few defaults before invoking LspAttach, see
+-- :help lsp-config. E.g.: omnifunc, formatexpr, tagfunc, keywordprg.
 vim.api.nvim_create_autocmd("LspAttach", {
   group = lsp_augroup,
   callback = function(args)
     local bufnr = args.buf
 
-    -- Integrate with builtin functionality.
-    --
-    -- In case of `omnifunc`, we also use a special completion plugin to trigger
-    -- automatically, but it's nice to have a fallback to determin whether the
-    -- plugin or the LSP is failing to trigger/complete.
-    --
-    -- In case of `tagfunc`, we also create our own `gd` mapping (see below) which
-    -- does something similar. See https://github.com/neovim/neovim/issues/15309
-    -- for a discussion. E.g., perform <c-w><c-]> to go to a definition in a new
-    -- split.
-    vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc" -- <C-x><C-o> in insert mode.
-    vim.bo[bufnr].formatexpr = "v:lua.vim.lsp.formatexpr"
-    vim.bo[bufnr].tagfunc = "v:lua.vim.lsp.tagfunc"
-
-    -- (Potentially) override some keybindings to use LSP functionality.
     local client = vim.lsp.get_client_by_id(args.data.client_id)
-    local function map(mode, key, fn, desc)
-      vim.keymap.set(mode, key, fn, { silent = true, buffer = bufnr, desc = desc })
-    end
-    if client.server_capabilities.hoverProvider then
-      map("n", "K", vim.lsp.buf.hover,
-        "Displays hover information about the symbol under the cursor in a floating window.")
-    end
     -- Disable semantic highlighting. It has the Christmas tree effect [1] and
     -- there's some bug triggered by an internal LSP I haven't yet tracked down
     -- [2].
@@ -314,6 +295,11 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- [1]: https://www.reddit.com/r/neovim/comments/zkvk18/colorscheme_modifications_to_reduce_christmas/
     -- [2]: https://github.com/neovim/neovim/issues/21387
     client.server_capabilities.semanticTokensProvider = nil
+
+    -- (Potentially) override some keybindings to use LSP functionality.
+    local function map(mode, key, fn, desc)
+      vim.keymap.set(mode, key, fn, { silent = true, buffer = bufnr, desc = desc })
+    end
     map("n", "<Leader>rn", vim.lsp.buf.rename, "Rename symbol")
     map("n", "g0", vim.lsp.buf.document_symbol, "Lists all symbols in the current buffer in the quickfix window.")
     map("n", "gW", vim.lsp.buf.workspace_symbol, "Lists all symbols in the current workspace in the quickfix window.")
