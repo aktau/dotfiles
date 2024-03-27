@@ -394,8 +394,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
       local ft = vim.bo[bufnr].filetype
       if ft == "go" then
         aucmd("BufWritePre", function() doCodeAction("source.organizeImports", client.offset_encoding) end)
-      elseif ft == "python" then
-        aucmd("BufWritePre", function() doCodeAction("quickfix.tidyImports", client.offset_encoding) end)
       end
 
       aucmd("BufWritePre", function() vim.lsp.buf.format({ timeout_ms = 1000 }) end)
