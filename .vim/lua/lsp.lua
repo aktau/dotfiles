@@ -20,13 +20,6 @@ vim.diagnostic.config({
   }
 })
 
-local function path_absolute(filename)
-  if filename == nil or filename == "" or string.sub(filename, 1, 1) == '/' then
-    return filename
-  end
-  return vim.uv.fs_realpath(filename)
-end
-
 -- Return the first file/dir in `names` found in an upwards traversal (starting
 -- at `start`).
 local function find_up(start, names)
@@ -263,7 +256,7 @@ vim.api.nvim_create_autocmd("FileType", {
       -- vim.fs.find (used in many root_dir functions) doesn't appear to search
       -- upwards from the relative root. Instead of handling it downstream,
       -- absolutize here.
-      local root_dir = config.root_dir(path_absolute(args.file))
+      local root_dir = config.root_dir(vim.fn.fnamemodify(args.file, ":p"))
       if root_dir ~= nil then
         vim.lsp.start({
           name = server_name,
