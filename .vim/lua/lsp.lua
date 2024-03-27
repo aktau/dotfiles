@@ -274,52 +274,6 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- Synchronously organise (Go) imports.
---
--- Taken from
--- https://github.com/neovim/nvim-lsp/issues/115#issuecomment-654427197.
---
--- Spurious note: there is an "official" recommendation in the golang/tools
--- repo: https://github.com/golang/tools/blob/master/gopls/doc/vim. It appears
--- to be based on the comments in that thread, and specifically upon a version I
--- submitted to my dotfiles (but did not mention in the comments), compare:
---
---  - 2020-06-10: https://github.com/aktau/dotfiles/commit/bd848ca8b9b7a3f116c9438875f6f4b37b035a4f#diff-86f5da41be84a0e774e1cc85d8c02440b0a92d3550517ed3331e795b74c43c88
---  - 2021-02-23: https://go-review.googlesource.com/c/tools/+/294529
---
--- Later another fix was made, which also came from the github thread: following
--- the LSP spec and using "only" in the context to limit the LSP to organizing
--- imports instead of executing all available actions:
--- https://github.com/golang/tools/commit/6e9046bfcd34178dc116189817430a2ad1ee7b43.
---
--- A later comment by alexaandru@ made another robustness improvement: avoiding
--- the hardcoded "1" indexing. I combined this with a look at more recent
--- versions (0.6.0-git) of the Neovim LSP implementation to arrive at the
--- current version.
-local function doCodeAction(name, offset_encoding)
-  local params = vim.lsp.util.make_range_params()
-  params.context = { only = { name } }
-
-  local response = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
-  for _, r in pairs(response or {}) do
-    for _, action in pairs(r.result or {}) do
-      -- textDocument/codeAction can return either Command[] or CodeAction[]. If
-      -- it is a CodeAction, it can have either an edit, a command or both.
-      -- Edits should be executed first.
-      if action.edit then
-        vim.lsp.util.apply_workspace_edit(action.edit, offset_encoding)
-      end
-      if action.command then
-        -- If the response was a Command[], then the inner "command' is a
-        -- string, if the response was a CodeAction, then the inner command is a
-        -- Command.
-        local command = type(action.command) == "table" and action.command or action
-        vim.lsp.buf.execute_command(command)
-      end
-    end
-  end
-end
-
 -- Make this global, to avoid looking it up every LspAttach (and we'd need to
 -- avoid clearing with  clear = false} (clearing is the default).
 local lsp_buffer_augroup = vim.api.nvim_create_augroup("lsp-buffer", {})
@@ -393,9 +347,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
       -- With gopls, textDocument/formatting only runs gofmt. If we also want
       -- goimports a specific code action. See
       -- https://github.com/Microsoft/language-server-protocol/issues/726.
-      local ft = vim.bo[bufnr].filetype
-      if ft == "go" then
-        aucmd("BufWritePre", function() doCodeAction("source.organizeImports", client.offset_encoding) end)
+      if vim.bo[bufnr].filetype == "go" then
+        local options = { context = { only = { "source.organizeImports" } }, apply = true }
+        aucmd("BufWritePre", function() vim.lsp.buf.code_action(options) end)
       end
 
       aucmd("BufWritePre", function() vim.lsp.buf.format({ timeout_ms = 1000 }) end)
