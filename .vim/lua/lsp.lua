@@ -212,15 +212,32 @@ if has_cmp and has_cmp_nvim_lsp then
 
   cmp.setup({
     snippet = {
-      -- cmp-nvim requires a snippet engine.
       expand = function(args)
-        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-      end,
+        vim.snippet.expand(args.body)
+      end
     },
     mapping = cmp.mapping.preset.insert({
       ['<C-Space>'] = cmp.mapping.complete(),
       ['<C-e>'] = cmp.mapping.abort(),
       ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+      ['<Tab>'] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_next_item()
+        elseif vim.snippet.jumpable(1) then
+          vim.snippet.jump(1)
+        else
+          fallback()
+        end
+      end, { 'i', 's' }),
+      ['<S-Tab>'] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_prev_item()
+        elseif vim.snippet.jumpable(-1) then
+          vim.snippet.jump(-1)
+        else
+          fallback()
+        end
+      end, { 'i', 's' }),
     }),
     sources = cmp.config.sources({
       { name = 'nvim_lsp' },
