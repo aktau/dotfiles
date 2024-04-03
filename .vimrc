@@ -139,8 +139,6 @@ set listchars=tab:▸\ ,trail:…
 nnoremap <CR> :noh<CR><CR>
 nnoremap / /\v
 vnoremap / /\v
-set incsearch                     " Find as you type search
-set hlsearch                      " Highlight search terms
 set ignorecase                    " Case-insensitive searching.
 set smartcase                     " But case-sensitive if expression contains a capital letter.
 set tagcase=match                 " Case sensitive tag matching (most langs are cs).
