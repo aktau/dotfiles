@@ -84,7 +84,6 @@ Plug 'godlygeek/tabular'
 Plug 'mhinz/vim-signify'
 Plug 'rhysd/clever-f.vim'
 Plug 'roman/golden-ratio'
-Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive', PlugCond(empty(filter(copy(g:fs_remote_folders), {_, dir -> getcwd() =~ '^' . dir})))
 Plug 'tpope/vim-repeat'
@@ -189,6 +188,20 @@ set history=1000                  " Store lots of :cmdline history
 
 set splitbelow
 set splitright
+
+" Spelling, from https://castel.dev/post/lecture-notes-1.
+set spell
+set spelllang=en
+" Mark current cursor position, naming it s (ms). Move to first spelling error
+" before the current position ([s,), fix it with the first suggestion (1z=),
+" highlight the fixed word in a hacky way (*), then move back (`s).
+nnoremap [gs ms[s1z=*`s
+nnoremap ]gs ms]s1z=*`s
+inoremap <C-l> <c-g>u<Esc>[s1z=`]a<c-g>u
+" Ignore URLs (https://vi.stackexchange.com/a/4003). This does not appears to
+" work when parsing is treesitter based. See
+" https://www.reddit.com/r/neovim/comments/13ewwpw/how_to_disable_spell_checking_based_on_a_regex/).
+syntax match UrlNoSpell "\w\+:\/\/[^[:space:]]\+" transparent contained contains=@NoSpell
 
 set scrolloff=3
 set sidescrolloff=7
