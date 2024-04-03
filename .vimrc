@@ -1,4 +1,4 @@
-" some distros linux distros set filetype in /etc/vimrc
+" Some distros set filetype in /etc/vimrc.
 filetype off
 filetype plugin indent off
 
@@ -65,20 +65,22 @@ if has('nvim')
   Plug 'hrsh7th/cmp-buffer'
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/nvim-cmp' " Async autocomplete using nvim builtin LSP.
+  Plug 'arkav/lualine-lsp-progress'
 
   " nvim-telescope
   Plug 'nvim-lua/plenary.nvim'
   Plug 'nvim-telescope/telescope.nvim'
+
+  " lualine
+  Plug 'nvim-lualine/lualine.nvim'
+
+  " TreeSitter
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 endif
 
 " original repos on github
 Plug 'b4winckler/vim-angry'
 Plug 'godlygeek/tabular'
-if has('nvim')
-  Plug 'arkav/lualine-lsp-progress'
-  Plug 'nvim-lualine/lualine.nvim'
-  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-endif
 Plug 'mhinz/vim-signify'
 Plug 'rhysd/clever-f.vim'
 Plug 'roman/golden-ratio'
