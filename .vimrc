@@ -473,13 +473,11 @@ if has('nvim')
       },
     },
   })
-END
 
-  " nvim-lsp
-  lua require('lsp')
+  -- nvim-lsp
+  require('lsp')
 
-  " lualine.nvim
-  lua << END
+  -- lualine.nvim
   -- Remove when https://github.com/arkav/lualine-lsp-progress/issues/10 is
   -- fixed.
   local function lsp_client_names()
