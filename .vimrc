@@ -66,13 +66,14 @@ if has('nvim')
 
   " TreeSitter
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+
+  Plug 'folke/flash.nvim'
 endif
 
 " original repos on github
 Plug 'b4winckler/vim-angry'
 Plug 'godlygeek/tabular'
 Plug 'mhinz/vim-signify'
-Plug 'rhysd/clever-f.vim'
 Plug 'roman/golden-ratio'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive', PlugCond(empty(filter(copy(g:fs_remote_folders), {_, dir -> getcwd() =~ '^' . dir})))
@@ -517,6 +518,38 @@ if has('nvim')
       additional_vim_regex_highlighting = false,
     },
   })
+
+  -- flash.nvim
+  require("flash").setup({
+    modes = {
+      -- Disable search integration. Better to use 's' if I want flash search.
+      -- If enabling this, make sure to remove the verymagic rebind
+      -- (https://github.com/folke/flash.nvim/issues/278).
+      search = {
+        enabled = false,
+      },
+      char = {
+        -- Make it possible to immediately jump to a far away character with
+        -- fFtT without needing to count by showing a jump label over matches.
+        jump_labels = true,
+      },
+    },
+    -- Disable the greying out:
+    -- https://www.reddit.com/r/neovim/comments/17x01nr/comment/kp23uvf/.
+    highlight = {
+      backdrop = false,
+      groups = {
+        backdrop = "",
+      }
+    },
+  })
+  -- Don't map in "o" (operator pending) because it conflicts with vim-surround.
+  -- Though it would be good to find an alternative as `s` and especially `S` in
+  -- operator pending mode sound very powerful.
+  vim.keymap.set({"n", "x"}, "s", function() require("flash").jump() end, {desc = "Flash"})
+  vim.keymap.set({"n", "x"}, "S", function() require("flash").treesitter() end, {desc = "Flash Treesitter"})
+  vim.keymap.set({"o"}, "r", function() require("flash").remote() end, {desc = "Remote Flash"})
+  vim.keymap.set({"o", "x"}, "R", function() require("flash").treesitter_search() end, {desc = "Treesitter Search"})
 END
 endif
 
