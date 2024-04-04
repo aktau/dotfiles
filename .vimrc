@@ -1,8 +1,4 @@
-" Some distros set filetype in /etc/vimrc.
-filetype off
-filetype plugin indent off
-
-set nocompatible               " be iMproved
+" Modeline is a security risk, editorconfig is a better (builtin) alternative.
 set nomodeline
 
 if has('mac')
@@ -98,9 +94,6 @@ Plug 'mmarchini/bpftrace.vim'
 Plug 'nfnty/vim-nftables'
 
 call plug#end()
-
-filetype plugin indent on         " load file type plugins + indentation
-syntax enable
 
 set encoding=utf-8
 scriptencoding utf-8
