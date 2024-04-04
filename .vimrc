@@ -490,10 +490,14 @@ if has('nvim')
 
   -- nvim-treesitter
   local treesitter_parsers = {
+    "c",
+    "cpp",
+    "go",
     "lua",  -- Want highlighting of lua nested in viml.
     "markdown",  -- Doesn't desync, and supports nested syntaxes (code blocks).
     "markdown_inline",  -- Nested syntax support for markdown.
     "sql",  -- Enable highlighted SQL in markdown blocks.
+    "starlark",
     "vim",  -- Doesn't desync, unlike the regex parser.
     "vimdoc",  -- Vim help.
   }
