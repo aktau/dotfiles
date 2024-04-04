@@ -30,16 +30,6 @@ if has('nvim')
   let g:loaded_ruby_provider = 0
 endif
 
-" PlugActivated is a cut-down version of PlugLoaded
-" (https://vi.stackexchange.com/a/14143), which only checks for whether a plugin
-" will be loaded. So it can be used at load-time itself to decide whether or not
-" to load an extra plugin based on other plugins being activated.
-function! PlugActivated(name)
-  return (
-    \ has_key(g:plugs, a:name) &&
-    \ isdirectory(g:plugs[a:name].dir))
-endfunction
-
 " Conditional activation of plugins by predicates.
 function! PlugCond(cond, ...)
   let opts = get(a:000, 0, {})
