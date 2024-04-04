@@ -571,16 +571,6 @@ vmap <Leader>a<bar> :Tabularize /\|<CR>
 nmap <Leader>a<tab> :Tabularize /\<tab><CR>
 vmap <Leader>a<tab> :Tabularize /\<tab><CR>
 
-" vim-unimpaired (not actually part of the plugin, but similar in spirit)
-nmap <silent> [g :tabprevious<CR>
-nmap <silent> ]g :tabnext<CR>
-nmap <silent> [G :tabrewind<CR>
-nmap <silent> ]G :tablast<CR>
-
-" rainbow
-let g:rainbow_active = 0 " Disabled by default, toggle with :RainbowToggle.
-map <F4> :RainbowToggle<CR>
-
 """"""""""""""""""""
 " filetype detection
 """"""""""""""""""""
