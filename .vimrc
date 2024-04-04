@@ -590,12 +590,7 @@ au FileType cpp   setlocal commentstring=//\ %s
 
 au FileType javascript setlocal nocindent
 
-" Only set the filetype of *.sql files to pgsql if it has been set to 'sql'
-" before. To avoid overwriting earlier autocmds peculiar to a local config.
-au BufRead,BufNewFile *.sql if !exists("g:filetype_sql") | set ft=pgsql | endif
-au BufRead,BufNewFile *.svg set ft=svg
 au BufRead,BufNewFile *.dasc set ft=c
-au BufRead,BufNewFile mutt{ng,}-*-\w\+ set ft=mail
 
 " Go file specific options
 " Hide tab characters (normally they're highlighted using listchars). Note that
