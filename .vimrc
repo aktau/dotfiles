@@ -128,7 +128,7 @@ set listchars=tab:▸\ ,trail:…
 " searching
 nnoremap <CR> :noh<CR><CR>
 nnoremap / /\v
-vnoremap / /\v
+xnoremap / /\v
 set ignorecase                    " Case-insensitive searching.
 set smartcase                     " But case-sensitive if expression contains a capital letter.
 set tagcase=match                 " Case sensitive tag matching (most langs are cs).
@@ -341,7 +341,7 @@ nnoremap <leader>v V`]
 nnoremap <leader>u :w !diff - %<CR>
 
 " go to the end of the copied/yank text
-vnoremap <silent> y y`]
+xnoremap <silent> y y`]
 nnoremap <silent> p p`]
 
 " Paste copied text into visual selection without overwriting the current copied
@@ -350,7 +350,7 @@ nnoremap <silent> p p`]
 xnoremap p "_dP
 
 " enable the dot command in visual mode
-vnoremap . :norm.<CR>
+xnoremap . :norm.<CR>
 
 " oh dear... disable the arrow keys
 map <Left> :echo "no!"<cr>
