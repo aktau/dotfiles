@@ -72,7 +72,6 @@ endif
 Plug 'godlygeek/tabular'
 Plug 'mhinz/vim-signify'
 Plug 'roman/golden-ratio'
-Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive', PlugCond(empty(filter(copy(g:fs_remote_folders), {_, dir -> getcwd() =~ '^' . dir})))
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
@@ -658,6 +657,12 @@ let s:listpatterns += ['^\s*TODO[(][^)]\+[)]:\s*'] " TODO(me): ...
 let s:listpatterns += ['^\s*TODO:\s*']             " TODO: ...
 let &l:formatlistpat = join(s:listpatterns, '\|')
 au FileType * let &formatlistpat=join(s:listpatterns, '\|')
+
+" Vim specific options
+" The Vim ftplugin doesn't use a space after the comment character, which makes
+" commenting with Neovims native feature annoying, see
+" https://github.com/neovim/neovim/pull/28176.
+au FileType vim   setlocal commentstring=\"\ %s
 
 " C-language family options.
 au FileType c,cpp,go set formatoptions+=roj
