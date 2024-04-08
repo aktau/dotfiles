@@ -43,7 +43,7 @@ go install github.com/mattn/efm-langserver@latest
   git submodule update --depth 1 --init --recursive
   (
     cd 3rd/luamake
-    ./compile/install.sh
+    env -u SHELL ./compile/install.sh
   )
-  ./3rd/luamake/luamake rebuild
+  env -u SHELL ./3rd/luamake/luamake rebuild
 )
