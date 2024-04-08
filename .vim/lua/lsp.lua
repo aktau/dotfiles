@@ -321,7 +321,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
     map("n", "gs", vim.lsp.buf.signature_help,
       "Displays signature information about the symbol under the cursor in a floating window.")
     map("n", "gt", vim.lsp.buf.type_definition, "Jumps to the definition of the type of the symbol under the cursor.")
-    map("n", "ga", vim.lsp.buf.code_action, "Selects a code action available at the current cursor position.")
+    map({ "n", "v" }, "ga", function() vim.lsp.buf.code_action({ apply = true }) end,
+      "Selects a code action available at the current cursor position.")
     map("n", "<Leader>cl", vim.lsp.codelens.refresh, "Show available codelenses.")
     map("n", "<Leader>cL", vim.lsp.codelens.clear, "Clear the lenses.")
     map("n", "<Leader>cr", vim.lsp.codelens.run,
