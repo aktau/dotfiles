@@ -526,6 +526,21 @@ if has('nvim')
         enabled = false,
       },
       char = {
+        config = function(opts)
+          local operator_pending = vim.fn.mode(true):find("no")
+
+          -- autohide flash when in operator-pending mode
+          opts.autohide = opts.autohide or operator_pending
+
+          -- disable jump labels when not enabled, when using a count,
+          -- or when recording/executing registers or when in operator pending
+          -- mode (to save a keystroke, just go to the first match).
+          opts.jump_labels = opts.jump_labels
+            and vim.v.count == 0
+            and vim.fn.reg_executing() == ""
+            and vim.fn.reg_recording() == ""
+            and not operator_pending
+        end,
         -- Make it possible to immediately jump to a far away character with
         -- fFtT without needing to count by showing a jump label over matches.
         jump_labels = true,
