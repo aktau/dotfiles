@@ -62,6 +62,7 @@ if has('nvim')
 
   " TreeSitter
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+  Plug 'nvim-treesitter/nvim-treesitter-context'
   Plug 'nvim-treesitter/nvim-treesitter-textobjects'
 
   Plug 'folke/flash.nvim'
@@ -185,7 +186,7 @@ inoremap <C-l> <c-g>u<Esc>[s1z=`]a<c-g>u
 " https://www.reddit.com/r/neovim/comments/13ewwpw/how_to_disable_spell_checking_based_on_a_regex/).
 syntax match UrlNoSpell "\w\+:\/\/[^[:space:]]\+" transparent contained contains=@NoSpell
 
-set scrolloff=3
+set scrolloff=10
 set sidescrolloff=7
 set sidescroll=1                  " Number of columns to scroll horizontally.
 set mouse=                        " Disable mouse (allows copying from cmdline).
