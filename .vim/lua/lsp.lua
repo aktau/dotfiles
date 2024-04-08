@@ -371,7 +371,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
       aucmd("CursorMoved", function() vim.lsp.buf.clear_references() end)
     end
 
-    -- Draw a popup window showing all diagnostics.
+    -- Draw a popup window showing diagnostics for the given line.
     aucmd("CursorHold", function() vim.diagnostic.open_float() end)
   end,
 })
