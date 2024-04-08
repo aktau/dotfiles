@@ -17,6 +17,7 @@ vim.diagnostic.config({
     header = false,
     scope = "line",
     source = "always",
+    focusable = false, -- Don't mess with my normal window movements.
   }
 })
 
