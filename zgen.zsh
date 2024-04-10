@@ -13,15 +13,9 @@ if ! zgen saved ; then
   zgen load zsh-users/zsh-syntax-highlighting       # Syntax highlight while you type.
   zgen load zsh-users/zsh-history-substring-search  # Too useful to miss.
 
-  if [[ -e "${HOME}/dotfiles/zsh/themes/aktau.zsh-theme" ]] ; then
-    # Need the oh-my-zsh git library for fetching information out of the
-    # prompt.
-    zgen oh-my-zsh lib/git.zsh
-    zgen load "${HOME}/dotfiles/zsh/themes/aktau.zsh-theme"
-  else
-    zgen oh-my-zsh
-    zgen oh-my-zsh robbyrussell
-  fi
+  # Need the oh-my-zsh git library for fetching information out of the prompt.
+  zgen oh-my-zsh lib/git.zsh
+  zgen load "${HOME}/dotfiles/zsh/themes/aktau.zsh-theme"
 
   # If I ever decide against this, I should still consider using
   #
