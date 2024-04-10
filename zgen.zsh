@@ -12,7 +12,6 @@ source "${HOME}/.zgen/zgen.zsh"
 if ! zgen saved ; then
   zgen load zsh-users/zsh-syntax-highlighting       # Syntax highlight while you type.
   zgen load zsh-users/zsh-history-substring-search  # Too useful to miss.
-  zgen load joepvd/grep2awk                         # Convert grep to awk invocations, just add <ctrl-X><ctrl-A>.
 
   if [[ -e "${HOME}/dotfiles/zsh/themes/aktau.zsh-theme" ]] ; then
     # Need the oh-my-zsh git library for fetching information out of the
