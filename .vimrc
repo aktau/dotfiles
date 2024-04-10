@@ -101,7 +101,6 @@ scriptencoding utf-8
 set showcmd                       " display incomplete commands.
 set showmode                      " display the mode you're in.
 set showmatch                     " show matching brackets/parenthesis
-set mat=5                         " duration to show matching tabs
 set autoread                      " reload files automagically
 
 " text preferences
