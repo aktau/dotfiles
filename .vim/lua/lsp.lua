@@ -87,7 +87,7 @@ local configs = {
     -- deduplication point. We only want one EFM so just set it to /.
     root_dir = function() return "/" end,
   },
-  ["sumneko_lua"] = {
+  ["luals"] = {
     cmd = { "lua-language-server" },
     filetypes = { "lua" },
     root_dir = function(fname)
