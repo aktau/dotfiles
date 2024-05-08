@@ -356,15 +356,11 @@ vim.api.nvim_create_autocmd("LspAttach", {
       -- already. Support for mhartingon/oceanic-next (my current scheme) is
       -- requested in https://github.com/mhartington/oceanic-next/issues/120.
       -- Alternatively (more understated):
-      --
-      --  vim.cmd("hi LspReferenceWrite cterm=undercurl gui=undercurl guibg=#3c3836")
-      vim.cmd([[
-        if !hlexists('LspReferenceRead')
-          hi! link LspReferenceRead Visual
-          hi! link LspReferenceText Visual
-          hi! link LspReferenceWrite Visual
-        endif
-      ]])
+      if not vim.fn.hlexists("LspReferenceRead") then
+        vim.api.nvim_set_hl(0, "LspReferenceRead", { link = "Visual" })
+        vim.api.nvim_set_hl(0, "LspReferenceText", { link = "Visual" })
+        vim.api.nvim_set_hl(0, "LspReferenceWrite", { link = "Visual" })
+      end
 
       aucmd("CursorHold", function() vim.lsp.buf.document_highlight() end)
       aucmd("CursorMoved", function() vim.lsp.buf.clear_references() end)
