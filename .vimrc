@@ -388,18 +388,14 @@ endif
 "
 " For now, typing <leader>g is fairly OK.
 "
+" NOTE: Neovim defaults to ripgrep (rg) if available, since
+" https://github.com/neovim/neovim/commit/20b38677c22b0ff19ea54396c7718b5a8f410ed4.
+"
 " TODO: Perhaps integrate
 "       https://vi.stackexchange.com/questions/8855/how-can-i-change-the-default-grep-call-grepprg-to-exclude-directories.
 "
 " [1]: https://gist.github.com/romainl/56f0c28ef953ffc157f36cc495947ab3
-if executable('rg')
-  set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
-  set grepformat=%f:%l:%c:%m
-endif
 nnoremap <leader>g :silent lgrep!
-" :Grep - search and then open the window
-" Source: https://vonheikemen.github.io/devlog/tools/vim-and-the-quickfix-list
-" command! -nargs=+ Grep execute 'silent grep! <args>' | copen
 
 " Open the quickfix/loclist window automatically when it is filled.
 augroup qf
