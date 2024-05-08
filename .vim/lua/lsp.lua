@@ -291,7 +291,8 @@ local lsp_buffer_augroup = vim.api.nvim_create_augroup("lsp-buffer", {})
 -- Setup keybindings once an LSP client is attached.
 --
 -- NOTE: Neovim already sets up a few defaults before invoking LspAttach, see
--- :help lsp-config. E.g.: omnifunc, formatexpr, tagfunc, keywordprg.
+-- :help lsp-config. E.g.: omnifunc, formatexpr, tagfunc, keywordprg,
+-- go-to-diagnostic.
 vim.api.nvim_create_autocmd("LspAttach", {
   group = lsp_augroup,
   callback = function(args)
@@ -327,8 +328,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     map("n", "<Leader>cL", vim.lsp.codelens.clear, "Clear the lenses.")
     map("n", "<Leader>cr", vim.lsp.codelens.run,
       "Show the data in the lens on the selected line (may be at the top of the buffer for whole-file lenses).")
-    map("n", "[d", function() vim.diagnostic.goto_prev({ float = false }) end, "Jump to previous diagnostic.")
-    map("n", "]d", function() vim.diagnostic.goto_next({ float = false }) end, "Jump to next diagnostic.")
 
     local function aucmd(event, callback)
       vim.api.nvim_create_autocmd(event, { group = lsp_buffer_augroup, buffer = bufnr, callback = callback })
