@@ -620,6 +620,10 @@ au FileType c,cpp setlocal comments^=:///
 " No C++ codebase I work on uses old-style /* */ comments.
 au FileType cpp   setlocal commentstring=//\ %s
 
+" We override everything to texwidth=80 up above, but git commits really should
+" be 72 (anything more messes with Gerrit rendering, for example).
+au FileType gitcommit   setlocal textwidth=72
+
 au FileType javascript setlocal nocindent
 
 au BufRead,BufNewFile *.dasc set ft=c
