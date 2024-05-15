@@ -1,3 +1,5 @@
+scriptencoding utf-8  " Everything hereafter is UTF-8.
+
 " Modeline is a security risk, editorconfig is a better (builtin) alternative.
 set nomodeline
 
@@ -95,117 +97,66 @@ Plug 'nfnty/vim-nftables'
 
 call plug#end()
 
-set encoding=utf-8
-scriptencoding utf-8
+" core
+set shell=/bin/zsh
+set shellcmdflag=-fc              " Add '-f' to inhibit loading of .zshenv etc.
+set noundofile                    " Don't save undo's after file closes.
+set nobackup                      " Don't make a backup before overwriting a file.
+set nowritebackup                 " And again.
+set directory=/tmp                " Keep swap files in one location.
+set noswapfile                    " Disable swap.
+set timeoutlen=500                " Msec to wait for mapped sequence completion.
 
-set showcmd                       " display incomplete commands.
-set showmode                      " display the mode you're in.
-set showmatch                     " show matching brackets/parenthesis
-set autoread                      " reload files automagically
-
-" text preferences
-set nowrap                        " don't wrap lines
-set tabstop=2 shiftwidth=2 softtabstop=2 nosmarttab expandtab
-set backspace=indent,eol,start    " backspace through everything in insert mode"
-set autoindent                    " match indentation of previous line
-set textwidth=80                  " in new gvim windows
+" editing
+set textwidth=80                  " Max column.
 set colorcolumn=+1                " Set colorcolumn = textwidth + 1.
 set formatoptions+=n              " format numbered lists properly
-set nojoinspaces                  " Don't add extra spaces after join/fmt.
-
-" show invisible characters
-set list
-" some alternatives: tab:▸\,eol:¬
-set listchars=tab:▸\ ,trail:…
-
-" searching
-nnoremap <CR> :noh<CR><CR>
-nnoremap / /\v
-xnoremap / /\v
-set ignorecase                    " Case-insensitive searching.
-set smartcase                     " But case-sensitive if expression contains a capital letter.
-set tagcase=match                 " Case sensitive tag matching (most langs are cs).
 set gdefault                      " Set the global flag on substitute commands by default
 set matchpairs+=<:>               " Match < and > as well.
-
-" undo
-set noundofile                    " Don't save undo's after file closes.
-
-set hidden                        " Handle multiple buffers better.
-set title                         " Set the terminal's title, see https://github.com/neovim/neovim/issues/19040
-set number                        " Show line numbers.
-set ruler                         " Show cursor position.
-set cursorline                    " Highlight current line
 set wildmode=list:longest         " Complete files like a shell.
-set wildmenu                      " Enhanced command line completion.
 set wildignore=*.o,*.obj,*~       " Stuff to ignore when tab completing
 set wildignore+=*/.git/objects/*
 set wildignore+=*/.git/refs/*
 set wildignore+=*/.hg/*,*/.svn/*
 set wildignore+=*.swp,*.zip,*.so
+set spell                         " See https://castel.dev/post/lecture-notes-1.
+set spelllang=en
 
-set magic                         " magic matching
+" searching
+set ignorecase                    " Case-insensitive searching.
+set smartcase                     " But case-sensitive if expression contains a capital letter.
+set tagcase=match                 " Case sensitive tag matching (most langs are cs).
 
-" small tweaks
-set shell=/bin/zsh
-" The default is `-c`. Add `-f` to inihit loading of files like .zshenv, .zshrc,
-" et cetera (only read /etc/zsh/zshenv). Improves startup speed.
-set shellcmdflag=-fc
+" ui
+set completeopt=menuone,noinsert,noselect
+set shortmess+=c                  " Avoid showing extra message when completing.
+set list                          " show invisible characters
+set listchars=tab:▸\ ,trail:…     " some alternatives: tab:▸\,eol:¬
+set showmatch                     " show matching brackets/parenthesis
+set nowrap                        " don't wrap lines
+set tabstop=2 shiftwidth=2 softtabstop=2 nosmarttab expandtab
+set hidden                        " Handle multiple buffers better.
+set title                         " Set the terminal's title, see https://github.com/neovim/neovim/issues/19040
+set number                        " Show line numbers.
+set cursorline                    " Highlight current line
+set laststatus=2                  " Show the status line all the time
+set visualbell                    " Visual bell instead of beeping.
+set splitbelow                    " New window should be below current one.
+set splitright                    " New window should be right of current one.
+set updatetime=500                " CursorHold after 500s. Used by vim-signify etc.
+set scrolloff=10
+set sidescrolloff=7
+set mouse=                        " Disable mouse (allows copying from cmdline).
 set diffopt+=vertical             " Vertical diff windows on :diffsplit.
-" Vim 8 and Neovim have libxdiff built-in, and can be told to use the patience
-" algorithm, which I like better.
-"
-" Sadly, the patch-level check doesn't wor for Neovim because it remains at
-" minor patchlevel 0 (meaning it doesn't consider any Vim 8.1 patches to be
-" integrated).
-set diffopt+=algorithm:patience
+set diffopt+=algorithm:patience   " Available since Vim 8 & Neovim
 if has('nvim')
   set diffopt+=linematch:50
 endif
 
-set visualbell
-set noerrorbells
-set history=1000                  " Store lots of :cmdline history
-
-set splitbelow
-set splitright
-
-" Spelling, from https://castel.dev/post/lecture-notes-1.
-set spell
-set spelllang=en
-" Mark current cursor position, naming it s (ms). Move to first spelling error
-" before the current position ([s,), fix it with the first suggestion (1z=),
-" highlight the fixed word in a hacky way (*), then move back (`s).
-nnoremap [gs ms[s1z=*`s
-nnoremap ]gs ms]s1z=*`s
-inoremap <C-l> <c-g>u<Esc>[s1z=`]a<c-g>u
 " Ignore URLs (https://vi.stackexchange.com/a/4003). This does not appears to
 " work when parsing is treesitter based. See
 " https://www.reddit.com/r/neovim/comments/13ewwpw/how_to_disable_spell_checking_based_on_a_regex/).
 syntax match UrlNoSpell "\w\+:\/\/[^[:space:]]\+" transparent contained contains=@NoSpell
-
-set scrolloff=10
-set sidescrolloff=7
-set sidescroll=1                  " Number of columns to scroll horizontally.
-set mouse=                        " Disable mouse (allows copying from cmdline).
-set mousehide
-if exists("+inccommand")
-  set inccommand=nosplit
-endif
-
-set nobackup                      " Don't make a backup before overwriting a file.
-set nowritebackup                 " And again.
-set directory=/tmp                " Keep swap files in one location
-set noswapfile
-set timeoutlen=500
-" Trigger CursorHold after 500ms (default is 4000ms). This used to be 100ms, but
-" e.g. vim-signify checks whether files on disk have changed based on this
-" interval (plus cursor move). Alternatively we could go back to 100ms and
-" disable vim-signify auto-update. This would allow the snappy experience of the
-" nvim-lsp diagnostic popup again.
-set updatetime=500
-
-set laststatus=2                  " Show the status line all the time
 
 " Use the $COLORTERM environment variable to detect 24-bit colour capability in
 " terminals. The Tc bit is a long way from being standardized, and at least with
@@ -252,6 +203,19 @@ if has('nvim') && executable('nvr')
   nnoremap <leader>cc :<C-u>call jobstart(['git', 'commit', '--verbose'])<CR>
   nnoremap <leader>cp :<C-u>call jobstart(['p4', 'change'])<CR>
 endif
+
+" Spelling
+"
+" Mark current cursor position, naming it s (ms). Move to first spelling error
+" before the current position ([s,), fix it with the first suggestion (1z=),
+" highlight the fixed word in a hacky way (*), then move back (`s).
+nnoremap [gs ms[s1z=*`s
+nnoremap ]gs ms]s1z=*`s
+
+" Searching. Clear highlight on return. Default to magic.
+nnoremap <CR> :noh<CR><CR>
+nnoremap / /\v
+xnoremap / /\v
 
 " indent/unindent visual mode selection with tab/shift+tab
 vmap <tab> >gv
@@ -348,12 +312,6 @@ map <Down> :echo "no!"<cr>
 " Use <Tab> and <S-Tab> to navigate through popup menu
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-
-" Set completeopt to have a better completion experience
-set completeopt=menuone,noinsert,noselect
-
-" Avoid showing message extra message when using completion
-set shortmess+=c
 
 " visual-at. Allow running macro's over a visual selection, just type @<reg>
 " while in visual mode.
