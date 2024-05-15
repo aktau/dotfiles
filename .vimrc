@@ -480,28 +480,28 @@ if has('nvim')
         set_jumps = true, -- whether to set jumps in the jumplist
         goto_next_start = {
           [']m'] = '@function.outer',
-          [']]'] = '@class.outer',
+          ["]s"] = { query = "@scope", query_group = "locals", desc = "Next scope" },
         },
         goto_next_end = {
           [']M'] = '@function.outer',
-          [']['] = '@class.outer',
+          ["]S"] = { query = "@scope", query_group = "locals", desc = "Next scope" },
         },
         goto_previous_start = {
           ['[m'] = '@function.outer',
-          ['[['] = '@class.outer',
+          ["[s"] = { query = "@scope", query_group = "locals", desc = "Next scope" },
         },
         goto_previous_end = {
           ['[M'] = '@function.outer',
-          ['[]'] = '@class.outer',
+          ["[S"] = { query = "@scope", query_group = "locals", desc = "Next scope" },
         },
       },
       swap = {
         enable = true,
         swap_next = {
-          ['<leader>a'] = '@parameter.inner',
+          ['<leader>sa'] = '@parameter.inner', -- [S]wap next [A]rgument.
         },
         swap_previous = {
-          ['<leader>A'] = '@parameter.inner',
+          ['<leader>sA'] = '@parameter.inner', -- [S]wap previous [A]rgument.
         },
       },
     },
