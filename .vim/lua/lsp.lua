@@ -21,40 +21,34 @@ vim.diagnostic.config({
   }
 })
 
--- Return the first file/dir in `names` found in an upwards traversal (starting
--- at `start`).
-local function find_up(start, names)
-  return vim.fs.find(names, { path = vim.fs.dirname(start), upward = true })[1]
-end
-
 local configs = {
   ["clangd"] = {
     cmd = { "clangd" },
     filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
     root_dir = function(fname)
-      return vim.fs.dirname(find_up(fname, {
+      return vim.fs.root(fname, {
         ".clangd",
         ".clang-tidy",
         ".clang-format",
         "compile_commands.json",
         "compile_flags.txt",
         "configure.ac", -- AutoTools
-      })) or vim.fs.dirname(find_up(fname, {
+      }) or vim.fs.root(fname, {
         ".git",
-      }))
+      })
     end,
   },
   ["gopls"] = {
     cmd = { "gopls" },
     filetypes = { "go", "gomod", "gotmpl" },
     root_dir = function(fname)
-      return vim.fs.dirname(find_up(fname, {
+      return vim.fs.root(fname, {
         "go.work",
-      })) or vim.fs.dirname(find_up(fname, {
+      }) or vim.fs.root(fname, {
         ".git",
-      })) or vim.fs.dirname(find_up(fname, {
+      }) or vim.fs.root(fname, {
         "go.mod",
-      }))
+      })
     end,
     settings = {
       gopls = {
@@ -91,7 +85,7 @@ local configs = {
     cmd = { "lua-language-server" },
     filetypes = { "lua" },
     root_dir = function(fname)
-      return vim.fs.dirname(find_up(fname, {
+      return vim.fs.root(fname, {
         ".luarc.json",
         ".luarc.jsonc",
         ".luacheckrc",
@@ -99,11 +93,11 @@ local configs = {
         "stylua.toml",
         "selene.toml",
         "selene.yml",
-      })) or find_up(fname, {
-        "lua", -- A lua dir.
-      }) or vim.fs.dirname(find_up(fname, {
+      }) or vim.fs.root(fname, {
         ".git",
-      })) or os.getenv("HOME")
+      }) or vim.fs.root(fname, {
+        "lua",
+      }) or os.getenv("HOME")
     end,
     settings = {
       Lua = {
@@ -261,7 +255,7 @@ vim.api.nvim_create_autocmd("FileType", {
       -- vim.fs.find (used in many root_dir functions) doesn't appear to search
       -- upwards from the relative root. Instead of handling it downstream,
       -- absolutize here.
-      local root_dir = config.root_dir(vim.fn.fnamemodify(args.file, ":p"))
+      local root_dir = config.root_dir(vim.api.nvim_buf_get_name(0))
       if root_dir ~= nil then
         vim.lsp.start({
           name = server_name,
