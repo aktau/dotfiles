@@ -334,7 +334,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     --
     -- TODO: When gopls implements willSaveWaitUntil
     --       (https://github.com/golang/go/issues/57281), remove this.
-    if client.server_capabilities.documentFormattingProvider then
+    if client.supports_method("textDocument/formatting") then
       -- With gopls, textDocument/formatting only runs gofmt. If we also want
       -- goimports a specific code action. See
       -- https://github.com/Microsoft/language-server-protocol/issues/726.
@@ -346,7 +346,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
       aucmd("BufWritePre", function() vim.lsp.buf.format({ timeout_ms = 1000 }) end)
     end
 
-    if client.server_capabilities.documentHighlightProvider then
+    if client.supports_method("textDocument/documentHighlight") then
       -- may not need this if your colorscheme supports these highlight groups
       -- already. Support for mhartingon/oceanic-next (my current scheme) is
       -- requested in https://github.com/mhartington/oceanic-next/issues/120.
