@@ -162,9 +162,7 @@ syntax match UrlNoSpell "\w\+:\/\/[^[:space:]]\+" transparent contained contains
 " terminals. The Tc bit is a long way from being standardized, and at least with
 " an environment variable it's easy for me to override. Some terminals (like
 " hterm) set the environment variable themselves, which is nice.
-if has('termguicolors') && (&termguicolors || !empty($COLORTERM))
-  set termguicolors
-
+if has('termguicolors') && !empty($COLORTERM)
   let g:oceanic_next_terminal_bold = 1
   let g:oceanic_next_terminal_italic = 1
 
