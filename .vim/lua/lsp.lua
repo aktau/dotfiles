@@ -212,11 +212,6 @@ if has_cmp and has_cmp_nvim_lsp then
   capabilities = vim.tbl_deep_extend("force", capabilities, cmp_nvim_lsp.default_capabilities())
 
   cmp.setup({
-    snippet = {
-      expand = function(args)
-        vim.snippet.expand(args.body)
-      end
-    },
     mapping = cmp.mapping.preset.insert({
       ['<C-Space>'] = cmp.mapping.complete(),
       ['<C-e>'] = cmp.mapping.abort(),
