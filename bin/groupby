@@ -2,7 +2,7 @@
 #
 # USAGE
 #
-#   groupby [AWK-OPTIONS] <group-col1,groupcol2,...> <agg-col> <sum|concat|count>
+#   groupby [AWK-OPTIONS] <group-col1,groupcol2,...> <agg-col> <sum|concat|count>...
 #
 # DESCRIPTION
 #
@@ -32,6 +32,16 @@
 #     $ printf "10:50 mike 49\n10:30 lisa 1\n10:50 mike 100" | groupby 1,2 3 sum
 #     10:30 lisa 1
 #     10:50 mike 149
+#
+#   Calculate the average for each group by aggregating with sum and count, then
+#   doing a second pass (avg = sum / count).
+#
+#     $ { echo "adam 5" ; echo "kathy 3" ; echo "adam 7" } |
+#         groupby 1 2 sum count |
+#         awk '{print $1, $2/$3}'
+#     kathy 3
+#     adam 6
+
 
 function count(acc, val) {
   return acc + 1
@@ -46,18 +56,23 @@ function concat(acc, val) {
 }
 
 BEGIN {
-  if (ARGC != 4) {
-    print "Usage: groupby [AWK-OPTIONS] <group-col1,group-col2,...> <agg-col1,agg-col2,...> <sum|concat|count>" > "/dev/stderr"
+  if (ARGC < 4) {
+    print "Usage: groupby [AWK-OPTIONS] <group-col1,group-col2,...> <agg-col1,agg-col2,...> <sum|concat|count...>" > "/dev/stderr"
     exit(1)
   }
   groupcol = ARGV[1]
-  aggcol = ARGV[2]
-  aggregator = ARGV[3]
   if (groupcol ~ /,/) {
     ngroupcols = split(groupcol, groupcols, ",")
   }
+  aggcol = ARGV[2]
   if (aggcol ~ /,/) {
     naggcols = split(aggcol, aggcols, ",")
+  }
+
+  aggregators[0] = ARGV[3]
+  for (i = 4; i < ARGC; i++) {
+    aggregators[i-3] = ARGV[i]
+    ARGV[i] = ""
   }
   ARGV[1] = "-"
   ARGV[2] = ""
@@ -74,7 +89,10 @@ ngroupcols && naggcols {
   for (i = 2 ; i <= naggcols ; i++) {
     agg = agg OFS $aggcols[i]
   }
-  arr[key] = @aggregator(arr[key], agg)
+  for (i in aggregators) {
+    aggregator = aggregators[i]
+    arr[key][i] = @aggregator(arr[key][i], agg)
+  }
   next
 }
 
@@ -84,7 +102,10 @@ ngroupcols {
   for (i = 2 ; i <= ngroupcols ; i++) {
     key = key OFS $groupcols[i]
   }
-  arr[key] = @aggregator(arr[key], $aggcol)
+  for (i in aggregators) {
+    aggregator = aggregators[i]
+    arr[key][i] = @aggregator(arr[key][i], $aggcol)
+  }
   next
 }
 
@@ -93,17 +114,27 @@ naggcols {
   for (i = 2 ; i <= naggcols ; i++) {
     agg = agg OFS $aggcols[i]
   }
-  arr[$groupcol] = @aggregator(arr[$groupcol], agg)
+  for (i in aggregators) {
+    aggregator = aggregators[i]
+    arr[$groupcol][i] = @aggregator(arr[$groupcol][i], agg)
+  }
   next
 }
 
 # Grouping on a single column (faster).
 {
-  arr[$groupcol] = @aggregator(arr[$groupcol], $aggcol)
+  for (i in aggregators) {
+    aggregator = aggregators[i]
+    arr[$groupcol][i] = @aggregator(arr[$groupcol][i], $aggcol)
+  }
 }
 
 END {
   for (key in arr) {
-    print key, arr[key]
+    printf key
+    for (agg in arr[key]) {
+      printf(" %s", arr[key][agg])
+    }
+    print ""
   }
 }
