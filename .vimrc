@@ -58,9 +58,6 @@ endif
 if has('nvim')
   " LSP extras. The actual setup is just based on native nvim functions, see
   " .vim/lua/lsp.lua.
-  Plug 'hrsh7th/cmp-buffer'
-  Plug 'hrsh7th/cmp-nvim-lsp'
-  Plug 'hrsh7th/nvim-cmp' " Async autocomplete using nvim builtin LSP.
   Plug 'arkav/lualine-lsp-progress'
 
   " nvim-telescope
@@ -136,7 +133,7 @@ set smartcase                     " But case-sensitive if expression contains a 
 set tagcase=match                 " Case sensitive tag matching (most langs are cs).
 
 " ui
-set completeopt=menuone,noinsert,noselect
+set completeopt=menuone,noinsert,noselect,fuzzy
 set shortmess+=c                  " Avoid showing extra message when completing.
 set list                          " show invisible characters
 set listchars=tab:▸\ ,trail:…     " some alternatives: tab:▸\,eol:¬

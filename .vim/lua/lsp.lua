@@ -193,50 +193,6 @@ capabilities.general.positionEncodings = {
   "utf-16",
 }
 
-local has_cmp, cmp = pcall(require, 'cmp')
-local has_cmp_nvim_lsp, cmp_nvim_lsp = pcall(require, 'cmp_nvim_lsp')
-if has_cmp and has_cmp_nvim_lsp then
-  -- The cmp_nvim_lsp.default_capabilities() function takes an "override" table
-  -- argument. It is **NOT** used as a base, it just overrides the specific
-  -- fields that default_capabilities() would otherwise set. This strangeness
-  -- likely works for users because cmp_nvim_lsp is meant to be used with
-  -- nvim-lspconfig which by default merges capabilities using tbl_deep_extend,
-  -- and always takes make_client_capabilities() as the base since
-  -- https://github.com/neovim/nvim-lspconfig/commit/b6d9e427c9fafca5b84a1f429bef4df3ef63244b.
-  capabilities = vim.tbl_deep_extend("force", capabilities, cmp_nvim_lsp.default_capabilities())
-
-  cmp.setup({
-    mapping = cmp.mapping.preset.insert({
-      ['<C-Space>'] = cmp.mapping.complete(),
-      ['<C-e>'] = cmp.mapping.abort(),
-      ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-      ['<Tab>'] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.select_next_item()
-        elseif vim.snippet.active({ direction = 1 }) then
-          vim.snippet.jump(1)
-        else
-          fallback()
-        end
-      end, { 'i', 's' }),
-      ['<S-Tab>'] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.select_prev_item()
-        elseif vim.snippet.active({ direction = -1 }) then
-          vim.snippet.jump(-1)
-        else
-          fallback()
-        end
-      end, { 'i', 's' }),
-    }),
-    sources = cmp.config.sources({
-      { name = 'nvim_lsp' },
-    }, {
-      { name = 'buffer' },
-    })
-  })
-end
-
 local lsp_augroup = vim.api.nvim_create_augroup("lsp", { clear = true })
 
 -- Start a matching LSP client for any of the filetypes owned by the servers in
@@ -297,8 +253,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
     client.server_capabilities.semanticTokensProvider = nil
 
     -- (Potentially) override some keybindings to use LSP functionality.
-    local function map(mode, key, fn, desc)
-      vim.keymap.set(mode, key, fn, { silent = true, buffer = bufnr, desc = desc })
+    local function map(mode, key, fn, opts)
+      opts = vim.tbl_extend("force", { silent = true, buffer = bufnr },
+        type(opts) == 'string' and { desc = opts } or opts)
+      vim.keymap.set(mode, key, fn, opts)
     end
     map("n", "<Leader>rn", vim.lsp.buf.rename, "Rename symbol")
     map("n", "g0", vim.lsp.buf.document_symbol, "Lists all symbols in the current buffer in the quickfix window.")
@@ -317,6 +275,15 @@ vim.api.nvim_create_autocmd("LspAttach", {
     map("n", "<Leader>cL", vim.lsp.codelens.clear, "Clear the lenses.")
     map("n", "<Leader>cr", vim.lsp.codelens.run,
       "Show the data in the lens on the selected line (may be at the top of the buffer for whole-file lenses).")
+
+    -- Based on
+    -- https://gist.github.com/MariaSolOs/2e44a86f569323c478e5a078d0cf98cc.
+    if client.supports_method("textDocument/completion") then
+      map("i", "<C-Space>", vim.lsp.completion.trigger, "Trigger autocompletion.")
+      map("i", "<cr>", function() return (tonumber(vim.fn.pumvisible()) ~= 0) and '<C-y>' or '<cr>' end,
+        { expr = true, desc = "Accept completion." })
+      vim.lsp.completion.enable(true, args.data.client_id, bufnr, { autotrigger = true })
+    end
 
     local function aucmd(event, callback)
       vim.api.nvim_create_autocmd(event, { group = lsp_buffer_augroup, buffer = bufnr, callback = callback })
