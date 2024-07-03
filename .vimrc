@@ -38,6 +38,14 @@ endfunction
 " interpret the output of df(1), but I'm lazy and it sounds error-prone.
 let g:fs_remote_folders = []
 
+" Enable Neovim Lua loader. Saves about 10ms (420ms -> 410ms startup time when
+" opening a cached file on the remote dir)
+"
+" $ hyperfine 'nvim swap.go -c q'
+if has('nvim')
+  lua vim.loader.enable()
+endif
+
 call plug#begin('~/.vim/bundle')
 
 let mapleader = ","
