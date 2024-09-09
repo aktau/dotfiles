@@ -474,19 +474,19 @@ if has('nvim')
         set_jumps = true, -- whether to set jumps in the jumplist
         goto_next_start = {
           [']m'] = '@function.outer',
-          ["]s"] = { query = "@scope", query_group = "locals", desc = "Next scope" },
+          ["]s"] = { query = "@local.scope", query_group = "locals", desc = "Next scope" },
         },
         goto_next_end = {
           [']M'] = '@function.outer',
-          ["]S"] = { query = "@scope", query_group = "locals", desc = "Next scope" },
+          ["]S"] = { query = "@local.scope", query_group = "locals", desc = "Next scope" },
         },
         goto_previous_start = {
           ['[m'] = '@function.outer',
-          ["[s"] = { query = "@scope", query_group = "locals", desc = "Next scope" },
+          ["[s"] = { query = "@local.scope", query_group = "locals", desc = "Next scope" },
         },
         goto_previous_end = {
           ['[M'] = '@function.outer',
-          ["[S"] = { query = "@scope", query_group = "locals", desc = "Next scope" },
+          ["[S"] = { query = "@local.scope", query_group = "locals", desc = "Next scope" },
         },
       },
       swap = {
