@@ -82,7 +82,6 @@ Plug 'roman/golden-ratio'
 Plug 'tpope/vim-fugitive', PlugCond(empty(filter(copy(g:fs_remote_folders), {_, dir -> getcwd() =~ '^' . dir})))
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
-Plug 'tpope/vim-unimpaired'
 
 " themes (only uncomment the ones I use frequently, to pollute rtp less)
 " Plug 'AhmedAbdulrahman/aylin.vim'
