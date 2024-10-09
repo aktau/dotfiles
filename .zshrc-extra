@@ -142,10 +142,24 @@ elif hash ag &>/dev/null ; then
     -g ''"
 fi
 
-# runargs is basically the same as xargs(1) but implemented as a shell
-# function so you don't have ugly long-running xargs processes all over the
-# place. Forces stdin to be the TTY (because the real stdin are the
-# filenames, of course).
+# Read stdin, pass each line as an argument to the command specified as the
+# argument. Supports zsh and bash. Similar to
+#
+#   $ parallel --xargs --tty --no-run-if-empty "$@"
+#   $ xargs --no-run-if-empty sh -c "$@ </dev/tty"
+#
+# But without running the extra perl(1) or sh(1) process, which means faster
+# startup.
+#
+# Forces stdin to be the TTY (because the real stdin are the filenames).
+#
+# USAGE
+#
+#   runargs <command>
+#
+# EXAMPLES
+#
+#   fzf -m | runargs vim -O
 runargs() {
   local -a args
   if [ -n "$ZSH_VERSION" ] ; then
@@ -174,7 +188,7 @@ vimin() {
 # fe <file|pattern>... - Open the selected file(s) with the default editor
 fe() {
   # If stdin is not a TTY, source file(s) from stdin instead of ag(1).
-  if [ ! -t 0 ] ; then
+  if [[ ! -t 0 ]] ; then
     fzf -0 -1 -m --query="$*" | vimin
     return
   fi
@@ -191,10 +205,12 @@ fe() {
   done
 
   if command -v fd >/dev/null 2>&1 ; then
-    fd --type f --no-ignore
+    fd --type f --no-ignore . "${paths[@]}"
   else
-    find -type f
-  fi | fzf -0 -1 -m --query="${query[@]}" | vimin
+    find "${paths[@]}" -type f
+  fi |
+    fzf -0 -1 -m --query="${query[@]}" --preview-window=up:65% --preview='head -$LINES {}' |
+    vimin
 }
 
 # vimp opens the argument if it can be found your $PATH.
@@ -282,4 +298,23 @@ lj() {
   # Add local and global rocks to the lua search path, then preload those
   # libraries and some other helper code from init.lua.
   ( eval "$(luarocks path)" && luajit -i $HOME/.lua/init.lua --examples )
+}
+
+in-git() {
+  git rev-parse --is-inside-work-tree >/dev/null 2>/dev/null
+}
+
+# vimc presents a list of modified git files in a fuzzy finder, and opens the
+# selected ones in $EDITOR.
+#
+# If used outside of a git repository, invokes fe(1).
+vimc() {
+  if ! in-git ; then
+    fe "$@"
+    return $?
+  fi
+
+  git diff --name-only |
+    fzf -0 -1 -m --preview-window=up:65% --preview="git diff --color {}" --query="$*" |
+    vimin
 }
