@@ -234,10 +234,6 @@ vim.api.nvim_create_autocmd("FileType", {
 local lsp_buffer_augroup = vim.api.nvim_create_augroup("lsp-buffer", {})
 
 -- Setup keybindings once an LSP client is attached.
---
--- NOTE: Neovim already sets up a few defaults before invoking LspAttach, see
--- :help lsp-config. E.g.: omnifunc, formatexpr, tagfunc, keywordprg,
--- go-to-diagnostic.
 vim.api.nvim_create_autocmd("LspAttach", {
   group = lsp_augroup,
   callback = function(args)
@@ -258,19 +254,24 @@ vim.api.nvim_create_autocmd("LspAttach", {
         type(opts) == 'string' and { desc = opts } or opts)
       vim.keymap.set(mode, key, fn, opts)
     end
-    map("n", "<Leader>rn", vim.lsp.buf.rename, "Rename symbol")
-    map("n", "g0", vim.lsp.buf.document_symbol, "Lists all symbols in the current buffer in the quickfix window.")
-    map("n", "gW", vim.lsp.buf.workspace_symbol, "Lists all symbols in the current workspace in the quickfix window.")
+    -- Defaults (:h lsp-defaults):
+    --  - grn (rename symbol)
+    --  - gra (apply action)
+    --  - grr (references)
+    --  - gri (implementation)
+    --  - gO (symbols)
+    --  - K (hover info)
+    --  - ]d (go to diagnostics)
+    --  - i_CTRL-S (display signature information in insert mode)
     map("n", "gd", vim.lsp.buf.definition, "Jumps to the definition of the symbol under the cursor.")
-    map("n", "gi", vim.lsp.buf.implementation,
-      "Lists all the implementations for the symbol under the cursor in the quickfix window.")
-    map("n", "gr", vim.lsp.buf.references,
-      "Lists all the references to the symbol under the cursor in the quickfix window.")
-    map("n", "gs", vim.lsp.buf.signature_help,
-      "Displays signature information about the symbol under the cursor in a floating window.")
     map("n", "gt", vim.lsp.buf.type_definition, "Jumps to the definition of the type of the symbol under the cursor.")
-    map({ "n", "v" }, "ga", function() vim.lsp.buf.code_action({ apply = true }) end,
+    -- Override the default gra mapping because it doesn't set the { apply =
+    -- true } option. The default mapping is global, so this buffer-local one
+    -- takes precedence.
+    map({ "n", "x" }, "gra", function() vim.lsp.buf.code_action({ apply = true }) end,
       "Selects a code action available at the current cursor position.")
+
+    -- Lenses
     map("n", "<Leader>cl", vim.lsp.codelens.refresh, "Show available codelenses.")
     map("n", "<Leader>cL", vim.lsp.codelens.clear, "Clear the lenses.")
     map("n", "<Leader>cr", vim.lsp.codelens.run,
