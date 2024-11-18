@@ -290,13 +290,33 @@ vim.api.nvim_create_autocmd("LspAttach", {
       vim.api.nvim_create_autocmd(event, { group = lsp_buffer_augroup, buffer = bufnr, callback = callback })
     end
 
+    -- Some language servers support various languages, and report the union of
+    -- their capabilities as server_capabilities. Neovim (as of 2024-11-18)
+    -- considers a static capability to supersede a dynamic one.
+    local ft = vim.bo[bufnr].filetype
+    local capability_filetype_override = {
+      markdown = {
+        ["textDocument/documentHighlight"] = false,
+        ["textDocument/inlayHint"] = false,
+      },
+    }
+
+    local function supports(method, opts)
+      local ft_override = capability_filetype_override[ft]
+      if ft_override ~= nil and ft_override[method] ~= nil then
+        return ft_override[method]
+      end
+
+      return client.supports_method(method, opts)
+    end
+
     -- Enable format-on-save when available (see :help lsp-config). A
     -- discussion on how to do this with nvim-lsp:
     -- https://github.com/neovim/nvim-lsp/issues/115.
     --
     -- TODO: When gopls implements willSaveWaitUntil
     --       (https://github.com/golang/go/issues/57281), remove this.
-    if client.supports_method("textDocument/formatting") then
+    if supports("textDocument/formatting") then
       -- With gopls, textDocument/formatting only runs gofmt. If we also want
       -- goimports a specific code action. See
       -- https://github.com/Microsoft/language-server-protocol/issues/726.
@@ -308,7 +328,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
       aucmd("BufWritePre", function() vim.lsp.buf.format({ timeout_ms = 1000 }) end)
     end
 
-    if client.supports_method("textDocument/documentHighlight") then
+    if supports("textDocument/documentHighlight") then
       -- may not need this if your colorscheme supports these highlight groups
       -- already. Support for mhartingon/oceanic-next (my current scheme) is
       -- requested in https://github.com/mhartington/oceanic-next/issues/120.
