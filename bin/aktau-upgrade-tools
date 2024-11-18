@@ -28,7 +28,7 @@ fi
   make distclean
   CFLAGS='-fno-omit-frame-pointer' env -u LUA_PATH -u LUA_CPATH make install
 )
-nvim --headless -c 'PlugUpgrade | PlugUpdate | TSUpdateSync | qa'
+nvim --headless -c 'lua MiniDeps.update()' -c 'TSUpdateSync' -c 'qa'
 
 # Language servers.
 
