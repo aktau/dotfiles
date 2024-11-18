@@ -124,6 +124,37 @@ mini.deps.add({ source = "mhartington/oceanic-next" })
 vim.cmd("colorscheme OceanicNext")
 vim.api.nvim_set_hl(0, "ExtraWhitespace", { ctermbg = "red", bg = "red", force = true })
 
+do -- lualine.nvim
+  mini.deps.add({ source = "nvim-lualine/lualine.nvim", })
+  mini.deps.add({ source = "arkav/lualine-lsp-progress", depends = { "nvim-lualine/lualine.nvim" } })
+
+  local function lsp_client_names()
+    local clients = {}
+    for idx, client in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
+      clients[idx] = client.name
+    end
+    if next(clients) == nil then
+      return ""
+    end
+    return "LSP(" .. table.concat(clients, "/") .. ")"
+  end
+  require("lualine").setup({
+    options = {
+      icons_enabled = false,
+      component_separators = { left = "|", right = "|" },
+      section_separators = { left = "", right = "" },
+    },
+    sections = {
+      lualine_a = { "mode" },
+      lualine_b = { "branch", "diff", { "diagnostics", sources = { "nvim_diagnostic" } } },
+      lualine_c = { { "filename", path = 1 }, lsp_client_names, "lsp_progress" },
+      lualine_x = { "encoding", "fileformat", "filetype" },
+      lualine_y = { "progress" },
+      lualine_z = { "location" }
+    },
+  })
+end
+
 -- Key mappings
 vim.g.mapleader = ","
 --
@@ -443,37 +474,6 @@ mini.deps.later(function()
     vim.keymap.set({ "n", "x" }, "S", function() require("flash").treesitter() end, { desc = "Flash Treesitter" })
     vim.keymap.set({ "o" }, "r", function() require("flash").remote() end, { desc = "Remote Flash" })
     vim.keymap.set({ "o", "x" }, "R", function() require("flash").treesitter_search() end, { desc = "Treesitter Search" })
-  end
-
-  do -- lualine.nvim
-    mini.deps.add({ source = "nvim-lualine/lualine.nvim", })
-    mini.deps.add({ source = "arkav/lualine-lsp-progress", depends = { "nvim-lualine/lualine.nvim" } })
-
-    local function lsp_client_names()
-      local clients = {}
-      for idx, client in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
-        clients[idx] = client.name
-      end
-      if next(clients) == nil then
-        return ""
-      end
-      return "LSP(" .. table.concat(clients, "/") .. ")"
-    end
-    require("lualine").setup({
-      options = {
-        icons_enabled = false,
-        component_separators = { left = "|", right = "|" },
-        section_separators = { left = "", right = "" },
-      },
-      sections = {
-        lualine_a = { "mode" },
-        lualine_b = { "branch", "diff", { "diagnostics", sources = { "nvim_diagnostic" } } },
-        lualine_c = { { "filename", path = 1 }, lsp_client_names, "lsp_progress" },
-        lualine_x = { "encoding", "fileformat", "filetype" },
-        lualine_y = { "progress" },
-        lualine_z = { "location" }
-      },
-    })
   end
 
   do -- mini.align
