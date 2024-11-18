@@ -36,7 +36,6 @@ files=(
   .tmux.conf
   .tmux.gruvbox.theme
   .vim
-  .vimrc
   .zshrc-extra
 )
 linux_files=(
