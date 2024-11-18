@@ -530,12 +530,8 @@ vim.api.nvim_create_autocmd("WinLeave", { pattern = "*", command = [[setlocal no
 vim.api.nvim_create_autocmd("VimResized",
   { pattern = "*", command = [[wincmd=]], desc = "resize splits on window resize." })
 
-vim.api.nvim_create_autocmd("TextYankPost", {
-  pattern = "*",
-  callback = function()
-    require("vim.highlight").on_yank({ timeout = 500, on_visual = false })
-  end
-})
+vim.api.nvim_create_autocmd("TextYankPost",
+  { pattern = "*", callback = function() vim.hl.on_yank({ timeout = 500, on_visual = false }) end })
 
 -- Open the quickfix/loclist window automatically when it is filled.
 vim.api.nvim_create_autocmd("QuickFixCmdPost",
