@@ -5,8 +5,8 @@
 --   export LUA_INIT="@$HOME/.lua/init.lua"
 
 -- Add $HOME/.lua to the search path.
-package.path = package.path .. ";" .. os.getenv("HOME") .. "/.lua/?.lua"
-package.cpath = package.cpath .. ";" .. os.getenv("HOME") .. "/.lua/?.so"
+package.path     = package.path .. ";" .. os.getenv("HOME") .. "/.lua/?.lua"
+package.cpath    = package.cpath .. ";" .. os.getenv("HOME") .. "/.lua/?.so"
 
 -- Load modules.
 has_fun, fun     = pcall(require, 'fun')
@@ -44,8 +44,8 @@ do
   -- space, a backslash, or a double quote)?
   local function IsEscapeable(Char)
     return string.find(Char, "[^%w%p]") -- Non-alphanumeric, non-punct.
-      and Char ~= " "                   -- Don't count spaces.
-      or string.find(Char, '[\\"]')     -- A backslash or quote.
+        and Char ~= " "                 -- Don't count spaces.
+        or string.find(Char, '[\\"]')   -- A backslash or quote.
   end
 
   -- Converts an "escapeable" character (a non-printing character,
@@ -57,10 +57,10 @@ do
   local function EscapeableToEscaped(Char, FollowingDigit)
     if IsEscapeable(Char) then
       local Format = FollowingDigit == ""
-        and "\\%d"
-        or "\\%03d" .. FollowingDigit
+          and "\\%d"
+          or "\\%03d" .. FollowingDigit
       return BsChars[Char]
-        or string.format(Format, string.byte(Char))
+          or string.format(Format, string.byte(Char))
     else
       return Char .. FollowingDigit
     end
@@ -74,12 +74,29 @@ do
   end
 
   -- Lua keywords:
-  local Keywords = {["and"] = true, ["break"] = true, ["do"] = true,
-    ["else"] = true, ["elseif"] = true, ["end"] = true, ["false"] = true,
-    ["for"] = true, ["function"] = true, ["if"] = true, ["in"] = true,
-    ["local"] = true, ["nil"] = true, ["not"] = true, ["or"] = true,
-    ["repeat"] = true, ["return"] = true, ["then"] = true,
-    ["true"] = true, ["until"] = true, ["while"] = true}
+  local Keywords = {
+    ["and"] = true,
+    ["break"] = true,
+    ["do"] = true,
+    ["else"] = true,
+    ["elseif"] = true,
+    ["end"] = true,
+    ["false"] = true,
+    ["for"] = true,
+    ["function"] = true,
+    ["if"] = true,
+    ["in"] = true,
+    ["local"] = true,
+    ["nil"] = true,
+    ["not"] = true,
+    ["or"] = true,
+    ["repeat"] = true,
+    ["return"] = true,
+    ["then"] = true,
+    ["true"] = true,
+    ["until"] = true,
+    ["while"] = true
+  }
 
   -- Is Str an identifier?
   local function IsIdent(Str)
@@ -127,9 +144,9 @@ do
           Val = ScalarToStr(Val)
         end
         Ret[#Ret + 1] = (type(Key) == "string"
-          and (Key .. " = ") -- Explicit key.
-          or "")             -- Implicit array key.
-          .. Val
+              and (Key .. " = ") -- Explicit key.
+              or "")             -- Implicit array key.
+            .. Val
       end
       Ret = "{" .. table.concat(Ret, ",") .. "}"
     else
@@ -143,7 +160,7 @@ do
   -- instead of <table: 0x...>.
   function tostring(t)
     if type(t) == 'table' and not
-      (getmetatable(t) and getmetatable(t).__tostring) then
+        (getmetatable(t) and getmetatable(t).__tostring) then
       return TblToStr(t)
     end
     return _tostring(t)
@@ -154,6 +171,10 @@ end
 -- you can use io.write(aString % {values}).
 function printf(s, ...)
   return io.write(s:format(...))
+end
+
+function tohex(num)
+  return string.format("0x%x", num)
 end
 
 -- Add the % operator to string types. It is used to format strings, like in
@@ -228,7 +249,7 @@ if has_syscall and has_lj and jit.os == "Linux" then
     -- to N) or the function takes more than benchtime to evaluate.
     while N < 1e10 and ns < benchtime do
       N = N * 10
-      ns = it(N)  -- How many nanoseconds did the benchmark take?
+      ns = it(N) -- How many nanoseconds did the benchmark take?
       printf("%.0e\t%.2f ns/op\n", N, ns / N)
     end
 
@@ -285,7 +306,7 @@ end
 -- However, luajit without the LUA52COMPAT option doesn't have this.
 function curry(fn, arg)
   return function(...)
-      return fn(arg, ...)
+    return fn(arg, ...)
   end
 end
 
@@ -303,7 +324,7 @@ if math.round == nil then
     if not precision then
       return math.floor(n + 0.5)
     end
-    local mult = 10^(precision or 0)
+    local mult = 10 ^ (precision or 0)
     return math.floor(n * mult + 0.5) / mult
   end
 end
@@ -314,9 +335,8 @@ end
 
 if math.fact == nil then
   function math.fact(n)
-    assert(n > 0)
     local r = 1
-    for i = 2,n do
+    for i = 2, n do
       r = r * i
     end
     return r
@@ -331,14 +351,14 @@ function split(s, pat)
   pat = pat or "%S+"
   result = {};
   for match in s:gmatch(pat) do
-      table.insert(result, match);
+    table.insert(result, match);
   end
   return result;
 end
 
 -- Make all math functions part of the global namespace, reduces typing.
 -- Nice when using lua as a souped-up bc(1).
-for k,v in pairs(math) do
+for k, v in pairs(math) do
   _G[k] = v
 end
 
