@@ -313,9 +313,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- Enable format-on-save when available (see :help lsp-config). A
     -- discussion on how to do this with nvim-lsp:
     -- https://github.com/neovim/nvim-lsp/issues/115.
-    --
-    -- TODO: When gopls implements willSaveWaitUntil
-    --       (https://github.com/golang/go/issues/57281), remove this.
     if supports("textDocument/formatting") then
       -- With gopls, textDocument/formatting only runs gofmt. If we also want
       -- goimports a specific code action. See
@@ -325,7 +322,13 @@ vim.api.nvim_create_autocmd("LspAttach", {
         aucmd("BufWritePre", function() vim.lsp.buf.code_action(options) end)
       end
 
-      aucmd("BufWritePre", function() vim.lsp.buf.format({ timeout_ms = 1000 }) end)
+      -- Neovim supports willSaveWaitUntil since
+      -- https://github.com/neovim/neovim/pull/21315. If so, it will
+      -- automatically request pre-save edits. Most language servers will
+      -- include formatting in this.
+      if not supports("textDocument/willSaveWaitUntil") then
+        aucmd("BufWritePre", function() vim.lsp.buf.format({ timeout_ms = 1000 }) end)
+      end
     end
 
     if supports("textDocument/documentHighlight") then
