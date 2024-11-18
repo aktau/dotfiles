@@ -343,6 +343,15 @@ vim.api.nvim_create_autocmd("LspAttach", {
       aucmd("CursorMoved", function() vim.lsp.buf.clear_references() end)
     end
 
+    if supports("textDocument/inlayHint", { bufnr = bufnr }) and (vim.fn.has("nvim-0.10") == 1) then
+      vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+      map("n", "<Leader>th", function()
+        local enable = not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr })
+        print(("%sing inlay hints"):format(enable and "enabl" or "disabl"))
+        vim.lsp.inlay_hint.enable(enable, { bufnr = bufnr })
+      end, "[T]oggle Inlay [H]ints")
+    end
+
     -- Draw a popup window showing diagnostics for the given line.
     aucmd("CursorHold", function() vim.diagnostic.open_float() end)
   end,
