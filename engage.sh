@@ -80,7 +80,7 @@ function setup_neovim {
     : "${XDG_CONFIG_HOME:=$HOME/.config}"
     mkdir -p "$XDG_CONFIG_HOME/nvim"
     setup_link ".vim" "$XDG_CONFIG_HOME/nvim"
-    setup_link ".vimrc" "$XDG_CONFIG_HOME/nvim/init.vim"
+    setup_link "nvim.lua" "$XDG_CONFIG_HOME/nvim/init.lua"
 }
 
 function setup_dotfiles {
