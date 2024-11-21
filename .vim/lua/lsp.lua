@@ -277,9 +277,30 @@ vim.api.nvim_create_autocmd("LspAttach", {
     map("n", "<Leader>cr", vim.lsp.codelens.run,
       "Show the data in the lens on the selected line (may be at the top of the buffer for whole-file lenses).")
 
+
+    -- Some language servers support various languages, and report the union of
+    -- their capabilities as server_capabilities. Neovim (as of 2024-11-18)
+    -- considers a static capability to supersede a dynamic one.
+    local ft = vim.bo[bufnr].filetype
+    local common_capability_override = {
+      ["textDocument/documentHighlight"] = false,
+      ["textDocument/inlayHint"] = false,
+    }
+    local capability_filetype_override = {
+      markdown = common_capability_override,
+    }
+    local function supports(method, opts)
+      local ft_override = capability_filetype_override[ft]
+      if ft_override ~= nil and ft_override[method] ~= nil then
+        return ft_override[method]
+      end
+
+      return client:supports_method(method, opts)
+    end
+
     -- Based on
     -- https://gist.github.com/MariaSolOs/2e44a86f569323c478e5a078d0cf98cc.
-    if client.supports_method("textDocument/completion") then
+    if supports("textDocument/completion") then
       map("i", "<C-Space>", vim.lsp.completion.trigger, "Trigger autocompletion.")
       map("i", "<cr>", function() return (tonumber(vim.fn.pumvisible()) ~= 0) and '<C-y>' or '<cr>' end,
         { expr = true, desc = "Accept completion." })
@@ -288,26 +309,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     local function aucmd(event, callback)
       vim.api.nvim_create_autocmd(event, { group = lsp_buffer_augroup, buffer = bufnr, callback = callback })
-    end
-
-    -- Some language servers support various languages, and report the union of
-    -- their capabilities as server_capabilities. Neovim (as of 2024-11-18)
-    -- considers a static capability to supersede a dynamic one.
-    local ft = vim.bo[bufnr].filetype
-    local capability_filetype_override = {
-      markdown = {
-        ["textDocument/documentHighlight"] = false,
-        ["textDocument/inlayHint"] = false,
-      },
-    }
-
-    local function supports(method, opts)
-      local ft_override = capability_filetype_override[ft]
-      if ft_override ~= nil and ft_override[method] ~= nil then
-        return ft_override[method]
-      end
-
-      return client.supports_method(method, opts)
     end
 
     -- Enable format-on-save when available (see :help lsp-config). A
