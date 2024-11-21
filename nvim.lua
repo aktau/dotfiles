@@ -13,6 +13,7 @@ vim.g.loaded_ruby_provider    = 0
 -- Disable unused builtin plugins.
 vim.g.loaded_gzip             = 0
 vim.g.loaded_matchit          = 0 -- Superseded by andymass/vim-matchup.
+vim.g.loaded_matchparen       = 0 -- Superseded by andymass/vim-matchup.
 vim.g.loaded_netrwPlugin      = 0
 vim.g.loaded_remote_plugins   = 0
 vim.g.loaded_tarPlugin        = 0
@@ -119,12 +120,14 @@ local mini = {
 }
 mini.deps.setup({ path = { package = path_package } })
 
--- Base UI.
-mini.deps.add({ source = "mhartington/oceanic-next" })
-vim.cmd("colorscheme OceanicNext")
-vim.api.nvim_set_hl(0, "ExtraWhitespace", { ctermbg = "red", bg = "red", force = true })
+do -- Colorscheme (eager due to affecting the UI).
+  mini.deps.add({ source = "mhartington/oceanic-next" })
 
-do -- lualine.nvim
+  vim.cmd("colorscheme OceanicNext")
+  vim.api.nvim_set_hl(0, "ExtraWhitespace", { ctermbg = "red", bg = "red", force = true })
+end
+
+do -- lualine.nvim (eager due to affecting the UI)
   mini.deps.add({ source = "nvim-lualine/lualine.nvim", })
   mini.deps.add({ source = "arkav/lualine-lsp-progress", depends = { "nvim-lualine/lualine.nvim" } })
 
@@ -154,6 +157,15 @@ do -- lualine.nvim
     },
   })
 end
+
+do -- vim-signify (eager due to installing autocommands)
+  mini.deps.add({ source = "mhinz/vim-signify" })
+
+  vim.g.signify_sign_change = "~" -- The default is "!", but I prefer vim-gitgutter's "~"
+end
+
+-- Eager due to installing autocommands.
+mini.deps.add({ source = "andymass/vim-matchup" })
 
 -- Key mappings
 vim.g.mapleader = ","
@@ -295,7 +307,7 @@ end)
 -- due to the autocommands.
 require("lsp")
 
--- Plugins.
+-- Plugins that can be lazy-loaded.
 mini.deps.later(function()
   -- Plugins without setup.
   mini.deps.add({ source = "roman/golden-ratio" })
@@ -317,7 +329,6 @@ mini.deps.later(function()
     mini.deps.add({ source = "nvim-treesitter/nvim-treesitter", hooks = { post_checkout = function() vim.cmd("TSUpdate") end } })
     mini.deps.add({ source = "nvim-treesitter/nvim-treesitter-context", depends = { "nvim-treesitter/nvim-treesitter" } })
     mini.deps.add({ source = "nvim-treesitter/nvim-treesitter-textobjects", depends = { "nvim-treesitter/nvim-treesitter" } })
-    mini.deps.add({ source = "andymass/vim-matchup", depends = { "nvim-treesitter/nvim-treesitter" } })
 
     local treesitter_parsers = {
       "c",
@@ -419,12 +430,6 @@ mini.deps.later(function()
         },
       },
     })
-  end
-
-  do -- vim-signify
-    mini.deps.add({ source = "mhinz/vim-signify" })
-
-    vim.g.signify_sign_change = "~" -- The default is "!", but I prefer vim-gitgutter's "~"
   end
 
   do -- flash.nvim
