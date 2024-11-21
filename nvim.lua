@@ -74,7 +74,7 @@ vim.opt.tagcase     = "match" -- Case sensitive tag matching (most langs are cs)
 vim.opt.completeopt = { "menuone", "noinsert", "noselect", "fuzzy" }
 vim.opt.shortmess:append("c") -- Avoid showing extra message when completing.
 vim.opt.list          = true -- show invisible characters
-vim.opt.listchars     = { tab = "▸\\", trail = "…" } -- some alternatives: tab:▸\,eol:¬
+vim.opt.listchars     = { tab = "▸ ", trail = "…" } -- some alternatives: tab:▸\,eol:¬
 vim.opt.showmatch     = true -- show matching brackets/parenthesis
 vim.opt.wrap          = false -- don't wrap lines
 vim.opt.tabstop       = 2
