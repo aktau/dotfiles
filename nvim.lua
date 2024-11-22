@@ -287,7 +287,7 @@ mini.deps.later(function()
     --  1. Open a buffer in the current editing session using `nvr --servername`.
     --  2. Wait until the buffer is deleted (--remote-wait) before returning.
     --  3. Delete the buffer when it is closed (bufhidden=wipe).
-    local editor = [[nvr -cc split --remote-wait +" setlocal bufhidden = wipe " --servername ]] .. vim.v.servername
+    local editor = [[nvr -cc split --remote-wait +"setlocal bufhidden=wipe " --servername ]] .. vim.v.servername
     vim.env.HGEDITOR = editor
     vim.env.GIT_EDITOR = editor
     vim.env.P4EDITOR = editor
