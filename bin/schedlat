@@ -1,0 +1,99 @@
+#!/bin/bash
+#
+# USAGE
+#
+#   schedlat <pid>
+#
+# DESCRIPTION
+#
+#   A pure bash script that samples /proc/pid/schedstat.
+#
+#   Inspired by:
+#
+#    - The latency.c tool linked from
+#      https://docs.kernel.org/scheduler/sched-stats.html.
+#    - schedlat(1) from 0x.tools:
+#      https://github.com/tanelpoder/0xtools/blob/master/bin/schedlat
+#
+#   Differences with schedlat(1) from 0x.tools:
+#
+#    - This schedlat does not need Python.
+#    - This schedlat outputs the number of times the thread has been scheduled in the last second.
+#
+#   Fields:
+#
+#    - %CPU: on-CPU percentage
+#    - %LAT: on-runqueue percentage
+#    - %SLP: 100-%CPU-%LAT
+#    - NSCHED: number of times scheduler since the last print
+#
+#   Please note, I believe this only prints statistics for the main thread in a
+#   process. See
+#   https://github.com/tanelpoder/0xtools/issues/14#issuecomment-2495065321 for
+#   follow-up.
+#
+# IMPLEMENTATION
+#
+#   We could also parse /proc/PID/sched, which contains more information, but
+#   the tuple in /proc/PID/schedstat is all that's needed to get some high-level
+#   information. I wanted to verify what the numbers documented under
+#   scheduler/sched-stats meant. The implementation (at the time of writing) in
+#   fs/proc/base.c:
+#
+#   /* Provides /proc/PID/schedstat */
+#   static int proc_pid_schedstat(struct seq_file *m, struct pid_namespace *ns, struct pid *pid, struct task_struct *task) {
+#     seq_printf(m, "%llu %llu %lu\n",
+#        (unsigned long long)task->se.sum_exec_runtime,
+#        (unsigned long long)task->sched_info.run_delay,
+#        task->sched_info.pcount);
+#   }
+#
+#   The documentation of these fields in code:
+#
+#      struct sched_info {
+#        /* Cumulative counters: */
+#        unsigned long       pcount;       /* # of times we have run on this CPU: */
+#        unsigned long long  run_delay;    /* Time spent waiting on a runqueue: */
+#
+#        /* Timestamps: */
+#        unsigned long long  last_arrival; /* When did we last run on a CPU? */
+#        unsigned long long  last_queued;  /* When were we last queued to run? */
+#      };
+#
+#   Spurious note: the implementation of /proc/PID/sched can be found in
+#   kernel/sched/debug.c.
+#
+#   Currently the sleep time is calculated using 100-cpu-rq. If schedstats is
+#   enabled, /proc/PID/sched prints exact value (sum_sleep_runtime,
+#   sum_block_runtime, ...).
+#
+# EXAMPLES
+
+set -euo pipefail
+
+PID=$1
+
+declare -i on_cpu_ns=0
+declare -i on_runqueue_ns=0
+declare -i nr_ticks=0
+
+declare -i prev_on_cpu_ns=0
+declare -i prev_on_runqueue_ns=0
+declare -i prev_nr_ticks=0
+
+printf "%-25s %6s %6s %6s %6s\n" "TIMESTAMP" "%CPU" "%LAT" "%SLP" "NSCHED"
+
+read -r on_cpu_ns on_runqueue_ns nr_ticks < "/proc/${PID}/schedstat"
+
+while : ; do
+  ((prev_on_cpu_ns = on_cpu_ns))
+  ((prev_on_runqueue_ns = on_runqueue_ns))
+  ((prev_nr_ticks = nr_ticks))
+  sleep 1
+  read -r on_cpu_ns on_runqueue_ns nr_ticks < "/proc/${PID}/schedstat"
+  declare -i cpu=$(( (on_cpu_ns-prev_on_cpu_ns)/10000000 ))
+  declare -i lat=$(( (on_runqueue_ns-prev_on_runqueue_ns)/10000000 ))
+  declare -i tic=$(( nr_ticks-prev_nr_ticks ))
+  declare -i slp=$(( 100 - cpu - lat ))
+  printf "%-25s %6.1f %6.1f %6.1f %6d\n" "$(date --rfc-3339=seconds)" ${cpu} ${lat} ${slp} ${tic}
+done
