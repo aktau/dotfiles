@@ -2,11 +2,11 @@
 #
 # USAGE
 #
-#   schedlat <pid>
+#   schedlat <pid> [<tid>]
 #
 # DESCRIPTION
 #
-#   A pure bash script that samples /proc/pid/schedstat.
+#   A pure bash script that samples /proc/PID/task/TID/schedstat.
 #
 #   Inspired by:
 #
@@ -17,20 +17,22 @@
 #
 #   Differences with schedlat(1) from 0x.tools:
 #
-#    - This schedlat does not need Python.
-#    - This schedlat outputs the number of times the thread has been scheduled in the last second.
+#    - This schedlat does not need Python. Though it does need GNU parallel in
+#      multi-thread mode.
+#    - This schedlat outputs the number of times the thread has been scheduled
+#      in the last second. This can be used to detect threads that perform lots
+#      of sleeping/runnable switches, those would get classified as interactive
+#      by the scheduler.
+#    - This schedlat prints (by default) the schedlat values for every thread in
+#      the process. Printing just the main thread as the 0x.tools schedlat is
+#      (for many processes) misleading. See https://github.com/tanelpoder/0xtools/issues/14#issuecomment-2495065321
 #
-#   Fields:
+#   Columns:
 #
 #    - %CPU: on-CPU percentage
 #    - %LAT: on-runqueue percentage
 #    - %SLP: 100-%CPU-%LAT
-#    - NSCHED: number of times scheduler since the last print
-#
-#   Please note, I believe this only prints statistics for the main thread in a
-#   process. See
-#   https://github.com/tanelpoder/0xtools/issues/14#issuecomment-2495065321 for
-#   follow-up.
+#    - NSCHED: number of times scheduled since the last print
 #
 # IMPLEMENTATION
 #
@@ -40,60 +42,162 @@
 #   scheduler/sched-stats meant. The implementation (at the time of writing) in
 #   fs/proc/base.c:
 #
-#   /* Provides /proc/PID/schedstat */
-#   static int proc_pid_schedstat(struct seq_file *m, struct pid_namespace *ns, struct pid *pid, struct task_struct *task) {
-#     seq_printf(m, "%llu %llu %lu\n",
-#        (unsigned long long)task->se.sum_exec_runtime,
-#        (unsigned long long)task->sched_info.run_delay,
-#        task->sched_info.pcount);
-#   }
+#    /* Provides /proc/PID/schedstat */
+#    static int proc_pid_schedstat(struct seq_file *m, struct pid_namespace *ns, struct pid *pid, struct task_struct *task) {
+#      seq_printf(m, "%llu %llu %lu\n",
+#         (unsigned long long)task->se.sum_exec_runtime,
+#         (unsigned long long)task->sched_info.run_delay,
+#         task->sched_info.pcount);
+#    }
 #
 #   The documentation of these fields in code:
 #
-#      struct sched_info {
-#        /* Cumulative counters: */
-#        unsigned long       pcount;       /* # of times we have run on this CPU: */
-#        unsigned long long  run_delay;    /* Time spent waiting on a runqueue: */
+#    struct sched_info {
+#      /* Cumulative counters: */
+#      unsigned long       pcount;       /* # of times we have run on this CPU: */
+#      unsigned long long  run_delay;    /* Time spent waiting on a runqueue: */
 #
-#        /* Timestamps: */
-#        unsigned long long  last_arrival; /* When did we last run on a CPU? */
-#        unsigned long long  last_queued;  /* When were we last queued to run? */
-#      };
+#      /* Timestamps: */
+#      unsigned long long  last_arrival; /* When did we last run on a CPU? */
+#      unsigned long long  last_queued;  /* When were we last queued to run? */
+#    };
 #
 #   Spurious note: the implementation of /proc/PID/sched can be found in
 #   kernel/sched/debug.c.
 #
+# TODO
+#
 #   Currently the sleep time is calculated using 100-cpu-rq. If schedstats is
 #   enabled, /proc/PID/sched prints exact value (sum_sleep_runtime,
-#   sum_block_runtime, ...).
+#   sum_block_runtime, ...). Perhaps we could use that.
 #
 # EXAMPLES
+#
+#  Every second, print the schedstat values for every thread in PID.
+#
+#    $ schedstat $(pidof sched-latencies)
+#    TIMESTAMP                      PID      TID   %CPU   %LAT   %SLP NSCHED
+#    2024-11-25 06:13:29-08:00  3423162  3423162  100.0    0.0    0.0      5
+#    2024-11-25 06:13:29-08:00  3423162  3423163    0.0    0.0  100.0     99
+#    2024-11-25 06:13:29-08:00  3423162  3423164   99.0    0.0    1.0      1
+#    2024-11-25 06:13:29-08:00  3423162  3423165    0.0    0.0  100.0      4
+#    2024-11-25 06:13:29-08:00  3423162  3423166  100.0    0.0    0.0      1
+#    2024-11-25 06:13:29-08:00  3423162  3423167  100.0    0.0    0.0      2
+#    2024-11-25 06:13:29-08:00  3423162  3423168    0.0    0.0  100.0      0
+#    2024-11-25 06:13:29-08:00  3423162  3423169   37.0    0.0   63.0     22
+#    2024-11-25 06:13:29-08:00  3423162  3423170  100.0    0.0    0.0      2
+#    2024-11-25 06:13:29-08:00  3423162  3423171   38.0    0.0   62.0     61
+#    2024-11-25 06:13:29-08:00  3423162  3423173   98.0    0.0    2.0      8
+#    2024-11-25 06:13:29-08:00  3423162  3423175   71.0    0.0   29.0     33
+#    2024-11-25 06:13:29-08:00  3423162  3423176   53.0    0.0   47.0     28
+#    2024-11-25 06:13:29-08:00  3423162  3423177  100.0    0.0    0.0      5
+#    2024-11-25 06:13:29-08:00  3423162  3423178   99.0    0.0    1.0      4
+#    2024-11-25 06:13:29-08:00  3423162  3423179    0.0    0.0  100.0     54
+#    ----------------------------------
+#    2024-11-25 06:13:30-08:00  3423162  3423162   99.0    0.0    1.0      3
+#    2024-11-25 06:13:30-08:00  3423162  3423163    0.0    0.0  100.0     99
+#    2024-11-25 06:13:30-08:00  3423162  3423164   99.0    0.0    1.0      2
+#    2024-11-25 06:13:30-08:00  3423162  3423165    0.0    0.0  100.0      4
+#    2024-11-25 06:13:30-08:00  3423162  3423166  100.0    0.0    0.0      2
+#    2024-11-25 06:13:30-08:00  3423162  3423167   99.0    0.0    1.0      6
+#    2024-11-25 06:13:30-08:00  3423162  3423168    0.0    0.0  100.0      0
+#    2024-11-25 06:13:30-08:00  3423162  3423169  100.0    0.0    0.0      7
+#    2024-11-25 06:13:30-08:00  3423162  3423170   54.0    0.0   46.0      0
+#    2024-11-25 06:13:30-08:00  3423162  3423171   46.0    0.0   54.0     31
+#    2024-11-25 06:13:30-08:00  3423162  3423173   99.0    0.0    1.0      7
+#    2024-11-25 06:13:30-08:00  3423162  3423175  100.0    0.0    0.0      3
+#    2024-11-25 06:13:30-08:00  3423162  3423176   86.0    0.0   14.0      4
+#    2024-11-25 06:13:30-08:00  3423162  3423177   99.0    0.0    1.0      3
+#    2024-11-25 06:13:30-08:00  3423162  3423178   12.0    0.0   88.0     43
+#    2024-11-25 06:13:30-08:00  3423162  3423179    0.0    0.0  100.0    104
+#    ----------------------------------
+#
+#   Print only a specific thread ID (TID):
+#
+#    $ schedlat 3426582 3426582
+#    TIMESTAMP                      PID      TID   %CPU   %LAT   %SLP NSCHED
+#    2024-11-25 06:16:44-08:00  3426582  3426582   99.0    0.0    1.0      7
+#    2024-11-25 06:16:45-08:00  3426582  3426582  100.0    0.0    0.0     13
+#    2024-11-25 06:16:46-08:00  3426582  3426582  100.0    0.0    0.0      8
+#    2024-11-25 06:16:47-08:00  3426582  3426582   99.0    0.0    1.0      9
+#    2024-11-25 06:16:48-08:00  3426582  3426582  100.0    0.0    0.0      6
+#    2024-11-25 06:16:49-08:00  3426582  3426582  100.0    0.0    0.0      6
+#    2024-11-25 06:16:50-08:00  3426582  3426582   99.0    0.0    1.0     17
+#    ...
+#
+#    $ schedlat 3426582  3426584
+#    TIMESTAMP                      PID      TID   %CPU   %LAT   %SLP NSCHED
+#    2024-11-25 06:16:53-08:00  3426582  3426584   99.0    0.0    1.0      9
+#    2024-11-25 06:16:55-08:00  3426582  3426584  100.0    0.0    0.0      9
+#    2024-11-25 06:16:56-08:00  3426582  3426584  100.0    0.0    0.0     11
+#    ...
+#
+# AUTHORS
+#
+#   Nicolas Hillegeer <nicolas@hilleger.com>
 
 set -euo pipefail
 
-PID=$1
+declare -i PID=$1
+declare -i TID=PID
 
-declare -i on_cpu_ns=0
-declare -i on_runqueue_ns=0
-declare -i nr_ticks=0
+declare -i opt_single=0
+if (( $# == 2 )) ; then
+  TID=$2
+  opt_single=1
+fi
 
-declare -i prev_on_cpu_ns=0
-declare -i prev_on_runqueue_ns=0
-declare -i prev_nr_ticks=0
+printf "%-25s %8s %8s %6s %6s %6s %6s\n" "TIMESTAMP" "PID" "TID" "%CPU" "%LAT" "%SLP" "NSCHED"
 
-printf "%-25s %6s %6s %6s %6s\n" "TIMESTAMP" "%CPU" "%LAT" "%SLP" "NSCHED"
+if (( opt_single )) ; then
+  declare -i on_cpu_ns=0
+  declare -i on_runqueue_ns=0
+  declare -i nr_ticks=0
 
-read -r on_cpu_ns on_runqueue_ns nr_ticks < "/proc/${PID}/schedstat"
+  declare -i prev_on_cpu_ns=0
+  declare -i prev_on_runqueue_ns=0
+  declare -i prev_nr_ticks=0
 
-while : ; do
-  ((prev_on_cpu_ns = on_cpu_ns))
-  ((prev_on_runqueue_ns = on_runqueue_ns))
-  ((prev_nr_ticks = nr_ticks))
-  sleep 1
-  read -r on_cpu_ns on_runqueue_ns nr_ticks < "/proc/${PID}/schedstat"
-  declare -i cpu=$(( (on_cpu_ns-prev_on_cpu_ns)/10000000 ))
-  declare -i lat=$(( (on_runqueue_ns-prev_on_runqueue_ns)/10000000 ))
-  declare -i tic=$(( nr_ticks-prev_nr_ticks ))
-  declare -i slp=$(( 100 - cpu - lat ))
-  printf "%-25s %6.1f %6.1f %6.1f %6d\n" "$(date --rfc-3339=seconds)" ${cpu} ${lat} ${slp} ${tic}
-done
+  read -r on_cpu_ns on_runqueue_ns nr_ticks < "/proc/${PID}/task/${PID}/schedstat"
+
+  while : ; do
+    ((prev_on_cpu_ns = on_cpu_ns))
+    ((prev_on_runqueue_ns = on_runqueue_ns))
+    ((prev_nr_ticks = nr_ticks))
+    sleep 1
+    read -r on_cpu_ns on_runqueue_ns nr_ticks < "/proc/${PID}/schedstat"
+    declare -i cpu=$(( (on_cpu_ns-prev_on_cpu_ns)/10000000 ))
+    declare -i lat=$(( (on_runqueue_ns-prev_on_runqueue_ns)/10000000 ))
+    declare -i tic=$(( nr_ticks-prev_nr_ticks ))
+    declare -i slp=$(( 100 - cpu - lat ))
+    printf "%-25s %8s %8s %6.1f %6.1f %6.1f %6d\n" "$(date --rfc-3339=seconds)" ${PID} ${TID} ${cpu} ${lat} ${slp} ${tic}
+  done
+else
+  # Multi-tid listing requires GNU parallel, for the time being. A pure bash
+  # version that performs well is surprisingly difficult to build...
+  while : ; do
+    parallel -k -j0 \
+      --rpl='{pid}  s:(/[^/]*){3}$:: ; s:.*/::' \
+      --rpl='{tid}  s:(/[^/]*){1}$:: ; s:.*/::' '
+      declare -i prev_on_cpu_ns
+      declare -i prev_on_runqueue_ns
+      declare -i prev_nr_ticks
+      read -r prev_on_cpu_ns prev_on_runqueue_ns prev_nr_ticks < {}
+
+      sleep 1
+
+      declare -i on_cpu_ns
+      declare -i on_runqueue_ns
+      declare -i nr_ticks
+      read -r on_cpu_ns on_runqueue_ns nr_ticks < {}
+
+      declare -i cpu=$(( (on_cpu_ns-prev_on_cpu_ns)/10000000 ))
+      declare -i lat=$(( (on_runqueue_ns-prev_on_runqueue_ns)/10000000 ))
+      declare -i tic=$(( nr_ticks-prev_nr_ticks ))
+      declare -i slp=$(( 100 - cpu - lat ))
+
+      printf "%-25s %8s %8s %6.1f %6.1f %6.1f %6d\n" "$(date --rfc-3339=seconds)" {pid} {tid} ${cpu} ${lat} ${slp} ${tic}
+    ' ::: /proc/${PID}/task/*/schedstat
+    echo '----------------------------------'
+  done
+fi
