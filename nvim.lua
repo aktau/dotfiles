@@ -110,7 +110,7 @@ if not vim.uv.fs_stat(mini_path) then
   vim.cmd([[echo "Installing `mini.nvim`" | redraw]])
   vim.system({
     "git", "clone", "--filter=blob:none",
-    "https://github.com/echasnovski/mini.nvim", mini_path
+    "https://github.com/echasnovski/mini.deps", mini_path
   }):wait()
   vim.cmd("packadd mini.nvim | helptags ALL")
   vim.cmd([[echo "Installed `mini.nvim`" | redraw]])
