@@ -482,10 +482,25 @@ mini.deps.later(function()
 
   do -- mini.align
     mini.deps.add({ source = "echasnovski/mini.align" })
-    require("mini.align").setup({
+    mini.align = require("mini.align")
+    mini.align.setup({
       mappings = {
         start = "<leader>a",
         start_with_preview = "<leader>A",
+      },
+      -- Add special modifier for pipes, often used for (markdown) tables.
+      -- mini.align already has builtins for ["="], [","] and [" "].
+      -- See https://github.com/echasnovski/mini.nvim/issues/1368.
+      modifiers = {
+        ["|"] = function(steps, opts)
+          opts.split_pattern = "|"
+          table.insert(steps.pre_justify, mini.align.gen_step.trim("both", "keep"))
+          opts.merge_delimiter = ' '
+        end,
+      },
+      -- Default options controlling alignment process.
+      steps = {
+        pre_justify = { mini.align.gen_step.trim("both", "keep") }
       },
     })
   end
