@@ -164,8 +164,11 @@ do -- vim-signify (eager due to installing autocommands)
   vim.g.signify_sign_change = "~" -- The default is "!", but I prefer vim-gitgutter's "~"
 end
 
--- Eager due to installing autocommands.
+-- Eager due to installing autocommands (setup happens later).
 mini.deps.add({ source = "andymass/vim-matchup" })
+mini.deps.add({ source = "nvim-treesitter/nvim-treesitter", hooks = { post_checkout = function() vim.cmd("TSUpdate") end } })
+mini.deps.add({ source = "nvim-treesitter/nvim-treesitter-context", depends = { "nvim-treesitter/nvim-treesitter" } })
+mini.deps.add({ source = "nvim-treesitter/nvim-treesitter-textobjects", depends = { "nvim-treesitter/nvim-treesitter" } })
 
 -- Key mappings
 vim.g.mapleader = ","
@@ -326,10 +329,6 @@ mini.deps.later(function()
   mini.deps.add({ source = "nfnty/vim-nftables" })
 
   do -- TreeSitter
-    mini.deps.add({ source = "nvim-treesitter/nvim-treesitter", hooks = { post_checkout = function() vim.cmd("TSUpdate") end } })
-    mini.deps.add({ source = "nvim-treesitter/nvim-treesitter-context", depends = { "nvim-treesitter/nvim-treesitter" } })
-    mini.deps.add({ source = "nvim-treesitter/nvim-treesitter-textobjects", depends = { "nvim-treesitter/nvim-treesitter" } })
-
     local treesitter_parsers = {
       "c",
       "cpp",
