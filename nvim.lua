@@ -536,7 +536,6 @@ local function open_quickfix_in_split()
   -- 5. open the "current" item of the quickfix or loclist list in the newly
   --    created buffer (the current means, the one focused before switching to
   --    the new buffer)
-  vim.print(win)
   vim.cmd(("%s%s"):format(qf_idx, win.loclist == 1 and "ll" or "cc"))
 end
 vim.api.nvim_create_autocmd("FileType",
