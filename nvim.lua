@@ -508,7 +508,7 @@ end)
 
 -- Autocommands
 vim.api.nvim_create_autocmd("BufWritePre",
-  { pattern = "*", command = [[kz|:%s/\s\+$//e|"z]], desc = "clear trailing spaces on save" })
+  { pattern = "*", command = [[kz|:%s/\s\+$//e|'z]], desc = "clear trailing spaces on save" })
 
 vim.api.nvim_create_autocmd("FileType", { pattern = { "c", "cpp" }, command = [[set cindent ]] })
 vim.api.nvim_create_autocmd("FileType", { pattern = { "c", "cpp" }, command = [[setlocal comments^=:///]] })
