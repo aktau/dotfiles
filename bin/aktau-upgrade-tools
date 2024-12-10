@@ -26,7 +26,7 @@ fi
 (
   git-fetch-and-cd https://github.com/neovim/neovim.git "$HOME/github/neovim/neovim"
   make distclean
-  CFLAGS='-fno-omit-frame-pointer' env -u LUA_PATH -u LUA_CPATH make install
+  CFLAGS='-fno-omit-frame-pointer' env -u LUA_PATH -u LUA_CPATH make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$HOME/neovim" CMAKE_BUILD_TYPE=RelWithDebInfo install
 )
 nvim --headless -c 'lua MiniDeps.update({ force = true })' -c 'TSUpdateSync' -c 'qa'
 
