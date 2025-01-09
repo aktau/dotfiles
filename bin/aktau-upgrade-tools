@@ -28,7 +28,7 @@ fi
   make distclean
   CFLAGS='-fno-omit-frame-pointer' env -u LUA_PATH -u LUA_CPATH make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$HOME/neovim" CMAKE_BUILD_TYPE=RelWithDebInfo install
 )
-nvim --headless -c 'lua MiniDeps.update(nil, { force = true })' -c 'TSUpdateSync' -c 'qa'
+nvim --headless -c 'lua ran = false ; MiniDeps.later(function() MiniDeps.update(nil, { force = true }) ; ran = true end) ; vim.wait(1000, function() return ran end)' -c 'TSUpdateSync' -c 'qa'
 
 # Language servers.
 
