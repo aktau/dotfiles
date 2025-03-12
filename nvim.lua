@@ -164,6 +164,11 @@ do -- vim-signify (eager due to installing autocommands)
   vim.g.signify_sign_change = "~" -- The default is "!", but I prefer vim-gitgutter's "~"
 end
 
+-- Filetypes. Eager due to adding autocommands.
+mini.deps.add({ source = "google/vim-jsonnet" })
+mini.deps.add({ source = "mmarchini/bpftrace.vim" })
+mini.deps.add({ source = "nfnty/vim-nftables" })
+
 -- Eager due to installing autocommands (setup happens later).
 mini.deps.add({ source = "andymass/vim-matchup" })
 mini.deps.add({ source = "nvim-treesitter/nvim-treesitter", hooks = { post_checkout = function() vim.cmd("TSUpdate") end } })
@@ -322,11 +327,6 @@ mini.deps.later(function()
   if not vim.iter(ipairs(vim.g.fs_remote_folders)):any(function(_, v) return vim.startswith(cwd, v) end) then
     mini.deps.add({ source = "tpope/vim-fugitive" })
   end
-
-  -- Filetypes.
-  mini.deps.add({ source = "google/vim-jsonnet" })
-  mini.deps.add({ source = "mmarchini/bpftrace.vim" })
-  mini.deps.add({ source = "nfnty/vim-nftables" })
 
   do -- TreeSitter
     local treesitter_parsers = {
