@@ -7,6 +7,12 @@ if [[ ! -e "${HOME}/.zgen/zgen.zsh" ]] ; then
   git clone https://github.com/tarjoilija/zgen.git "${HOME}/.zgen"
 fi
 
+# Workaround for https://github.com/ohmyzsh/ohmyzsh/issues/12328. Async git
+# prompt breaks the git_prompt_info function. Calling _omz_git_prompt_info
+# directly works, but the devs state they will change this. So use the other
+# workaround: revert to sync.
+zstyle ':omz:alpha:lib:git' async-prompt no
+
 source "${HOME}/.zgen/zgen.zsh"
 
 if ! zgen saved ; then
