@@ -1,0 +1,32 @@
+#!/usr/bin/env bpftrace
+
+// vfsreadsnoop.bt
+//
+// Prints paths in reverse order because of (current) bpftrace limitations. Can
+// be postprocessed to yield normal-looking paths. E.g.:
+//
+//     awk '{printf("%s %s %s %s ", $1, $2, $3, $4) ; for (i = NF ; i > 4 ; i--) { printf("/%s", $i) } ; print("") }'
+
+#include <linux/fs.h>
+
+// Use kretfunc instead of a kprobe/kretprobe combo which the original did,
+// because it allows us to read both args and retval at the same time.
+kretfunc:vfs_read /strcontains(comm, str($1))/ {
+    if (retval >= 0) {
+        printf("%-16s %10d want=%-6d read=%-6d", comm, pid, args->count, retval);
+        $dentry = args->file->f_path.dentry;
+        // Print maximum 16 path elements. Otherwise the eBPFs verified refuses
+        // to load this program. An alternative is unroll(16), but that's harder
+        // to manage.
+        //
+        // The sentinel value for "no more parents" is not a NULL pointer, but
+        // d->parent == d.
+        $i = 0;
+        while ($dentry->d_parent != $dentry && $i <= 16) {
+          printf(" %s", str($dentry->d_name.name));
+          $dentry = $dentry->d_parent;
+          $i++;
+        }
+        print("");
+    }
+}
