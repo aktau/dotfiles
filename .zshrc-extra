@@ -125,7 +125,7 @@ export LESS="-R -S"
 
 # Set manpager to nvim if possible. Highlighted linkable manpages!
 if command -v nvim >/dev/null 2>&1 ; then
-  export MANPAGER='nvim --clean -c "colo sorbet" +Man!'
+  export MANPAGER='nvim --clean -c "colo sorbet" -c "set clipboard+=unnamedplus" +Man!'
 fi
 
 # Use the fastest way available to supply fzf(1) with filenames instead of find.
