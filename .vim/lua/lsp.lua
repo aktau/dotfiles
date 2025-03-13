@@ -319,8 +319,15 @@ vim.api.nvim_create_autocmd("LspAttach", {
       -- With gopls, textDocument/formatting only runs gofmt. If we also want
       -- goimports a specific code action. See
       -- https://github.com/Microsoft/language-server-protocol/issues/726.
-      if vim.bo[bufnr].filetype == "go" then
+      --
+      -- TODO(aktau): Detect the presence of source.organizeImports (not just
+      --              advertised, but actually working) on first save.
+      if ft == "go" or ft == "python" then
         local options = { context = { only = { "source.organizeImports" } }, apply = true }
+        -- TODO(aktau): Make synchronous if/when
+        --              https://github.com/neovim/neovim/issues/31206 is fixed.
+        --              Otherwise use a workaround like
+        --              https://github.com/neovim/nvim-lspconfig/issues/115
         aucmd("BufWritePre", function() vim.lsp.buf.code_action(options) end)
       end
 
