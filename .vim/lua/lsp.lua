@@ -11,6 +11,7 @@ vim.diagnostic.config({
   signs = true,             -- Apply signs for diagnostics.
   underline = true,         -- Apply underlines to diagnostics.
   update_in_insert = false, -- Do not update diagnostics while still inserting.
+  virtual_lines = false,     -- Apply virtual text in a shadow line.
   virtual_text = true,      -- Apply virtual text to line endings.
   float = {
     border = "single",
