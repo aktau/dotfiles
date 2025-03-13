@@ -35,7 +35,6 @@ files=(
   .psqlrc
   .tmux.conf
   .tmux.gruvbox.theme
-  .vim
   .zshrc-extra
 )
 linux_files=(
@@ -70,16 +69,6 @@ function setup_link {
     else
         "$scriptdir/safelink.sh" "$dir/$orig" "$HOME/$file" "$olddir_current"
     fi
-}
-
-function setup_neovim {
-    printf "%b %b\n" "${MAKECOLOR}Creating${ENDCOLOR}" 'neovim aliases...'
-
-    # neovim uses the same config as vanilla
-    : "${XDG_CONFIG_HOME:=$HOME/.config}"
-    mkdir -p "$XDG_CONFIG_HOME/nvim"
-    setup_link ".vim" "$XDG_CONFIG_HOME/nvim"
-    setup_link "nvim.lua" "$XDG_CONFIG_HOME/nvim/init.lua"
 }
 
 function setup_dotfiles {
@@ -209,6 +198,5 @@ setup_dotfiles "${files[@]}"
 setup_folders "$dir" "$HOME" "${folders[@]}"
 setup_git
 setup_ssh
-setup_neovim
 config_zsh
 check_zsh
