@@ -3,6 +3,7 @@
 
 .vim/autoload/plug.vim*
 .vim/bundle/*
+.vim/init.lua
 .vim/spell
 .vim/undo
 .vim/view
