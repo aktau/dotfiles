@@ -11,7 +11,7 @@ vim.diagnostic.config({
   signs = true,             -- Apply signs for diagnostics.
   underline = true,         -- Apply underlines to diagnostics.
   update_in_insert = false, -- Do not update diagnostics while still inserting.
-  virtual_lines = false,     -- Apply virtual text in a shadow line.
+  virtual_lines = false,    -- Apply virtual text in a shadow line.
   virtual_text = true,      -- Apply virtual text to line endings.
   float = {
     border = "single",
@@ -302,7 +302,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- Based on
     -- https://gist.github.com/MariaSolOs/2e44a86f569323c478e5a078d0cf98cc.
     if supports("textDocument/completion") then
-      map("i", "<C-Space>", vim.lsp.completion.trigger, "Trigger autocompletion.")
+      map("i", "<C-Space>", vim.lsp.completion.get, "Trigger autocompletion.")
       map("i", "<cr>", function() return (tonumber(vim.fn.pumvisible()) ~= 0) and '<C-y>' or '<cr>' end,
         { expr = true, desc = "Accept completion." })
       vim.lsp.completion.enable(true, args.data.client_id, bufnr, { autotrigger = true })
