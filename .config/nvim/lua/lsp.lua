@@ -22,21 +22,6 @@ vim.diagnostic.config({
   }
 })
 
-vim.lsp.config("*", {
-  capabilities = (function()
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-    -- Add utf-8 in the default capability set. Neovim defaults to only utf-16 since
-    -- https://github.com/neovim/neovim/commit/ca26ec3438 because it is unable to
-    -- deal with different encodings if there are multiple clients for a buffer. But
-    -- we use only one client per buffer (clangd supports utf-8, for example).
-    capabilities.general.positionEncodings = {
-      "utf-8",
-      "utf-16",
-    }
-    return capabilities
-  end)(),
-})
-
 --- @param name string
 --- @param config vim.lsp.Config
 local function configure(name, config)
