@@ -255,7 +255,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
       -- automatically request pre-save edits. Most language servers will
       -- include formatting in this.
       if not supports("textDocument/willSaveWaitUntil") then
-        aucmd("BufWritePre", function() vim.lsp.buf.format({ timeout_ms = 1000 }) end)
+        aucmd("BufWritePre", function() vim.lsp.buf.format({ bufnr = bufnr, id = client.id, timeout_ms = 1000 }) end)
       end
     end
 
