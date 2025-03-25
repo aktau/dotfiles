@@ -15,9 +15,8 @@ vim.diagnostic.config({
   virtual_text = true,      -- Apply virtual text to line endings.
   float = {
     border = "single",
-    header = false,
     scope = "line",
-    source = "always",
+    source = "if_many",
     focusable = false, -- Don't mess with my normal window movements.
   }
 })
