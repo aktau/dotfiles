@@ -22,213 +22,147 @@ vim.diagnostic.config({
   }
 })
 
-local configs = {
-  ["clangd"] = {
-    cmd = { "clangd" },
-    filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
-    root_dir = function(fname)
-      return vim.fs.root(fname, {
-        ".clangd",
-        ".clang-tidy",
-        ".clang-format",
-        "compile_commands.json",
-        "compile_flags.txt",
-        "configure.ac", -- AutoTools
-      }) or vim.fs.root(fname, {
-        ".git",
-      })
-    end,
-  },
-  ["gopls"] = {
-    cmd = { "gopls" },
-    filetypes = { "go", "gomod", "gotmpl" },
-    root_dir = function(fname)
-      return vim.fs.root(fname, {
-        "go.work",
-      }) or vim.fs.root(fname, {
-        ".git",
-      }) or vim.fs.root(fname, {
-        "go.mod",
-      })
-    end,
-    settings = {
-      gopls = {
-        codelenses = {
-          gc_details = true,    -- This is the only lens that defaults to false, enable it.
-        },
-        usePlaceholders = true, -- Enables placeholders for function parameters or struct fields in completion responses.
-        analyses = {
-          fieldalignment = true,
-          nilness = true,
-          shadow = true, -- Check for shadowed variables where the shadowed variable is used in the outer scope afterwards.
-          useany = true, -- Check for constraints that could be simplified to "any".
-          unusedparams = true,
-          unusedwrite = true,
-        },
-        staticcheck = true, -- Enable extra staticcheck analyzers.
-      },
-      hints = {
-        constantValues = true, -- Shows values for constants (when using iota).
-        -- parameterNames = true, -- Show parameter names when calling functions.
-      },
-    },
-  },
-  ["efm"] = {
-    cmd = { "efm-langserver" },
-    filetypes = { "bash", "sh", "zsh" },
-    -- Normally root_dir is set to util.root_pattern(".git"). But this means
-    -- shellcheck is not enabled for any shell file not in a git repository,
-    -- which is not desirable. `root_dir` is required, it servers as an LSP
-    -- deduplication point. We only want one EFM so just set it to /.
-    root_dir = function() return "/" end,
-  },
-  ["luals"] = {
-    cmd = { "lua-language-server" },
-    filetypes = { "lua" },
-    root_dir = function(fname)
-      return vim.fs.root(fname, {
-        ".luarc.json",
-        ".luarc.jsonc",
-        ".luacheckrc",
-        ".stylua.toml",
-        "stylua.toml",
-        "selene.toml",
-        "selene.yml",
-      }) or vim.fs.root(fname, {
-        ".git",
-      }) or vim.fs.root(fname, {
-        "lua",
-      }) or os.getenv("HOME")
-    end,
-    settings = {
-      Lua = {
-        telemetry = {
-          enable = false
-        },
-        runtime = {
-          version = "LuaJIT", -- Neovim uses LuaJIT.
-        },
-        diagnostics = {
-          globals = { "vim" }, -- Global variable in Neovim.
-        },
-        completion = {
-          enable = true,
-        },
-        workspace = {
-          library = vim.api.nvim_get_runtime_file("", true), -- Runtime libs.
-          -- Prevent questions about working environment
-          -- (https://github.com/neovim/nvim-lspconfig/issues/1700).
-          checkThirdParty = false,
-        },
-      },
-    },
-  },
-}
+vim.lsp.config("*", {
+  capabilities = (function()
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    -- Add utf-8 in the default capability set. Neovim defaults to only utf-16 since
+    -- https://github.com/neovim/neovim/commit/ca26ec3438 because it is unable to
+    -- deal with different encodings if there are multiple clients for a buffer. But
+    -- we use only one client per buffer (clangd supports utf-8, for example).
+    capabilities.general.positionEncodings = {
+      "utf-8",
+      "utf-16",
+    }
+    return capabilities
+  end)(),
+})
 
--- Lookup table of LSP servers by filetype.
-local servers_by_filetype = {}
+--- @param name string
+--- @param config vim.lsp.Config
+local function configure(name, config)
+  vim.lsp.config[name] = config
+  vim.lsp.enable(name)
+end
 
--- Will make `server_name` the _first_ server started for every item in
--- `filetypes`.
-local function register_server_for_filetypes(server_name, filetypes)
-  -- Prepend `item` to the list (`tbl`), or create the list.
-  local function tbl_prepend(tbl, item)
-    if tbl == nil then
-      return { item }
+-- Turns a root finder that takes a file into a vim.lsp.Config.root_dir
+-- function. If the root finder returns nil, the LSP is not started.
+--
+--- @param find fun(string): string?
+--- @return fun(bufnr: integer, cb:fun(root_dir?:string))
+local function make_root_fn(find)
+  return function(bufnr, cb)
+    local root = find(vim.api.nvim_buf_get_name(bufnr))
+    if root then
+      cb(root)
     end
-    table.insert(tbl, 1, item)
-    return tbl
-  end
-
-  for _, ft in ipairs(filetypes) do
-    servers_by_filetype[ft] = tbl_prepend(servers_by_filetype[ft], server_name)
   end
 end
 
-for name, config in pairs(configs) do
-  register_server_for_filetypes(name, config.filetypes)
-end
+configure("clangd", {
+  cmd = { "clangd" },
+  filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
+  root_dir = make_root_fn(function(fname)
+    return vim.fs.root(fname, {
+      ".clangd",
+      ".clang-tidy",
+      ".clang-format",
+      "compile_commands.json",
+      "compile_flags.txt",
+      "configure.ac", -- AutoTools
+    }) or vim.fs.root(fname, {
+      ".git",
+    })
+  end),
+})
 
-local override_lsp = vim.g.aktau_override_lsp
-if override_lsp ~= nil then
-  configs[override_lsp.name] = {
-    cmd = override_lsp.cmd,
-    filetypes = override_lsp.filetypes,
-    -- Only run instances of the remote fs LSP for files that are actually on
-    -- the remote fs.
-    --
-    -- override_lsp_root returns the first matching root from
-    -- `g:aktau_override_lsp.roots` that `fname` is a child of, returns nil if
-    -- none match.
-    root_dir = function(fname)
-      -- Early out shortcuts, if either `fname` or `g:aktau_override_lsp.roots`
-      -- are empty.
-      if fname == nil or fname == '' then
-        return nil
-      end
-      if override_lsp.roots == nil or #override_lsp.roots == 0 then
-        return nil
-      end
+configure("gopls", {
+  cmd = { "gopls" },
+  filetypes = { "go", "gomod", "gotmpl" },
+  root_dir = make_root_fn(function(fname)
+    return vim.fs.root(fname, {
+      "go.work",
+    }) or vim.fs.root(fname, {
+      ".git",
+    }) or vim.fs.root(fname, {
+      "go.mod",
+    })
+  end),
+  settings = {
+    gopls = {
+      codelenses = {
+        gc_details = true,    -- This is the only lens that defaults to false, enable it.
+      },
+      usePlaceholders = true, -- Enables placeholders for function parameters or struct fields in completion responses.
+      analyses = {
+        fieldalignment = true,
+        nilness = true,
+        shadow = true, -- Check for shadowed variables where the shadowed variable is used in the outer scope afterwards.
+        useany = true, -- Check for constraints that could be simplified to "any".
+        unusedparams = true,
+        unusedwrite = true,
+      },
+      staticcheck = true, -- Enable extra staticcheck analyzers.
+    },
+    hints = {
+      constantValues = true, -- Shows values for constants (when using iota).
+      -- parameterNames = true, -- Show parameter names when calling functions.
+    },
+  },
+})
 
-      for _, root_for_override_lsp in ipairs(override_lsp.roots) do
-        if vim.startswith(fname, root_for_override_lsp) then
-          return root_for_override_lsp
-        end
-      end
+configure("efm", {
+  cmd = { "efm-langserver" },
+  filetypes = { "bash", "sh", "zsh" },
+  -- Normally root_dir is set to util.root_pattern(".git"). But this means
+  -- shellcheck is not enabled for any shell file not in a git repository,
+  -- which is not desirable. `root_dir` is required, it servers as an LSP
+  -- deduplication point. We only want one EFM so just set it to /.
+  root_dir = "/",
+})
 
-      return nil
-    end,
-  }
-
-  register_server_for_filetypes(override_lsp.name, override_lsp.filetypes)
-end
-
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-
--- Add utf-8 in the default capability set. Neovim defaults to only utf-16 since
--- https://github.com/neovim/neovim/commit/ca26ec3438 because it is unable to
--- deal with different encodings if there are multiple clients for a buffer. But
--- we use only one client per buffer (clangd supports utf-8, for example).
-capabilities.general.positionEncodings = {
-  "utf-8",
-  "utf-16",
-}
+configure("luals", {
+  cmd = { "lua-language-server" },
+  filetypes = { "lua" },
+  root_dir = make_root_fn(function(fname)
+    return vim.fs.root(fname, {
+      ".luarc.json",
+      ".luarc.jsonc",
+      ".luacheckrc",
+      ".stylua.toml",
+      "stylua.toml",
+      "selene.toml",
+      "selene.yml",
+    }) or vim.fs.root(fname, {
+      ".git",
+    }) or vim.fs.root(fname, {
+      "lua",
+    }) or os.getenv("HOME")
+  end),
+  settings = {
+    Lua = {
+      telemetry = {
+        enable = false
+      },
+      runtime = {
+        version = "LuaJIT", -- Neovim uses LuaJIT.
+      },
+      diagnostics = {
+        globals = { "vim" }, -- Global variable in Neovim.
+      },
+      completion = {
+        enable = true,
+      },
+      workspace = {
+        library = vim.api.nvim_get_runtime_file("", true), -- Runtime libs.
+        -- Prevent questions about working environment
+        -- (https://github.com/neovim/nvim-lspconfig/issues/1700).
+        checkThirdParty = false,
+      },
+    },
+  },
+})
 
 local lsp_augroup = vim.api.nvim_create_augroup("lsp", { clear = true })
-
--- Start a matching LSP client for any of the filetypes owned by the servers in
--- `configs`.
-vim.api.nvim_create_autocmd("FileType", {
-  group = lsp_augroup,
-  pattern = vim.tbl_keys(servers_by_filetype), -- Union of all recognized filetypes.
-  callback = function(args)
-    local ft = args.match
-    local servers = servers_by_filetype[ft]
-    for _, server_name in ipairs(servers) do
-      -- Start the first LSP in servers_by_filetype[ft] that returns a matching
-      -- root_dir.
-      local config = configs[server_name]
-      -- Autcommands supply the file in relative (to cwd) fashion, but
-      -- vim.fs.find (used in many root_dir functions) doesn't appear to search
-      -- upwards from the relative root. Instead of handling it downstream,
-      -- absolutize here.
-      local root_dir = config.root_dir(vim.api.nvim_buf_get_name(0))
-      if root_dir ~= nil then
-        vim.lsp.start({
-          name = server_name,
-          cmd = config.cmd,
-          root_dir = root_dir,
-          capabilities = capabilities,
-          settings = config.settings,
-        })
-        return
-      end
-    end
-    print("WARNING: the filetype", ft,
-      "is claimed by at least one LSP server config, but none were executable or had a non-nil root_dir, available:",
-      vim.inspect(servers))
-  end,
-})
 
 -- Make this global, to avoid looking it up every LspAttach (and we'd need to
 -- avoid clearing with  clear = false} (clearing is the default).
