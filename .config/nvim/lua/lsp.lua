@@ -209,13 +209,13 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local capability_filetype_override = {
       markdown = common_capability_override,
     }
-    local function supports(method, opts)
+
+    local function supports(method)
       local ft_override = capability_filetype_override[ft]
       if ft_override ~= nil and ft_override[method] ~= nil then
         return ft_override[method]
       end
-
-      return client:supports_method(method, opts)
+      return client:supports_method(method, bufnr)
     end
 
     -- Based on
@@ -274,7 +274,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
       aucmd("CursorMoved", function() vim.lsp.buf.clear_references() end)
     end
 
-    if supports("textDocument/inlayHint", { bufnr = bufnr }) and (vim.fn.has("nvim-0.10") == 1) then
+    if supports("textDocument/inlayHint") and (vim.fn.has("nvim-0.10") == 1) then
       vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
       map("n", "<Leader>th", function()
         local enable = not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr })
