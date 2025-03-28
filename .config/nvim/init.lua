@@ -98,7 +98,9 @@ vim.opt.mouse         = "" -- Disable mouse (allows copying from cmdline).
 vim.opt.diffopt       = {
   "vertical",              -- Vertical diff windows on :diffsplit.
   "algorithm:patience",    -- Available since Vim 8 & Neovim
+  "inline:word",           -- Highlight differences within a line at word granularity.
   "linematch:50",
+  "closeoff",              -- Turn off diff move if either of a split is closed.
 }
 
 -- Plugins
