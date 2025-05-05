@@ -28,16 +28,23 @@ local function configure(name, config)
   vim.lsp.enable(name)
 end
 
--- Turns a root finder that takes a file into a vim.lsp.Config.root_dir
--- function. If the root finder returns nil, the LSP is not started.
+-- Turns a root_markers list (as would normally be assigned to
+-- lsp.Config.root_markers) into a root_dir that only starts the LSP server if
+-- at least one non-nil root is found.
 --
---- @param find fun(string): string?
+-- This is different to lsp.Config.root_markers, as that will start an LSP
+-- server even if no root is found.
+--
+--- @param root_markers (string|string[])[]
 --- @return fun(bufnr: integer, cb:fun(root_dir?:string))
-local function make_root_fn(find)
+local function root_markers_required(root_markers)
   return function(bufnr, cb)
-    local root = find(vim.api.nvim_buf_get_name(bufnr))
-    if root then
-      cb(root)
+    for _, marker in ipairs(root_markers) do
+      local root = vim.fs.root(bufnr, marker)
+      if root ~= nil then
+        cb(root)
+        return
+      end
     end
   end
 end
@@ -45,32 +52,27 @@ end
 configure("clangd", {
   cmd = { "clangd" },
   filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
-  root_dir = make_root_fn(function(fname)
-    return vim.fs.root(fname, {
+  root_dir = root_markers_required({
+    {
       ".clangd",
       ".clang-tidy",
       ".clang-format",
       "compile_commands.json",
       "compile_flags.txt",
       "configure.ac", -- AutoTools
-    }) or vim.fs.root(fname, {
-      ".git",
-    })
-  end),
+    },
+    ".git",
+  }),
 })
 
 configure("gopls", {
   cmd = { "gopls" },
   filetypes = { "go", "gomod", "gotmpl" },
-  root_dir = make_root_fn(function(fname)
-    return vim.fs.root(fname, {
-      "go.work",
-    }) or vim.fs.root(fname, {
-      ".git",
-    }) or vim.fs.root(fname, {
-      "go.mod",
-    })
-  end),
+  root_dir = root_markers_required({
+    "go.work",
+    ".git",
+    "go.mod",
+  }),
   settings = {
     gopls = {
       codelenses = {
@@ -107,8 +109,8 @@ configure("efm", {
 configure("luals", {
   cmd = { "lua-language-server" },
   filetypes = { "lua" },
-  root_dir = make_root_fn(function(fname)
-    return vim.fs.root(fname, {
+  root_dir = root_markers_required({
+    {
       ".luarc.json",
       ".luarc.jsonc",
       ".luacheckrc",
@@ -116,12 +118,11 @@ configure("luals", {
       "stylua.toml",
       "selene.toml",
       "selene.yml",
-    }) or vim.fs.root(fname, {
-      ".git",
-    }) or vim.fs.root(fname, {
-      "lua",
-    }) or os.getenv("HOME")
-  end),
+    },
+    ".git",
+    "lua",
+    os.getenv("HOME"),
+  }),
   settings = {
     Lua = {
       telemetry = {
