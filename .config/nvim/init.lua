@@ -277,19 +277,9 @@ mini.deps.later(function()
   -- text object (gc). noremap doesn't work, not sure why.
   vim.keymap.set("n", "<leader>e", "gwgc", { remap = true, desc = "rewrap the current comment block" })
 
-  -- TODO(aktau): Remove when https://github.com/neovim/neovim/issues/31100.
-  --
-  -- Source: https://gist.github.com/telemachus/9410fcd2d7484ccf080b02144f85012b
-  -- (earlier version).
-  local function adjust_paste(reg_name, paste_type, paste_cmd)
-    local reg_type = vim.fn.getregtype(reg_name)
-    vim.fn.setreg(reg_name, vim.fn.getreg(reg_name), paste_type)
-    vim.cmd.normal([["]] .. reg_name .. paste_cmd)
-    vim.fn.setreg(reg_name, vim.fn.getreg(reg_name), reg_type)
-  end
-  local default_opts = { remap = false, silent = true }
-  vim.keymap.set("n", "[p", function() adjust_paste(vim.v.register, "l", "P") end, default_opts) -- linewise above
-  vim.keymap.set("n", "]p", function() adjust_paste(vim.v.register, "l", "p") end, default_opts) -- linewise below
+  -- Paste before/after linewise
+  vim.keymap.set({ "n", "x" }, "[p", [[<Cmd>exe "iput! " . v:register<CR>]], { desc = "Paste above" })
+  vim.keymap.set({ "n", "x" }, "]p", [[<Cmd>exe "iput "  . v:register<CR>]], { desc = "Paste below" })
 
   if vim.fn.executable("nvr") then
     -- Set the source control systems" editor (e.g.: git commit --amend) to:
