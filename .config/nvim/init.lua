@@ -397,30 +397,48 @@ mini.deps.later(function()
     })
   end
 
-  -- Plugins with setup.
-  do -- telescope.nvim
-    mini.deps.add({ source = "nvim-telescope/telescope.nvim", depends = { "nvim-lua/plenary.nvim" } })
+  do -- fzf-lua
+    mini.deps.add({ source = "ibhagwan/fzf-lua" })
 
-    vim.keymap.set("n", "<c-p>", "<cmd>Telescope find_files hidden=true<cr>", { silent = true })                  -- ctrl-p: find files.
-    vim.keymap.set("n", "<c-m-p>", "<cmd>Telescope find_files hidden=true no_ignore=true<cr>", { silent = true }) -- ctrl-alt-p: find files but don't take .gitignore into account.
-    vim.keymap.set("n", "<c-g>", "<cmd>Telescope live_grep<cr>", { silent = true })                               -- Like <leader>g but much more dynamic.
-    vim.keymap.set("n", "<c-f>", "<cmd>Telescope help_tags<cr>", { silent = true })                               -- Better help tags search. Regrettably c-h is already taken by split nav.
-    vim.keymap.set("n", "<m-p>", "<cmd>Telescope commands<cr>", { silent = true })                                -- Command palette, type <alt-p> because <c-shift-p> doesn't seem to work right in ChromeOS.
-
-    local actions = require("telescope.actions")
-    require("telescope").setup({
-      defaults = {
-        mappings = {
-          -- Quite on escape (in insert mode).
-          i = {
-            ["<esc>"] = actions.close,
-            -- Cycle through previous selected prompts.
-            ["<C-Down>"] = actions.cycle_history_next,
-            ["<C-Up>"] = actions.cycle_history_prev,
-          },
+    mini.deps.later(function()
+      require("fzf-lua").setup({
+        defaults = {
+          -- Setting the following to false leads to better performance. It
+          -- enables the "native" mode (no interposition) even when the
+          -- non-native variants (e.g.: live_grep) are executed.
+          file_icons = false,
+          git_icons = false,
         },
-      },
-    })
+        grep = {
+          rg_glob = false, -- Inhibits native mode, and I never use it.
+        },
+        fzf_colors = {
+          true, -- It looks ugly without this.
+        },
+      })
+
+      -- Override |vim.ui.select|. See
+      -- https://github.com/ibhagwan/fzf-lua/wiki#automatic-sizing-of-heightwidth-of-vimuiselect.
+      require("fzf-lua").register_ui_select(function(_, items)
+        local min_h, max_h = 0.15, 0.70
+        local h = (#items + 4) / vim.o.lines
+        if h < min_h then
+          h = min_h
+        elseif h > max_h then
+          h = max_h
+        end
+        return { winopts = { height = h, width = 0.60, row = 0.40 } }
+      end)
+    end)
+
+    vim.keymap.set("n", "<c-p>", function() require("fzf-lua").files() end, { desc = "fuzzy find files" })
+    vim.keymap.set("n", "<c-g>", function() require("fzf-lua").live_grep() end, { desc = "fuzzy live grep" })
+    vim.keymap.set("n", "<c-f>", function() require("fzf-lua").helptags() end, { desc = "fuzzy help tags" }) --Regrettably c-h is already taken by split nav.
+    vim.keymap.set("n", "<m-p>", function() require("fzf-lua").commands() end, { desc = "fuzzy command palette" })
+    vim.keymap.set("n", "<m-k>", function() require("fzf-lua").keymaps() end, { desc = "fuzzy keymaps" })
+    vim.keymap.set("n", "<m-h>", function() require("fzf-lua").command_history() end, { desc = "fuzzy command history" })
+    vim.keymap.set({ "n", "v", "i" }, "<C-x><C-f>", function() require("fzf-lua").complete_path() end,
+      { desc = "fuzzy complete path" })
   end
 
   do -- flash.nvim
