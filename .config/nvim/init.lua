@@ -131,18 +131,7 @@ end
 
 do -- lualine.nvim (eager due to affecting the UI)
   mini.deps.add({ source = "nvim-lualine/lualine.nvim", })
-  mini.deps.add({ source = "arkav/lualine-lsp-progress", depends = { "nvim-lualine/lualine.nvim" } })
 
-  local function lsp_client_names()
-    local clients = {}
-    for idx, client in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
-      clients[idx] = client.name
-    end
-    if next(clients) == nil then
-      return ""
-    end
-    return "LSP(" .. table.concat(clients, "/") .. ")"
-  end
   require("lualine").setup({
     options = {
       icons_enabled = false,
@@ -152,7 +141,7 @@ do -- lualine.nvim (eager due to affecting the UI)
     sections = {
       lualine_a = { "mode" },
       lualine_b = { "branch", { "diagnostics", sources = { "nvim_diagnostic" } } },
-      lualine_c = { { "filename", path = 1 }, lsp_client_names, "lsp_progress" },
+      lualine_c = { { "filename", path = 1 }, "lsp_status" },
       lualine_x = { "encoding", "fileformat", "filetype" },
       lualine_y = { "progress" },
       lualine_z = { "location" }
