@@ -18,6 +18,7 @@ source "${HOME}/.zgen/zgen.zsh"
 if ! zgen saved ; then
   zgen load zsh-users/zsh-syntax-highlighting       # Syntax highlight while you type.
   zgen load zsh-users/zsh-history-substring-search  # Too useful to miss.
+  zgen load zsh-users/zsh-autosuggestions
 
   # Need the oh-my-zsh git library for fetching information out of the prompt.
   zgen oh-my-zsh lib/git.zsh
@@ -39,3 +40,14 @@ if ! zgen saved ; then
   # Generate the init script from plugins above.
   zgen save
 fi
+
+# zsh-autosuggestions
+#
+# Press "right arrow" to accept the autosuggestion. For some reason the
+# following doesn't work:
+#
+#   bindkey '^ ' autosuggest-accept
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1 # Performance
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#bd93f9,bold"
