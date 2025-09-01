@@ -36,7 +36,8 @@ vim.opt.modeline              = false      -- Modeline is a security risk, edito
 vim.opt.textwidth             = 80           -- Max column.
 vim.opt.colorcolumn           = "+1"         -- Draw the delimiting line one after textwidth.
 vim.opt.formatoptions:append("n")            -- format numbered lists properly
-vim.opt.gdefault = true                      -- vim.opt.the global flag on substitute commands by default
+vim.opt.foldenable = false                   -- I don't like folds, recent nvim seem to have foldexpr set (to a treesitter-based expr) for some filetypes.
+vim.opt.gdefault   = true                    -- vim.opt.the global flag on substitute commands by default
 vim.opt.matchpairs:append("<:>")             -- Match < and > as well.
 vim.opt.wildmode            = "list:longest" -- Complete files like a shell.
 vim.opt.wildignore          = {              -- Stuff to ignore when tab completing
