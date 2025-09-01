@@ -424,6 +424,7 @@ mini.deps.later(function()
     vim.keymap.set("n", "<c-p>", function() require("fzf-lua").files() end, { desc = "fuzzy find files" })
     vim.keymap.set("n", "<c-g>", function() require("fzf-lua").live_grep() end, { desc = "fuzzy live grep" })
     vim.keymap.set("n", "<c-f>", function() require("fzf-lua").helptags() end, { desc = "fuzzy help tags" }) --Regrettably c-h is already taken by split nav.
+    vim.keymap.set("n", "<c-d>", function() require("fzf-lua").tabs() end, { desc = "fuzzy buffer select" }) -- Can't use c-b because tmux owns that.
     vim.keymap.set("n", "<m-p>", function() require("fzf-lua").commands() end, { desc = "fuzzy command palette" })
     vim.keymap.set("n", "<m-k>", function() require("fzf-lua").keymaps() end, { desc = "fuzzy keymaps" })
     vim.keymap.set("n", "<m-h>", function() require("fzf-lua").command_history() end, { desc = "fuzzy command history" })
