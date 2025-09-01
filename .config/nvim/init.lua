@@ -285,10 +285,11 @@ mini.deps.later(function()
     --
     -- Use job control instead of `!...`  because these commands need to block, and
     -- their blocking nature prevents Neovim from opening the desired split.
-    vim.keymap.set("n", "<leader>ch", function() vim.system({ "hg", "reword" }) end)
-    vim.keymap.set("n", "<leader>cg", function() vim.system({ "git", "commit", "--verbose", "--amend" }) end)
-    vim.keymap.set("n", "<leader>cc", function() vim.system({ "git", "commit", "--verbose" }) end)
-    vim.keymap.set("n", "<leader>cp", function() vim.system({ "p4", "change" }) end)
+    vim.keymap.set("n", "<leader>ch", function() vim.system({ "hg", "reword" }) end, { desc = "reword/amend hg commit" })
+    vim.keymap.set("n", "<leader>cg", function() vim.system({ "git", "commit", "--verbose", "--amend" }) end,
+      { desc = "reword/amend git commit" })
+    vim.keymap.set("n", "<leader>cp", function() vim.system({ "p4", "change" }) end,
+      { desc = "reword/amend perforce commit" })
   end
 end)
 
