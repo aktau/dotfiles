@@ -525,9 +525,18 @@ mini.deps.later(function()
   })
 end)
 
+vim.filetype.add({
+  extension = {
+    ["9p"] = "asm",
+  },
+})
+
 -- Autocommands
 vim.api.nvim_create_autocmd("BufWritePre",
   { pattern = "*", command = [[kz|:%s/\s\+$//e|'z]], desc = "clear trailing spaces on save" })
+
+vim.api.nvim_create_autocmd("FileType",
+  { pattern = { "asm" }, command = [[setlocal tabstop=8 listchars=tab:\ \ ,trail:…]] })
 
 vim.api.nvim_create_autocmd("FileType", { pattern = { "c", "cpp" }, command = [[set cindent ]] })
 vim.api.nvim_create_autocmd("FileType", { pattern = { "c", "cpp" }, command = [[setlocal comments^=:///]] })
