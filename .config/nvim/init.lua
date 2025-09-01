@@ -494,7 +494,7 @@ mini.deps.later(function()
         pre_justify = { mini.align.gen_step.trim("both", "keep") }
       },
     })
-   end
+  end
 end)
 
 -- Settings that can be done lazily.
