@@ -34,7 +34,7 @@ vim.opt.modeline              = false      -- Modeline is a security risk, edito
 
 -- editing
 vim.opt.textwidth             = 80           -- Max column.
-vim.opt.colorcolumn           = { vim.o.textwidth + 1 }
+vim.opt.colorcolumn           = "+1"         -- Draw the delimiting line one after textwidth.
 vim.opt.formatoptions:append("n")            -- format numbered lists properly
 vim.opt.gdefault = true                      -- vim.opt.the global flag on substitute commands by default
 vim.opt.matchpairs:append("<:>")             -- Match < and > as well.
