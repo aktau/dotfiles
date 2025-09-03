@@ -108,7 +108,7 @@ vim.opt.diffopt       = {
 -- Download (if needed) and setup mini.deps plugin manager.
 local path_package    = vim.fn.stdpath("data") .. "/site/"
 local mini_path       = path_package .. "pack/deps/start/mini.nvim"
-if not vim.uv.fs_stat(mini_path) then
+if not vim.uv.fs_access(mini_path, "") then
   vim.cmd([[echo "Installing `mini.nvim`" | redraw]])
   vim.system({
     "git", "clone", "--filter=blob:none",
@@ -174,7 +174,7 @@ vim.g.mapleader = ","
 vim.g.fs_remote_folders = {}
 
 local function sourcefile(fname)
-  if vim.uv.fs_stat(fname) then
+  if vim.uv.fs_access(fname, "") then
     dofile(fname)
   end
 end
