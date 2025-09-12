@@ -104,8 +104,8 @@ vim.opt.diffopt:append({
 -- Plugins
 
 -- Download (if needed) and setup mini.deps plugin manager.
-local path_package    = vim.fn.stdpath("data") .. "/site/"
-local mini_path       = path_package .. "pack/deps/start/mini.nvim"
+local path_package = vim.fn.stdpath("data") .. "/site/"
+local mini_path    = path_package .. "pack/deps/start/mini.nvim"
 if not vim.uv.fs_access(mini_path, "") then
   vim.cmd([[echo "Installing `mini.nvim`" | redraw]])
   vim.system({
