@@ -95,13 +95,11 @@ vim.opt.updatetime    = 500  -- CursorHold after 500s. Used by vim-signify etc.
 vim.opt.scrolloff     = 10
 vim.opt.sidescrolloff = 7
 vim.opt.mouse         = "" -- Disable mouse (allows copying from cmdline).
-vim.opt.diffopt       = {
-  "vertical",              -- Vertical diff windows on :diffsplit.
+vim.opt.diffopt:append({
   "algorithm:patience",    -- Available since Vim 8 & Neovim
-  "inline:word",           -- Highlight differences within a line at word granularity.
-  "linematch:50",
-  "closeoff",              -- Turn off diff move if either of a split is closed.
-}
+  "linematch:60",          -- Align and mark changes between the most similar lines between the buffers. Lines will not be aligned if diff hunk is larger than {n}. Default is 40.
+  "vertical",              -- Vertical diff windows on :diffsplit.
+})
 
 -- Plugins
 
