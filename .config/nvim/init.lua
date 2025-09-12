@@ -120,11 +120,6 @@ local mini = {
 }
 mini.deps.setup({ path = { package = path_package } })
 
-do -- Colorscheme (eager due to affecting the UI).
-  mini.deps.add({ source = "mhartington/oceanic-next" })
-  vim.cmd.colorscheme("OceanicNext")
-end
-
 do -- lualine.nvim (eager due to affecting the UI)
   mini.deps.add({ source = "nvim-lualine/lualine.nvim", })
 
