@@ -103,22 +103,23 @@ vim.opt.diffopt:append({
 
 -- Plugins
 
--- Download (if needed) and setup mini.deps plugin manager.
-local path_package = vim.fn.stdpath("data") .. "/site/"
-local mini_path    = path_package .. "pack/deps/start/mini.nvim"
-if not vim.uv.fs_access(mini_path, "") then
-  vim.cmd([[echo "Installing `mini.nvim`" | redraw]])
-  vim.system({
-    "git", "clone", "--filter=blob:none",
-    "https://github.com/echasnovski/mini.deps", mini_path
-  }):wait()
-  vim.cmd("packadd mini.nvim | helptags ALL")
-  vim.cmd([[echo "Installed `mini.nvim`" | redraw]])
-end
+-- A shim that allows using the mini.deps API, backed by vim.pack.
 local mini = {
-  deps = require("mini.deps"),
+  deps = {
+    add = function(minispec)
+      local opts = { confirm = false }
+      for _, dep in ipairs(minispec.depends or {}) do
+        -- Add dependencies too. From the docs:
+        --
+        --  Adding plugin second and more times during single session does
+        --  nothing: only the data from the first adding is registered.
+        vim.pack.add({ { src = "https://github.com/" .. dep } }, opts)
+      end
+      return vim.pack.add({ { src = "https://github.com/" .. minispec.source, data = minispec } }, opts)
+    end,
+    later = vim.schedule,
+  }
 }
-mini.deps.setup({ path = { package = path_package } })
 
 do -- lualine.nvim (eager due to affecting the UI)
   mini.deps.add({ source = "nvim-lualine/lualine.nvim", })
