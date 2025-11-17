@@ -304,8 +304,10 @@ mini.deps.later(function()
 
   do -- TreeSitter
     local treesitter_parsers = {
+      "bash",
       "c",
       "cpp",
+      "diff",
       "go",
       "lua",             -- Want highlighting of lua nested in viml.
       "markdown",        -- Doesn't desync, and supports nested syntaxes (code blocks).
