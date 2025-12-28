@@ -149,7 +149,6 @@ end
 
 -- Filetypes. Eager due to adding autocommands.
 mini.deps.add({ source = "google/vim-jsonnet" })
-mini.deps.add({ source = "mmarchini/bpftrace.vim" })
 mini.deps.add({ source = "nfnty/vim-nftables" })
 
 -- Eager due to installing autocommands (setup happens later).
