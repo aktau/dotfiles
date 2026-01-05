@@ -28,6 +28,9 @@ PROMPT='%F{green}%D{%T}%f${_MVMN_HOST} %B%F{blue}%2~%f%b ${_MVMN_GIT_CACHE}%B»%
 # colors right before these statements... I have to figure out what that's
 # all about.
 autoload -U colors && colors
+# prompt_subst is not enabled by default. In some installations (like NixOS),
+# this defaults to false. Enable this to expand variables like $_MVMN_GIT_CACHE.
+setopt PROMPT_SUBST
 ZSH_THEME_GIT_PROMPT_PREFIX="%B%F{blue}git:(%F{red}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%f%b "
 ZSH_THEME_GIT_PROMPT_DIRTY="%F{blue}) %F{yellow}✗"
