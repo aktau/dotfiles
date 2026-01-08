@@ -104,6 +104,19 @@ vim.opt.diffopt:append({
 -- Plugins
 
 -- A shim that allows using the mini.deps API, backed by vim.pack.
+local function minispecToPackspec(minispec)
+  -- Canonicalize string-only minispecs.
+  if type(minispec) == "string" then
+    local sourceStr = minispec
+    minispec = { source = sourceStr }
+  end
+
+  return {
+    src = "https://github.com/" .. minispec.source,
+    version = minispec.checkout,
+    data = minispec,
+  }
+end
 local mini = {
   deps = {
     add = function(minispec)
@@ -113,16 +126,16 @@ local mini = {
         --
         --  Adding plugin second and more times during single session does
         --  nothing: only the data from the first adding is registered.
-        vim.pack.add({ { src = "https://github.com/" .. dep } }, opts)
+        vim.pack.add({ minispecToPackspec(dep) }, opts)
       end
-      return vim.pack.add({ { src = "https://github.com/" .. minispec.source, data = minispec } }, opts)
+      return vim.pack.add({ minispecToPackspec(minispec) }, opts)
     end,
     later = vim.schedule,
   }
 }
 
 do -- lualine.nvim (eager due to affecting the UI)
-  mini.deps.add({ source = "nvim-lualine/lualine.nvim", })
+  mini.deps.add({ source = "nvim-lualine/lualine.nvim" })
 
   require("lualine").setup({
     options = {
