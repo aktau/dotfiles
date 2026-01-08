@@ -155,7 +155,6 @@ mini.deps.add({ source = "nfnty/vim-nftables" })
 mini.deps.add({ source = "andymass/vim-matchup" })
 mini.deps.add({ source = "nvim-treesitter/nvim-treesitter", hooks = { post_checkout = function() vim.cmd("TSUpdate") end } })
 mini.deps.add({ source = "nvim-treesitter/nvim-treesitter-context", depends = { "nvim-treesitter/nvim-treesitter" } })
-mini.deps.add({ source = "nvim-treesitter/nvim-treesitter-textobjects", depends = { "nvim-treesitter/nvim-treesitter" } })
 
 -- Key mappings
 vim.g.mapleader = ","
@@ -332,50 +331,6 @@ mini.deps.later(function()
       -- vim-matchup
       matchup = {
         enable = true,
-      },
-      -- If at some point this list grows too large, consider moving to
-      -- nvim-treesitter-textsubjects.
-      textobjects = {
-        select = {
-          enable = true,
-          lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-          keymaps = {
-            -- You can use the capture groups defined in textobjects.scm
-            ["aa"] = "@parameter.outer",
-            ["ia"] = "@parameter.inner",
-            ["af"] = "@function.outer",
-            ["if"] = "@function.inner",
-          },
-        },
-        move = {
-          enable = true,
-          set_jumps = true, -- whether to set jumps in the jumplist
-          goto_next_start = {
-            ["]m"] = "@function.outer",
-            ["]s"] = { query = "@local.scope", query_group = "locals", desc = "Next scope" },
-          },
-          goto_next_end = {
-            ["]M"] = "@function.outer",
-            ["]S"] = { query = "@local.scope", query_group = "locals", desc = "Next scope" },
-          },
-          goto_previous_start = {
-            ["[m"] = "@function.outer",
-            ["[s"] = { query = "@local.scope", query_group = "locals", desc = "Next scope" },
-          },
-          goto_previous_end = {
-            ["[M"] = "@function.outer",
-            ["[S"] = { query = "@local.scope", query_group = "locals", desc = "Next scope" },
-          },
-        },
-        swap = {
-          enable = true,
-          swap_next = {
-            ["<leader>sa"] = "@parameter.inner", -- [S]wap next [A]rgument.
-          },
-          swap_previous = {
-            ["<leader>sA"] = "@parameter.inner", -- [S]wap previous [A]rgument.
-          },
-        },
       },
     })
   end
