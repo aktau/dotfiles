@@ -166,7 +166,8 @@ mini.deps.add({ source = "nfnty/vim-nftables" })
 
 -- Eager due to installing autocommands (setup happens later).
 mini.deps.add({ source = "andymass/vim-matchup" })
-mini.deps.add({ source = "nvim-treesitter/nvim-treesitter", hooks = { post_checkout = function() vim.cmd("TSUpdate") end } })
+mini.deps.add({ source = "nvim-treesitter/nvim-treesitter", checkout = "master", hooks = { post_checkout = function() vim
+      .cmd("TSUpdate") end } })
 mini.deps.add({ source = "nvim-treesitter/nvim-treesitter-context", depends = { "nvim-treesitter/nvim-treesitter" } })
 
 -- Key mappings
